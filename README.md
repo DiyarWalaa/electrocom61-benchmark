@@ -82,6 +82,7 @@ electrocom61/
 │           └── Metadata_ElectroCom61.csv
 ├── scripts/
 ├── runs/
+├── reference/                             <- third-party material, see below
 └── notes/
 ```
 
@@ -172,6 +173,52 @@ without a run folder attached has no provenance and should not be trusted.
 
 ---
 
+## Reference material
+
+`reference/electrocom61-yolov9.ipynb` is the ElectroCom61 **first author's own
+public Kaggle notebook**, archived here **unmodified**. It is not part of this
+study's analysis and nothing in `scripts/` reads it.
+
+**Why it is archived.** It is the source of the paper's headline **95.9%**
+figure, and a Kaggle notebook can be edited or deleted by its owner at any time.
+If it disappears, the claim loses the only public artifact showing how it was
+produced. A frozen copy keeps that checkable.
+
+**What it actually contains.** Read it before quoting anything from it:
+
+- **The 95.9% is a hand-typed dict, not a measurement.** Cell 33 assigns 61
+  per-class values as a Python literal; their arithmetic mean is 0.9593. The
+  notebook stores **no cell outputs at all**, so there is nothing in it showing
+  which run produced those values, or which metric they are — the dict is
+  unlabelled as to mAP@50, mAP@50-95, precision or recall.
+- **It trains on a different dataset version than this study analyses.** Cell 29
+  downloads Roboflow `datasetsynthesis/electrocom-61` **version 5**. The archive
+  published at `doi:10.17632/6scy6h8sjz.2` is Roboflow **version 9** (see *Byte
+  provenance* above). Numbers from this notebook are not automatically
+  comparable to anything computed over `data/ElectroCom-61_v2/`.
+- **No test split is ever evaluated.** Cell 41 runs `val.py` without `--task
+  test`, and YOLOv9's `val.py` defaults to the `val` split. The `test/`
+  directory is never passed to an evaluation command anywhere in the notebook.
+- **Two different models are trained and neither is tied to a result.** Cell 31
+  trains `gelan-c`, cell 49 trains `yolov9-e` — both 25 epochs, batch 8, 640px,
+  `hyp.scratch-high.yaml`. Which of the two the per-class dict came from is not
+  stated.
+- **The author flags annotation problems in their own data.** Cell 45 notes
+  keypad/servo-motor relabelling, buzzer↔inductor confusion, and double
+  labelling.
+- **Environment is inconsistent with the saved state.** Paths are Colab
+  (`/content/…`) and cells request `--device 0`, while the Kaggle metadata
+  records `accelerator: none`, `isGpuEnabled: false`. As saved, it would not run
+  end to end.
+
+None of the above is a claim about whether 95.9% is *correct*. It is a statement
+about what the notebook does and does not evidence, which is the part that
+matters when deciding how much weight the figure can carry.
+
+> **Provenance gap:** the source URL and retrieval date of this copy are not yet
+> recorded here. Both should be, or the archive cannot be tied back to what was
+> public and when.
+
 ## Project rules
 
 `CLAUDE.md` holds the working rules for this study and is committed
@@ -197,3 +244,8 @@ the data:
   cluster memberships). Reuse them freely, but the CC BY attribution to the
   dataset authors travels with anything derived from their data — so credit
   both this repository and the ElectroCom61 DOI.
+- **`reference/`** is **third-party material, not covered by the MIT grant
+  above.** `electrocom61-yolov9.ipynb` is the ElectroCom61 first author's work,
+  archived unmodified for the reasons given in *Reference material*. Its
+  copyright rests with its author under whatever licence the original Kaggle
+  notebook carries; that licence has not been recorded here yet.

@@ -1,0 +1,40 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "declared_nc": 61,
+  "external_claims_under_test": {
+    "expected_missing_valid": 16,
+    "expected_never_evaluated": 15,
+    "expected_train_only_dates": [
+      "20240219",
+      "20240220"
+    ],
+    "expected_untimestamped_images": 189,
+    "note": "this dataset is Roboflow v9; counts are recomputed, not assumed",
+    "source": "reference/electrocom61-yolov9.ipynb (Roboflow v5)"
+  },
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "split_source": "directory on disk (NOT csv DATA_TYPE)",
+    "test_count_thresholds": [
+      1,
+      2,
+      3,
+      4,
+      5,
+      10,
+      20
+    ],
+    "units_counted": [
+      "instances (boxes)",
+      "images (distinct)"
+    ],
+    "untimestamped_bucket": "<untimestamped:counter>"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-02T19:27:37.155829Z",
+  "script": "class_date_provenance.py",
+  "script_sha256": "cfb7dc4330ce721be6ff1cb56e60654a822a8b4aaa5858514cd2b75d2a1d25d7"
+}

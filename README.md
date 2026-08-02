@@ -123,6 +123,7 @@ python scripts/disagreement_189.py       # the (csv=train, actual=valid) cell
 python scripts/burst_clusters.py         # photo bursts across the split boundary
 python scripts/scene_signature.py        # duplicate detection from label files
 python scripts/counter_duplicates.py     # redundancy inside the `counter` family
+python scripts/class_date_provenance.py  # why 15 classes are never evaluated
 python scripts/v1_provenance.py          # requires data/v1/ (see below)
 ```
 
@@ -137,6 +138,7 @@ python scripts/v1_provenance.py          # requires data/v1/ (see below)
 | `burst_clusters.py` | Clusters images into photo bursts from filename timestamps (per device, single-linkage, gap threshold τ swept over 3/5/10/30/60 s) and counts test images sharing a burst with a train image. | `runs/<date>_burst_clusters/` |
 | `scene_signature.py` | Duplicate detection needing no pixels and no model: bucket by exact class multiset, then score geometric agreement of box centres. Reaches the untimestamped images that `burst_clusters.py` structurally cannot see. | `runs/<date>_scene_signature/` |
 | `counter_duplicates.py` | How much of the `counter` family is redundant *within itself*? Counts connected components of the near-duplicate graph, because pairs are the wrong unit — three shots of one scene are three pairs but only two redundant images. | `runs/<date>_counter_duplicates/` |
+| `class_date_provenance.py` | Why are 15 of 61 classes never evaluated? Recomputes per-class instances per split from the label files, then tests whether those classes are *session-confined* (only photographed on dates that landed entirely in train) or merely *rare* — a per-class verdict, not an aggregate assertion. Also reports test-instance counts for every class. | `runs/<date>_class_date_provenance/` |
 | `v1_provenance.py` | Was the metadata CSV shipped in v2 ever regenerated for v2, or is it v1's metadata unchanged? Four tests of increasing strength against an actual v1 download. | `runs/<date>_v1_provenance/` |
 
 `v1_provenance.py` is the only script with an optional argument:

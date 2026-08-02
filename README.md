@@ -183,8 +183,17 @@ as p50 and p95 with the batch size stated.
 
 ## License
 
-No license has been chosen for the analysis code in `scripts/` yet. Until one is
-added, default copyright applies and reuse rights are not granted.
+The analysis code in `scripts/` is released under the **MIT License** — see
+[`LICENSE`](LICENSE). Copyright © 2026 Diyar Walaa.
 
-The ElectroCom61 dataset itself is © its authors and distributed under CC BY
-4.0. Cite the Mendeley DOI above if you use it.
+That grant covers the code written for this study. It does **not** extend to
+the data:
+
+- **The ElectroCom61 dataset** is © its authors, distributed under
+  [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). It is not
+  redistributed here — `data/` is git-ignored and you download it yourself from
+  the Mendeley DOIs above. Cite the DOI if you use it.
+- **`runs/`** holds measurements derived from that dataset (filenames, counts,
+  cluster memberships). Reuse them freely, but the CC BY attribution to the
+  dataset authors travels with anything derived from their data — so credit
+  both this repository and the ElectroCom61 DOI.

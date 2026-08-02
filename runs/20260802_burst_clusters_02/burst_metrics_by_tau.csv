@@ -1,0 +1,11 @@
+keying,tau_s,n_clusters,n_pure,n_crossing,largest_cluster,median_crossing_size,n_test_clustered,test_with_train,pct_test_with_train,n_valid_clustered,valid_with_train,pct_valid_with_train,test_with_valid
+csv_device,3,1816,1794,22,6,2,205,7,3.4,438,18,4.1,0
+csv_device,5,1437,1328,109,6,2,205,45,22.0,438,81,18.5,23
+csv_device,10,864,678,186,19,3,205,83,40.5,438,206,47.0,72
+csv_device,30,306,187,119,58,6,205,107,52.2,438,319,72.8,177
+csv_device,60,127,55,72,64,13,205,117,57.1,438,396,90.4,197
+family_only,3,1817,1795,22,6,2,205,7,3.4,438,18,4.1,0
+family_only,5,1438,1329,109,6,2,205,45,22.0,438,81,18.5,23
+family_only,10,866,680,186,19,3,205,83,40.5,438,206,47.0,72
+family_only,30,314,194,120,58,6,205,107,52.2,438,319,72.8,175
+family_only,60,134,62,72,64,13,205,117,57.1,438,396,90.4,197

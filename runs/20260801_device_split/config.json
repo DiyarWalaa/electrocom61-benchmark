@@ -1,0 +1,29 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "3a5dbbfc88130f72dc1ffaa9167241d6fd260a917959d6d6f9d5ca02c9e951d8",
+  "n_csv_data_rows": 2071,
+  "n_duplicate_csv_keys": 0,
+  "n_images_on_disk": 2121,
+  "n_images_without_csv_row": 50,
+  "n_joined": 2071,
+  "params": {
+    "family_patterns": [
+      "ts_underscore",
+      "ts_compact_sub",
+      "ts_compact",
+      "counter"
+    ],
+    "splits": [
+      "train",
+      "valid",
+      "test"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-01T13:56:05.191883Z",
+  "script": "device_split_table.py",
+  "script_sha256": "0076ecf2b31d481f2fb1b35e96bacba96cfda86994c722a7db2c40f7035f0d99"
+}

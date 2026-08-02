@@ -1,0 +1,27 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "n_buckets": 595,
+  "n_empty_label_file": 0,
+  "n_images_on_disk": 2121,
+  "n_missing_label_file": 0,
+  "n_with_usable_labels": 2121,
+  "params": {
+    "criterion": "max matched-box centre distance <= epsilon",
+    "epsilons": [
+      0.01,
+      0.02,
+      0.05
+    ],
+    "low_info_box_count": 2,
+    "matching": "greedy nearest-centre within class",
+    "max_bucket": 600
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-02T14:08:23.598188Z",
+  "script": "scene_signature.py",
+  "script_sha256": "03a41b6d79b7480f0f09085c25dfb07c6cc58f26dd8e937a107d7b27f72acbb2"
+}

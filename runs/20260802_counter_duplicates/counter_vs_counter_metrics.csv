@@ -1,0 +1,13 @@
+scoring,epsilon,exclude_low_info,n_pairs,n_images_with_a_twin,n_components,n_multi_components,largest_component,redundant_images,n_counter_total
+raw,0.01,False,0,0,189,0,1,0,189
+raw,0.01,True,0,0,189,0,1,0,189
+raw,0.02,False,0,0,189,0,1,0,189
+raw,0.02,True,0,0,189,0,1,0,189
+raw,0.05,False,14,23,176,10,4,13,189
+raw,0.05,True,14,23,176,10,4,13,189
+aligned,0.01,False,1,2,188,1,2,1,189
+aligned,0.01,True,1,2,188,1,2,1,189
+aligned,0.02,False,6,11,183,5,3,6,189
+aligned,0.02,True,6,11,183,5,3,6,189
+aligned,0.05,False,54,71,146,28,5,43,189
+aligned,0.05,True,54,71,146,28,5,43,189

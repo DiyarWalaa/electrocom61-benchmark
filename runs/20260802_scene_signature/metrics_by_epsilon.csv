@@ -1,0 +1,13 @@
+scoring,epsilon,exclude_low_info,n_same_scene_pairs,test_images_with_train_twin,n_test_total,pct_test,valid_images_with_train_twin
+raw,0.01,False,2,0,205,0.0,1
+raw,0.01,True,1,0,205,0.0,0
+raw,0.02,False,12,0,205,0.0,2
+raw,0.02,True,4,0,205,0.0,0
+raw,0.05,False,61,4,205,2.0,9
+raw,0.05,True,26,0,205,0.0,1
+aligned,0.01,False,129,9,205,4.4,18
+aligned,0.01,True,3,0,205,0.0,0
+aligned,0.02,False,139,9,205,4.4,18
+aligned,0.02,True,13,0,205,0.0,0
+aligned,0.05,False,213,10,205,4.9,21
+aligned,0.05,True,85,0,205,0.0,3

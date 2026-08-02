@@ -1,0 +1,29 @@
+# ---------------------------------------------------------------------------
+# Datasets -- NEVER committed.
+#
+# Both dataset versions are publicly archived (see README.md) and are large
+# binary blobs that git handles badly. They are inputs to this study, not
+# products of it, so they are reproduced by download instruction rather than
+# stored here. Excluding the whole directory also covers the metadata CSV,
+# which ships inside the dataset archives.
+# ---------------------------------------------------------------------------
+data/
+
+# ---------------------------------------------------------------------------
+# Python bytecode -- regenerated on every run, machine-specific.
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+
+# ---------------------------------------------------------------------------
+# Per-machine tool permissions. Not part of the study and not portable to
+# another checkout. CLAUDE.md (the actual project rules) IS committed.
+# ---------------------------------------------------------------------------
+.claude/settings.local.json
+
+# ---------------------------------------------------------------------------
+# OS / editor droppings.
+# ---------------------------------------------------------------------------
+Thumbs.db
+desktop.ini
+.DS_Store

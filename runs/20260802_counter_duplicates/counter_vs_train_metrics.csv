@@ -1,0 +1,13 @@
+scoring,epsilon,exclude_low_info,n_pairs,n_counter_images_with_any_train_twin,n_counter_total
+raw,0.01,False,0,0,189
+raw,0.01,True,0,0,189
+raw,0.02,False,0,0,189
+raw,0.02,True,0,0,189
+raw,0.05,False,14,23,189
+raw,0.05,True,14,23,189
+aligned,0.01,False,1,2,189
+aligned,0.01,True,1,2,189
+aligned,0.02,False,6,11,189
+aligned,0.02,True,6,11,189
+aligned,0.05,False,54,71,189
+aligned,0.05,True,54,71,189

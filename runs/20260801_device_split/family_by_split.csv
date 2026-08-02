@@ -1,0 +1,6 @@
+filename_family,train,valid,test,total
+counter,189,0,0,189
+ts_compact,485,149,109,743
+ts_compact_sub,9,0,0,9
+ts_underscore,795,289,96,1180
+TOTAL,1478,438,205,2121

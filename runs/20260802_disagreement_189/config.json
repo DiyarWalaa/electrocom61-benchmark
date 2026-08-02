@@ -1,0 +1,24 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "n_cell": 189,
+  "n_counter_family": 189,
+  "n_csv_data_rows": 2071,
+  "n_images_on_disk": 2121,
+  "n_joined": 2071,
+  "n_overlap": 0,
+  "params": {
+    "cell_actual_split": "valid",
+    "cell_csv_DATA_TYPE": "train",
+    "comparison_set": "filename_family == 'counter'"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-02T08:40:22.370387Z",
+  "script": "disagreement_189.py",
+  "script_sha256": "b2e28f5750367b14fac44b9e61f0d465bafc3782e9921145d98a008ec738ae3f",
+  "sets_are_disjoint": true,
+  "sets_are_identical": false
+}

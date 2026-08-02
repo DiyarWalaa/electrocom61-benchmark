@@ -1,0 +1,7 @@
+device_name_csv,train,valid,test,total
+<no CSV row>,35,10,5,50
+ONEPLUS_NORD,218,91,82,391
+REDMI,795,289,96,1180
+X,241,48,22,311
+iPhone,189,0,0,189
+TOTAL,1478,438,205,2121

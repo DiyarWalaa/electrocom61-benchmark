@@ -1,0 +1,3 @@
+filename_family,capture_date,n_in_session_on_disk,n_missing_from_csv,first_missing_time,last_missing_time,n_contiguous_runs
+ts_compact,20241118,49,49,101346,161943,1
+ts_compact_sub,20241118,1,1,160515,160515,1

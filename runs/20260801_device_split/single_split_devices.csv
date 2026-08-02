@@ -1,0 +1,4 @@
+kind,key,only_split,n_images
+device,iPhone,train,189
+family,counter,train,189
+family,ts_compact_sub,train,9

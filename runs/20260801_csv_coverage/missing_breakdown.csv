@@ -1,0 +1,4 @@
+filename_family,train,valid,test,total
+ts_compact,34,10,5,49
+ts_compact_sub,1,0,0,1
+TOTAL,35,10,5,50

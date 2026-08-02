@@ -1,0 +1,36 @@
+{
+  "counter_by_split": {
+    "train": 189
+  },
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "largest_counter_bucket": 74,
+  "loose_prefilter_counter_vs_anything": 71,
+  "loose_prefilter_counter_vs_counter": 71,
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "n_counter_family": 189,
+  "n_counter_vs_counter_pairs_scored": 4273,
+  "n_counter_vs_train_buckets_skipped": 0,
+  "n_counter_vs_train_pairs_scored": 4273,
+  "n_images_on_disk": 2121,
+  "n_train_usable": 1478,
+  "n_usable_labels": 2121,
+  "params": {
+    "epsilons": [
+      0.01,
+      0.02,
+      0.05
+    ],
+    "low_info_box_count": 2,
+    "max_bucket_applied_to_counter_vs_counter": false,
+    "max_bucket_applied_to_counter_vs_train": 600,
+    "redundancy_unit": "connected components (single linkage)",
+    "scoring_source": "scene_signature.compare (imported, not reimplemented)"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-02T14:23:18.153574Z",
+  "script": "counter_duplicates.py",
+  "script_sha256": "52b25d424ba4f207626afea9efaf3f77bde5203e392282c4b6a100fa51f9eed4"
+}

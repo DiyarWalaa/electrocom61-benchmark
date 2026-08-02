@@ -1,0 +1,47 @@
+{
+  "T1_count_pass": true,
+  "T2_n_csv_rows_without_v1_image": 0,
+  "T2_n_v1_images_without_csv_row": 0,
+  "T2_set_identity_pass": true,
+  "T3_date_pass": true,
+  "T3_n_v1_images_on_predicted_absent_date": 0,
+  "T3b_v2_minus_v1_equals_the_unjoined_set": true,
+  "T4_n_disagreements": 0,
+  "T4_n_rows_checked": 2071,
+  "T4_status": "PASS",
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "n_csv_data_rows": 2071,
+  "n_csv_duplicate_keys": 0,
+  "n_v1_duplicate_stems": 0,
+  "n_v1_image_files": 2071,
+  "n_v1_unique_stems": 2071,
+  "n_v2_image_files": 2121,
+  "params": {
+    "predicted_absent_date": "20241118",
+    "split_aliases": [
+      "test",
+      "train",
+      "valid"
+    ],
+    "v1_dir": "C:\\research\\electrocom61\\data\\v1"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-02T14:40:08.992820Z",
+  "script": "v1_provenance.py",
+  "script_sha256": "792b28bfef589f67deb877aed7beb6c55051fa2a91568b00f4bc658e072bfa04",
+  "v1_split_folders_found": [
+    "test",
+    "train",
+    "valid"
+  ],
+  "v1_stem_parse_routes": {
+    "roboflow": 2071
+  },
+  "v2_stem_parse_routes": {
+    "roboflow": 2121
+  }
+}

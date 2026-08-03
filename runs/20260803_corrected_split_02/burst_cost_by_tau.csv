@@ -1,0 +1,11 @@
+state,tau_seconds,n_clusters,n_crossing_clusters,test_images_with_train_twin,valid_images_with_train_twin,largest_cluster
+before,3,1817,22,7,18,6
+before,5,1438,109,45,81,6
+before,10,866,186,83,206,19
+before,30,314,120,107,319,58
+before,60,134,72,117,396,64
+after,3,1817,27,11,19,6
+after,5,1438,114,52,84,6
+after,10,866,209,104,215,19
+after,30,314,137,161,338,58
+after,60,134,85,180,407,64

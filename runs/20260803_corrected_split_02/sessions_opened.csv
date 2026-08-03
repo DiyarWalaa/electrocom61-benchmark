@@ -1,0 +1,4 @@
+capture_date,images_in_train_before,to_valid,to_test,total_released,share_of_group_released,remaining_in_train
+20240220,486,10,10,20,4.1%,466
+<untimestamped:counter>,189,5,3,8,4.2%,181
+20240219,100,2,2,4,4.0%,96

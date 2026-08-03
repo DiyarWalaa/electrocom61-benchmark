@@ -562,6 +562,44 @@ def main():
         [[k[0], k[1], k[2], v] for k, v in sorted(grp.items())],
     )
 
+    # Sessions opened: per source date group, how many images train handed to
+    # valid and to test, counted separately.
+    #
+    # Because valid <-> test moves are disallowed (ALLOW_VALID_TEST_MOVES is
+    # False), train is the ONLY path into either split. These two columns
+    # therefore account for the entire inflow -- there is no third route a
+    # reader needs to go looking for. The share column is what says how far
+    # each session was opened: a group that gave up 4% of its images is a
+    # different claim from one that gave up half.
+    group_train_size = {}
+    for rec in records:
+        if original[rec.filename] == "train":
+            b = date_bucket(rec)
+            group_train_size[b] = group_train_size.get(b, 0) + 1
+
+    received = {}
+    for row in move_rows:
+        _f, sb, sa, bucket = row[0], row[1], row[2], row[3]
+        if sb == "train" and sa in ("valid", "test"):
+            d = received.setdefault(bucket, {"valid": 0, "test": 0})
+            d[sa] += 1
+
+    sessions_rows = []
+    for bucket in sorted(received, key=lambda b: (-sum(received[b].values()), b)):
+        v, t = received[bucket]["valid"], received[bucket]["test"]
+        held = group_train_size.get(bucket, 0)
+        sessions_rows.append([
+            bucket, held, v, t, v + t,
+            "%.1f%%" % (100.0 * (v + t) / held) if held else "n/a",
+            held - (v + t),
+        ])
+    ec61.write_csv(
+        os.path.join(run_dir, "sessions_opened.csv"),
+        ["capture_date", "images_in_train_before", "to_valid", "to_test",
+         "total_released", "share_of_group_released", "remaining_in_train"],
+        sessions_rows,
+    )
+
     ec61.write_csv(
         os.path.join(run_dir, "burst_cost_by_tau.csv"),
         ["state", "tau_seconds", "n_clusters", "n_crossing_clusters",
@@ -645,6 +683,24 @@ def main():
     lines.append(_fmt_markdown_table(
         ["capture_date", "from", "to", "n_images"],
         [[k[0], k[1], k[2], v] for k, v in sorted(grp.items())]))
+    lines.append("")
+
+    lines.append("## Which sessions were opened, and by how much")
+    lines.append("")
+    lines.append("Valid <-> test moves are disallowed, so train is the only path "
+                 "into either split: these columns account for the entire inflow.")
+    lines.append("")
+    lines.append(_fmt_markdown_table(
+        ["capture group", "in train before", "-> valid", "-> test",
+         "released", "share of group", "left in train"],
+        sessions_rows))
+    lines.append("")
+    lines.append("Totals: valid received **%d** images from train, test received "
+                 "**%d** -- %d in all, matched by %d returned to train."
+                 % (sum(r[2] for r in sessions_rows),
+                    sum(r[3] for r in sessions_rows),
+                    sum(r[4] for r in sessions_rows),
+                    len([r for r in move_rows if r[2] == "train"])))
     lines.append("")
 
     lines.append("## Cost: broken bursts")

@@ -1,0 +1,40 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "moves_files": false,
+  "output_is": "manifest only (image_name, split)",
+  "params": {
+    "allow_valid_test_moves": false,
+    "frozen_split_sizes": {
+      "test": 205,
+      "train": 1478,
+      "valid": 438
+    },
+    "max_iterations": 40,
+    "min_per_split": 5,
+    "scene_epsilons": [
+      0.01,
+      0.02,
+      0.05
+    ],
+    "scene_low_info_box_count": 2,
+    "seed": 20260803,
+    "seed_role": "tie-breaking among equally valuable candidates only",
+    "target_per_split": 5,
+    "taus": [
+      3,
+      5,
+      10,
+      30,
+      60
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-03T15:24:56.749723Z",
+  "script": "corrected_split.py",
+  "script_sha256": "30a3836230607899801f25e9c796b0f36229ea1ec273f85710018b9a790cc20d",
+  "stage2_reconciled_against": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\class_split_counts.csv"
+}

@@ -1,0 +1,11 @@
+capture_date,split_before,split_after,n_images
+20240219,train,test,2
+20240219,train,valid,2
+20240220,train,test,10
+20240220,train,valid,10
+20240228,valid,train,16
+20240303,test,train,14
+20240306,test,train,1
+20240306,valid,train,1
+<untimestamped:counter>,train,test,3
+<untimestamped:counter>,train,valid,5

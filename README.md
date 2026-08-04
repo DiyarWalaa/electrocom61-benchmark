@@ -100,9 +100,20 @@ Only `v1_provenance.py` needs `data/v1/`. Every other script runs with v2 alone.
 
 ## Requirements
 
-Python 3 and nothing else. **Standard library only** — no pandas, no numpy, no
-PyTorch at this stage. This is deliberate: a reviewer needs only an interpreter
-to reproduce any number in `runs/`.
+**Every analysis script is standard library only** — no pandas, no numpy, no
+PyTorch. This is deliberate: reproducing any number in `runs/` requires nothing
+but a Python 3 interpreter.
+
+The one exception is figure rendering. `scripts/figure_near_duplicate.py`
+imports `matplotlib` and `pillow` (which pulls `numpy`):
+
+```bash
+pip install matplotlib pillow    # needed ONLY for figure scripts
+```
+
+Nothing that produces a number depends on those packages. If they are missing,
+every analysis script still runs and every result in `runs/` is still
+reproducible; only the figures under `figures/` cannot be rebuilt.
 
 Developed and run on Python 3.12.10 (Windows 11); every `config.json` records
 the interpreter and platform that produced that run. Older Python 3 versions
@@ -125,6 +136,9 @@ python scripts/scene_signature.py        # duplicate detection from label files
 python scripts/counter_duplicates.py     # redundancy inside the `counter` family
 python scripts/class_date_provenance.py  # why 15 classes are never evaluated
 python scripts/corrected_split.py        # build a split where all 61 are evaluable
+python scripts/duplicate_contamination_addendum.py   # published vs corrected, 3-way
+python scripts/build_corrected_dataset.py            # materialise the split as folders
+python scripts/figure_near_duplicate.py              # figure (needs matplotlib)
 python scripts/v1_provenance.py          # requires data/v1/ (see below)
 ```
 
@@ -141,6 +155,9 @@ python scripts/v1_provenance.py          # requires data/v1/ (see below)
 | `counter_duplicates.py` | How much of the `counter` family is redundant *within itself*? Counts connected components of the near-duplicate graph, because pairs are the wrong unit — three shots of one scene are three pairs but only two redundant images. | `runs/<date>_counter_duplicates/` |
 | `class_date_provenance.py` | Why are 15 of 61 classes never evaluated? Recomputes per-class instances per split from the label files, then tests whether those classes are *session-confined* (only photographed on dates that landed entirely in train) or merely *rare* — a per-class verdict, not an aggregate assertion. Also reports test-instance counts for every class. | `runs/<date>_class_date_provenance/` |
 | `corrected_split.py` | Builds a corrected split where all 61 classes hold ≥5 instances in both valid and test, with image counts frozen at 1478/438/205 so training-set size cannot explain any later accuracy difference. Emits a manifest only — **no image file is moved or copied**. Prices the cost in broken bursts, smallest cross-split time gap, and (for the untimestamped images, where time gaps do not exist) label-geometry duplicates. | `runs/<date>_corrected_split/` |
+| `duplicate_contamination_addendum.py` | Near-duplicate contamination, published vs corrected split, broken out three ways (test↔train, valid↔train, valid↔test). Scores every candidate pair **once** and classifies it under both assignments, so the two states share buckets, pairs and scorer by construction. Reconciles with `20260802_scene_signature`. | `runs/<date>_duplicate_contamination/` |
+| `build_corrected_dataset.py` | Materialises a split manifest into real folders under `data/ElectroCom-61_corrected/` by **copying** from v2 (source never modified). Refuses to overwrite an existing tree, preflights before writing, and verifies by re-reading the built tree from disk — including SHA-256 of every copy against its source. | `runs/<date>_build_corrected_dataset/` |
+| `figure_near_duplicate.py` | Renders `figures/near_duplicate_pair.png`: the tightest cross-split near-duplicate pair, two panels, boxes labelled, per-box centre shift in pixels. **Requires matplotlib + pillow.** | `runs/<date>_figure_near_duplicate/` |
 | `v1_provenance.py` | Was the metadata CSV shipped in v2 ever regenerated for v2, or is it v1's metadata unchanged? Four tests of increasing strength against an actual v1 download. | `runs/<date>_v1_provenance/` |
 
 `v1_provenance.py` is the only script with an optional argument:

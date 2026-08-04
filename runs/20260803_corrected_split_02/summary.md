@@ -1,9 +1,27 @@
-> **CANONICAL RUN.** Cite this directory for the corrected split and its
-> manifest. Supersedes `runs/20260803_corrected_split/`.
+> **SUPERSEDED — no longer the released split.**
 >
-> **Its near-duplicate contamination figures are superseded by
-> `runs/20260804_duplicate_contamination/`** (note appended 2026-08-04; nothing
-> below has been altered).
+> Released split: **`runs/20260804_burst_aware_split_04/`** (burst-aware,
+> τ=15 s, seed 20260804). Promoted 2026-08-04. Nothing below this banner has
+> been altered; every number here is exactly as the run produced it.
+>
+> **Why it was replaced.** This split moved individual images and was blind to
+> duplicates. It therefore moved `IMG_20240220_115315` into test while its
+> near-twin `IMG_20240220_115316` — shot one second later, same five
+> components — stayed in train. That created **2 test↔train near-duplicate
+> pairs under raw scoring and 4 under aligned** at ε=0.05, where the published
+> split had none.
+>
+> The released split moves whole bursts, so a burst cannot straddle the
+> boundary. It achieves **zero test↔train pairs at every epsilon under both
+> scorings**, still holds 1478/438/205 exactly, and still gives all 61 classes
+> ≥5 instances in both valid and test — for 68 images moved instead of 64.
+>
+> `runs/20260804_burst_aware_tau_sweep/` shows why τ=15: every τ from 15 s up
+> satisfies class feasibility, but only 15/20/25 s leave the test split enough
+> removable images to hold the frozen sizes.
+>
+> **Its near-duplicate contamination figures were already superseded by
+> `runs/20260804_duplicate_contamination/`** (note appended 2026-08-04).
 >
 > Two reasons the section *"Cost: the untimestamped blind spot"* below should
 > not be quoted:

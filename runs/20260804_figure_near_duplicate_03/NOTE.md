@@ -6,7 +6,7 @@ Note added 2026-08-04. The files beside it are exactly as the run produced them,
 and `per_box_centre_shift.csv` is identical across all four figure runs — the
 per-box shifts are a property of the two photographs, not of any split.
 
-Rendered a figure with three defects: identical shift signs under both panels (the right must negate them), a caption running off both edges, and colliding Fuse/Diode labels.
+Recaptioned for the released split, but the subtitle crowded the title. Only figure spacing changed; every number is identical to the canonical run.
 
 `figures/near_duplicate_pair.png` is overwritten by each render, so only the
 canonical run's output exists on disk.

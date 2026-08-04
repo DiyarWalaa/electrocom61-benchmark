@@ -1,3 +1,22 @@
+> **RELEASED SPLIT — cite this directory.** Promoted 2026-08-04, superseding
+> `runs/20260803_corrected_split_02/`. The heading below still reads
+> "(CANDIDATE)" because that is the word the script wrote at generation time;
+> the run's numbers are untouched.
+>
+> `split_manifest.csv` here is the released assignment.
+> `data/ElectroCom-61_corrected/` was built from it and verified in
+> `runs/20260804_build_corrected_dataset_02/`.
+>
+> τ=15 s, scene ε=0.05, seed 20260804. 68 images moved. Sizes 1478/438/205
+> held exactly. All 61 classes ≥5 instances in both valid and test. Zero
+> test↔train near-duplicate pairs at every epsilon under both scorings.
+>
+> **valid↔train contamination is 1 pair (raw) / 3 pairs (aligned) at ε=0.05 in
+> BOTH this split and the published one.** Those pairs are pre-existing in the
+> published data; neither allocator created them and neither removed them. Do
+> not read "zero contamination" as applying to all three cross-split
+> relationships — it applies to test↔train.
+
 # Burst-aware split (CANDIDATE)
 
 Run directory: `20260804_burst_aware_split_04`  |  tau=15s  |  scene eps=0.05  |  seed=20260804

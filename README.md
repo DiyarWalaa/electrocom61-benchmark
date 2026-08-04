@@ -8,12 +8,64 @@ repository is to produce a benchmark where every reported number is traceable
 to a split, a seed, a set of weights and a machine — and where the dataset
 itself has been audited before any model is trained on it.
 
-**Current stage: dataset audit (Stage 1).** No detector has been trained yet.
-Everything in `runs/` so far concerns the *integrity of the data*: whether the
-train/valid/test split is clean, whether the shipped metadata describes the
-shipped images, and whether near-duplicate photo bursts straddle the split
-boundary. Those questions have to be answered first, because a leaked split
-inflates test scores no matter which model is trained on it.
+**Current stage: dataset audit complete; a corrected split released.** No
+detector has been trained yet. Everything in `runs/` so far concerns the
+*integrity of the data*: whether the train/valid/test split is clean, whether
+the shipped metadata describes the shipped images, and whether near-duplicate
+photo bursts straddle the split boundary. Those questions have to be answered
+first, because a leaked split inflates test scores no matter which model is
+trained on it.
+
+---
+
+## The released split
+
+The split published by this repository is **burst-aware, τ = 15 s, seed
+20260804**.
+
+| Property | Value |
+|---|---|
+| Manifest | `runs/20260804_burst_aware_split_04/split_manifest.csv` |
+| Built dataset | `data/ElectroCom-61_corrected/` (rebuild with `build_corrected_dataset.py`) |
+| Build verification | `runs/20260804_build_corrected_dataset_02/` — 8/8 checks pass |
+| Images moved vs published | **68** |
+| Split sizes | **1478 / 438 / 205** — unchanged from the published split |
+| Class coverage | all **61** classes hold ≥5 instances in **both** valid and test |
+| test↔train near-duplicate pairs | **0** at every epsilon, under both scorings |
+| Total annotations | 12937 — every image and label copied unmodified from v2 |
+
+**Why it exists.** In the published v2 split, 15 of the 61 classes have zero
+instances in *both* valid and test, so they cannot be evaluated at all — they
+were photographed only in sessions that landed entirely in train
+(`runs/20260802_class_date_provenance/`). Fixing that requires moving images
+out of those sessions.
+
+**Why bursts, not images.** An earlier allocator minimised images moved and was
+blind to duplicates. It split `IMG_20240220_115315` from `IMG_20240220_115316`
+— shot one second apart, same five components — putting one in test and one in
+train, and creating 2 raw / 4 aligned test↔train near-duplicate pairs where the
+published split had none. The released allocator moves whole bursts, so a burst
+cannot straddle the boundary. See `figures/near_duplicate_pair.png`.
+
+**Why τ = 15 s.** `runs/20260804_burst_aware_tau_sweep/` swept 15/20/25/30/35/45/60.
+Class feasibility holds at every value, so it does not decide. What decides is
+how many images the test split can give back: 59 available at τ=15 against 10
+at τ=30. Only 15/20/25 hold the frozen sizes, and τ=15 moves the fewest images.
+
+### One thing not to overstate
+
+**Zero contamination refers to test↔train.** The `valid↔train` count is
+**1 pair (raw) / 3 pairs (aligned)** at ε=0.05 — and it is *identical in the
+published split and in the released one*. Those pairs are pre-existing in the
+data as distributed; neither allocator created them and neither removed them.
+`valid↔test` is zero in both. Quote the three relationships separately:
+test contamination biases the headline metric, valid contamination biases model
+selection, and they are not interchangeable. Full breakdown in
+`runs/20260804_duplicate_contamination/`.
+
+The split makes all 61 classes *measurable*, not *well measured*. Five
+instances is a floor for existence, not a sample size to quote a confident
+per-class AP from.
 
 ---
 
@@ -157,12 +209,12 @@ python scripts/v1_provenance.py          # requires data/v1/ (see below)
 | `scene_signature.py` | Duplicate detection needing no pixels and no model: bucket by exact class multiset, then score geometric agreement of box centres. Reaches the untimestamped images that `burst_clusters.py` structurally cannot see. | `runs/<date>_scene_signature/` |
 | `counter_duplicates.py` | How much of the `counter` family is redundant *within itself*? Counts connected components of the near-duplicate graph, because pairs are the wrong unit — three shots of one scene are three pairs but only two redundant images. | `runs/<date>_counter_duplicates/` |
 | `class_date_provenance.py` | Why are 15 of 61 classes never evaluated? Recomputes per-class instances per split from the label files, then tests whether those classes are *session-confined* (only photographed on dates that landed entirely in train) or merely *rare* — a per-class verdict, not an aggregate assertion. Also reports test-instance counts for every class. | `runs/<date>_class_date_provenance/` |
-| `corrected_split.py` | Builds a corrected split where all 61 classes hold ≥5 instances in both valid and test, with image counts frozen at 1478/438/205 so training-set size cannot explain any later accuracy difference. Emits a manifest only — **no image file is moved or copied**. Prices the cost in broken bursts, smallest cross-split time gap, and (for the untimestamped images, where time gaps do not exist) label-geometry duplicates. | `runs/<date>_corrected_split/` |
+| `corrected_split.py` | **Superseded** by `burst_aware_split.py`. Builds a split where all 61 classes hold ≥5 instances in both valid and test, with image counts frozen at 1478/438/205 so training-set size cannot explain any later accuracy difference. Emits a manifest only — **no image file is moved or copied**. Prices the cost in broken bursts, smallest cross-split time gap, and (for the untimestamped images, where time gaps do not exist) label-geometry duplicates. | `runs/<date>_corrected_split/` |
 | `duplicate_contamination_addendum.py` | Near-duplicate contamination, published vs corrected split, broken out three ways (test↔train, valid↔train, valid↔test). Scores every candidate pair **once** and classifies it under both assignments, so the two states share buckets, pairs and scorer by construction. Reconciles with `20260802_scene_signature`. | `runs/<date>_duplicate_contamination/` |
-| `build_corrected_dataset.py` | Materialises a split manifest into real folders under `data/ElectroCom-61_corrected/` by **copying** from v2 (source never modified). Refuses to overwrite an existing tree, preflights before writing, and verifies by re-reading the built tree from disk — including SHA-256 of every copy against its source. | `runs/<date>_build_corrected_dataset/` |
-| `figure_near_duplicate.py` | Renders `figures/near_duplicate_pair.png`: the tightest cross-split near-duplicate pair, two panels, boxes labelled, per-box centre shift in pixels. **Requires matplotlib + pillow.** | `runs/<date>_figure_near_duplicate/` |
+| `build_corrected_dataset.py` | Materialises the released manifest into real folders under `data/ElectroCom-61_corrected/` by **copying** from v2 (source never modified). Refuses to overwrite an existing tree, preflights before writing, and verifies by re-reading the built tree from disk — including SHA-256 of every copy against its source. | `runs/<date>_build_corrected_dataset/` |
+| `figure_near_duplicate.py` | Renders `figures/near_duplicate_pair.png`: the near-duplicate pair the released split keeps together, two panels, boxes labelled, per-box centre shift in pixels. Splits are read from the built tree, so the figure tracks whatever split is released. **Requires matplotlib + pillow.** | `runs/<date>_figure_near_duplicate/` |
 | `burst_feasibility.py` | Answers whether the never-evaluated classes can be rescued by moving whole bursts: how many distinct groups inside the train-only sessions carry each class, and how many carry ≥5 instances. Two regimes, because the untimestamped images have no bursts — scene components stand in. τ and ε swept. | `runs/<date>_burst_feasibility/` |
-| `burst_aware_split.py` | **Candidate**, not canonical. A split whose atomic unit of movement is a whole burst (or scene component), so no group can straddle the boundary. Reports images moved, three-way near-duplicate contamination, classes unrescued, and whether 1478/438/205 survives. | `runs/<date>_burst_aware_split/` |
+| `burst_aware_split.py` | **Produces the released split** (τ=15 s, seed 20260804). A split whose atomic unit of movement is a whole burst (or scene component), so no group can straddle the boundary. Reports images moved, three-way near-duplicate contamination, classes unrescued, and whether 1478/438/205 survives. | `runs/<date>_burst_aware_split/` |
 | `burst_aware_tau_sweep.py` | Runs the burst-aware allocator at τ = 15/20/25/30/35/45/60 and reports, per τ: whether all 15 rescued classes keep ≥2 qualifying groups, how many test↔train near-duplicate pairs survive, and whether 1478/438/205 holds. Imports the allocator rather than copying it. | `runs/<date>_burst_aware_tau_sweep/` |
 | `v1_provenance.py` | Was the metadata CSV shipped in v2 ever regenerated for v2, or is it v1's metadata unchanged? Four tests of increasing strength against an actual v1 download. | `runs/<date>_v1_provenance/` |
 

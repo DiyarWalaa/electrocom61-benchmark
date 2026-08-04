@@ -6,14 +6,24 @@ with their YOLO boxes drawn and named, and captions each panel with filename,
 capture time, split, and the per-box centre shift in pixels.
 
 WHY THIS PAIR
-    runs/20260804_duplicate_contamination identified it as the tightest
-    near-duplicate the corrected split creates: aligned max centre distance
-    0.00712 in normalised coordinates. It is also the pair with the smallest
-    cross-split time gap in runs/20260803_corrected_split_02 -- one second.
-    Those were two separate observations of the same two photographs.
 
-    Both images sat in TRAIN under the published split. The corrected split
-    moved one of them to TEST. That is the cost of class coverage made visible.
+    Three splits, three fates for the same two photographs:
+
+      published                both in TRAIN
+      image-level allocator    left panel moved to TEST -- a test<->train
+                               near-duplicate at aligned distance 0.00712,
+                               the tightest the split created, and the pair
+                               with the smallest cross-split time gap at one
+                               second (two observations, one pair of photos)
+      burst-aware tau=15       both in TRAIN again -- the burst moves whole
+
+    So this figure no longer shows a defect in the released split. It shows the
+    defect the released split AVOIDS, which is why it is worth printing: the
+    reader can see what "moving whole bursts instead of images" actually buys,
+    on a concrete pair rather than in a contamination table.
+
+    The split shown under each panel is read from the built tree, not asserted
+    here, so if the released split ever changes this figure changes with it.
 
 RESOLUTION, HONESTLY
     The source images are 640x640 because Roboflow stretch-resized every image
@@ -257,13 +267,18 @@ def main():
     fig = plt.figure(figsize=(11.0, 7.4), dpi=DPI, facecolor=SURFACE)
     gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.30],
                           hspace=0.04, wspace=0.05,
-                          left=0.035, right=0.965, top=0.885, bottom=0.085)
+                          left=0.035, right=0.965, top=0.862, bottom=0.085)
 
-    fig.suptitle("Near-duplicate pair separated by the corrected split",
-                 fontsize=13, color=INK, y=0.965, fontweight="bold")
-    fig.text(0.5, 0.918,
-             "Both images sit in train under the published split; the corrected "
-             "split moves the left one to test.",
+    fig.suptitle("The near-duplicate pair the released split keeps together",
+                 fontsize=13, color=INK, y=0.977, fontweight="bold")
+    fig.text(0.5, 0.928,
+             "Shot one second apart, five identical components. Under the "
+             "published split both sit in train.",
+             ha="center", fontsize=8.5, color=INK_SECONDARY)
+    fig.text(0.5, 0.899,
+             "An image-level allocator moved the left panel to test, creating a "
+             "test↔train near-duplicate. The released burst-aware split (τ=15 s) "
+             "moves whole bursts, so both stay in train.",
              ha="center", fontsize=8.5, color=INK_SECONDARY)
 
     def shift_lines(sign):
@@ -304,8 +319,9 @@ def main():
              "Diode, Fuse, Fuse-Base, Heat-Sink and RFID-Scanner.",
              ha="center", fontsize=7.4, color=INK_SECONDARY)
     fig.text(0.5, 0.022,
-             "Largest per-box centre shift: %.1f px of %d (%.1f%%). "
-             "Boxes are the dataset's own YOLO annotations, unmodified."
+             "Largest per-box centre shift: %.1f px of %d (%.1f%%). Boxes are "
+             "the dataset's own YOLO annotations, unmodified. The released "
+             "split carries zero test↔train near-duplicate pairs at every epsilon."
              % (max_shift, size, 100.0 * max_shift / size),
              ha="center", fontsize=7.4, color=INK_SECONDARY)
 

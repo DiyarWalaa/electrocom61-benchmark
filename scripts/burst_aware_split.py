@@ -17,11 +17,22 @@ Here the atomic unit of movement is not an image but a GROUP:
 Whole groups move together, so a group can never straddle the boundary. The
 one-second pair either both go to test or both stay in train.
 
-THIS IS A CANDIDATE, NOT A REPLACEMENT
+THIS IS THE RELEASED SPLIT
 
-runs/20260803_corrected_split_02 remains canonical. This run exists to be
-compared against it on four numbers: images moved, cross-split near-duplicate
-pairs, classes left unrescued, and whether 1478/438/205 survives.
+Promoted 2026-08-04, superseding runs/20260803_corrected_split_02 (which moved
+individual images and created 2 raw / 4 aligned test<->train near-duplicate
+pairs). Released run: runs/20260804_burst_aware_split_04.
+
+It is compared against that predecessor on four numbers: images moved,
+cross-split near-duplicate pairs, classes left unrescued, and whether
+1478/438/205 survives. It wins or ties on all four.
+
+WHAT "ZERO CONTAMINATION" DOES AND DOES NOT COVER
+
+Zero refers to test<->train near-duplicate pairs. valid<->train sits at 1 pair
+(raw) / 3 (aligned) at eps=0.05 in this split AND in the published one --
+pre-existing, created by neither allocator and removed by neither. The summary
+reports all three relationships separately so the claim is never overstated.
 
 WHY TAU=15
 
@@ -434,14 +445,14 @@ def main():
     # ---- summary ----------------------------------------------------------
     n_moved = len(move_rows)
     lines = []
-    lines.append("# Burst-aware split (CANDIDATE)")
+    lines.append("# Burst-aware split (RELEASED)")
     lines.append("")
     lines.append("Run directory: `%s`  |  tau=%ds  |  scene eps=%.2f  |  seed=%d"
                  % (os.path.basename(run_dir), TAU, SCENE_EPS, SEED))
     lines.append("")
-    lines.append("Candidate alternative to `%s`, which remains canonical. "
-                 "Whole bursts move together, so no group can straddle the "
-                 "split boundary." % BASELINE)
+    lines.append("Released split, superseding `%s`. Whole bursts move "
+                 "together, so no group can straddle the split boundary."
+                 % BASELINE)
     lines.append("")
     lines.append("## Headline comparison")
     lines.append("")

@@ -54,7 +54,7 @@ import ec61  # noqa: E402
 # globbed for "the latest run": a build that silently picked up a different
 # manifest than the one cited in the paper would be undetectable.
 MANIFEST = os.path.join(
-    ec61.RUNS_DIR, "20260803_corrected_split_02", "split_manifest.csv")
+    ec61.RUNS_DIR, "20260804_burst_aware_split_04", "split_manifest.csv")
 
 DEST_DIR = os.path.join(ec61.DATA_DIR, "ElectroCom-61_corrected")
 

@@ -1,0 +1,7 @@
+scoring,epsilon,stage1_n_pairs,here_n_pairs,stage1_test_w_train,here_test_w_train,stage1_valid_w_train,here_valid_w_train,agree
+aligned,0.01,3,3,0,0,0,0,yes
+aligned,0.02,13,13,0,0,0,0,yes
+aligned,0.05,85,85,0,0,3,3,yes
+raw,0.01,1,1,0,0,0,0,yes
+raw,0.02,4,4,0,0,0,0,yes
+raw,0.05,26,26,0,0,1,1,yes

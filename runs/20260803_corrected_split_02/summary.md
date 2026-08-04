@@ -1,3 +1,28 @@
+> **CANONICAL RUN.** Cite this directory for the corrected split and its
+> manifest. Supersedes `runs/20260803_corrected_split/`.
+>
+> **Its near-duplicate contamination figures are superseded by
+> `runs/20260804_duplicate_contamination/`** (note appended 2026-08-04; nothing
+> below has been altered).
+>
+> Two reasons the section *"Cost: the untimestamped blind spot"* below should
+> not be quoted:
+>
+> 1. **It conflates two distinct measurements.** *Temporal adjacency* (images
+>    captured close in time, from burst clustering) and *near-duplicate
+>    contamination* (images showing the same scene, from annotation geometry)
+>    are different properties. The burst tables below measure the first and are
+>    still valid; only the label-geometry figure is superseded.
+> 2. **Its scope was too narrow.** That pass examined only pairs involving an
+>    untimestamped image, so it could not see near-duplicates between two
+>    timestamped images. It reported 2 cross-split pairs at eps=0.05 and 0 at
+>    eps=0.02. The full pass finds test<->train contamination at *every*
+>    epsilon, including 1 pair at the strictest (aligned, eps=0.01).
+>
+> The addendum run reports test<->train, valid<->train and valid<->test
+> separately for both the published and the corrected split, and reproduces
+> `runs/20260802_scene_signature` exactly on the published split.
+
 # Corrected split for ElectroCom61 v2
 
 Run directory: `20260803_corrected_split_02`  |  seed: `20260803`

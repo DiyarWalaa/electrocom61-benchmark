@@ -9,6 +9,14 @@
 # ---------------------------------------------------------------------------
 data/
 
+# The corrected-split tree built by scripts/build_corrected_dataset.py. Already
+# covered by `data/` above; named explicitly because it is GENERATED rather than
+# downloaded, and a reader checking "is my rebuilt dataset excluded?" should be
+# able to find the answer by searching for it. Rebuild it with that script from
+# runs/20260803_corrected_split_02/split_manifest.csv rather than committing
+# 146 MB of images that are byte-identical to v2's.
+data/ElectroCom-61_corrected/
+
 # ---------------------------------------------------------------------------
 # Python bytecode -- regenerated on every run, machine-specific.
 # ---------------------------------------------------------------------------

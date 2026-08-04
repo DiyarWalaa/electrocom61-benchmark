@@ -1,3 +1,20 @@
+> **SUPERSEDED — do not cite this run.**
+>
+> Canonical run: `runs/20260803_corrected_split_02/`.
+>
+> This note was appended on 2026-08-04, after the run. Nothing below it has
+> been altered: every number, table and file in this directory is exactly as
+> the run produced them.
+>
+> `_02` was produced by the same script under the same seed (`20260803`) and
+> its `split_manifest.csv` is **byte-identical** to this one
+> (`sha256 601d115c…`), so the split itself is unchanged. `_02` additionally
+> reports the per-split inflow broken down by source capture session
+> (`sessions_opened.csv`), which this run does not contain.
+>
+> The physical dataset in `data/ElectroCom-61_corrected/` was built from
+> `_02`'s manifest.
+
 # Corrected split for ElectroCom61 v2
 
 Run directory: `20260803_corrected_split`  |  seed: `20260803`

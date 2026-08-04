@@ -1,0 +1,8 @@
+tau_seconds,all_15_have_2_qualifying_groups,test_train_pairs_raw_005,test_train_pairs_aligned_005,zero_at_every_epsilon,sizes_after,sizes_held,images_moved,classes_below_bar,satisfies_both
+15,yes,0,0,yes,1478/438/205,yes,68,0,**YES**
+20,yes,0,0,yes,1478/438/205,yes,78,0,**YES**
+25,yes,0,0,yes,1478/438/205,yes,80,0,**YES**
+30,yes,0,0,yes,1458/438/225,NO,64,0,no
+35,yes,0,1,no,1454/438/229,NO,74,0,no
+45,yes,0,0,yes,1448/438/235,NO,88,0,no
+60,yes,0,1,no,1408/477/236,NO,70,0,no

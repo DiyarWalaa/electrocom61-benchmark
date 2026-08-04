@@ -23,15 +23,28 @@ runs/20260803_corrected_split_02 remains canonical. This run exists to be
 compared against it on four numbers: images moved, cross-split near-duplicate
 pairs, classes left unrescued, and whether 1478/438/205 survives.
 
-WHY TAU=30 AND NOT SOMETHING SMALLER
+WHY TAU=15
 
-runs/20260804_burst_feasibility_02 measured how many distinct groups carry each
-never-evaluated class. At tau=10 one class (RFID-Scanner) has only a single
-group holding >= 5 instances, so it cannot be given both a valid group and a
-test group. At tau=30 every one of the 15 has at least two. Tau=30 is therefore
-the smallest swept value at which the whole problem is solvable -- and it costs
-something, because bigger tau means bigger groups and the test split only holds
-205 images.
+runs/20260804_burst_aware_tau_sweep ran this allocator at 15, 20, 25, 30, 35,
+45 and 60 seconds. Every one of those values leaves all 15 rescued classes with
+at least two qualifying groups, so feasibility does not decide it. What decides
+it is the size constraint, and it turns on how many images the test split can
+give back:
+
+    tau      15    20    25    30    35    45    60
+    owes     15    19    19    20    24    30    31
+    can give 59    47    26    10     9     3     1
+
+Bigger tau means bigger groups, and a bigger group is more likely to hold the
+last few instances of some class and so be unremovable. Past tau=25 the test
+split simply runs out of returnable images, which is why an earlier version of
+this script -- fixed at tau=30 -- could not hold 1478/438/205 and ended at
+1458/438/225.
+
+Tau=15 is the smallest swept value that achieves BOTH zero test<->train
+near-duplicate pairs at every epsilon AND the exact frozen sizes. It also moves
+the fewest images of the three values that qualify (68, against 78 at tau=20
+and 80 at tau=25).
 
 WHAT "PURE" MEANS HERE
 
@@ -69,7 +82,7 @@ import scene_signature  # noqa: E402
 
 
 MIN_PER_SPLIT = 5
-TAU = 30                      # see module docstring
+TAU = 15                      # see module docstring (chosen by the tau sweep)
 SCENE_EPS = 0.05              # loosest epsilon: merges most, safest direction
 SEED = 20260804
 TARGET_SIZES = {"train": 1478, "valid": 438, "test": 205}
@@ -122,6 +135,157 @@ def subset_summing_to(items, target):
     return reachable.get(target)
 
 
+def counter_pair_rows(records, boxes_by_stem):
+    """Score the untimestamped images once. Independent of tau, so a tau sweep
+    must not pay for this repeatedly."""
+    counter_recs = [r for r in records if r.family == "counter"]
+    if not counter_recs:
+        return [], {}
+    rows, _largest = counter_duplicates.score_pairs(counter_recs, boxes_by_stem)
+    return rows, {r.stem: r.filename for r in counter_recs}
+
+
+def build_units(records, img_classes, published, date_of, tau, scene_eps,
+                pair_rows, stem_to_name):
+    """Partition every image into exactly one atomic movable group.
+
+    Timestamped images group into bursts at `tau`; untimestamped ones into
+    connected components of the near-duplicate graph at `scene_eps`; anything
+    reached by neither becomes a singleton, so the partition is total and no
+    image is silently unmovable.
+    """
+    groups = []
+    timed = [r for r in records if r.epoch is not None]
+    for cl in burst_clusters.cluster_by_device(timed, tau, lambda r: r.device_key):
+        groups.append([r.filename for r in cl])
+
+    if stem_to_name:
+        edges = [(a, b) for (a, b, _nb, _raw, ali, low, _ri, _ai) in pair_rows
+                 if not low and ali <= scene_eps]
+        for comp in counter_duplicates.connected_components(
+                sorted(stem_to_name), edges):
+            groups.append([stem_to_name[s] for s in comp])
+
+    covered = {f for g in groups for f in g}
+    for r in records:
+        if r.filename not in covered:
+            groups.append([r.filename])
+
+    units = []
+    for gid, files in enumerate(groups):
+        per_class = {}
+        for f in files:
+            for cid, n in img_classes[f].items():
+                per_class[cid] = per_class.get(cid, 0) + n
+        units.append({
+            "id": gid,
+            "images": sorted(files),
+            "n": len(files),
+            "splits": {published[f] for f in files},
+            "per_class": per_class,
+            "dates": sorted({date_of[f] for f in files}),
+        })
+    return units
+
+
+def allocate(units, img_classes, published, nc, seed, min_per_split=MIN_PER_SPLIT):
+    """Admit whole groups to close deficits, then return whole groups to train.
+
+    Returns a dict of the assignment and every diagnostic the report needs.
+    """
+    rng = random.Random(seed)
+
+    def counts_for(assign):
+        c = {i: {s: 0 for s in ec61.SPLITS} for i in range(nc)}
+        for f, s in assign.items():
+            for cid, n in img_classes[f].items():
+                c[cid][s] += n
+        return c
+
+    def deficits(assign):
+        c = counts_for(assign)
+        d = {}
+        for i in range(nc):
+            for s in ("valid", "test"):
+                short = min_per_split - c[i][s]
+                if short > 0:
+                    d[(i, s)] = short
+        return d
+
+    assignment = dict(published)
+    pure_train = [u for u in units if u["splits"] == {"train"}]
+    rng.shuffle(pure_train)
+
+    admitted = {"valid": [], "test": []}
+    used = set()
+    d = deficits(assignment)
+    while d:
+        best = None
+        for u in pure_train:
+            if u["id"] in used:
+                continue
+            for s in ("test", "valid"):
+                val = 0
+                for cid, n in u["per_class"].items():
+                    need = d.get((cid, s), 0)
+                    if need:
+                        val += min(n, need)
+                if val <= 0:
+                    continue
+                # Value per image moved: the size budget is the scarce resource.
+                rank = (-(val / float(u["n"])), u["n"], 0 if s == "test" else 1)
+                if best is None or rank < best[0]:
+                    best = (rank, u, s)
+        if best is None:
+            break
+        _r, u, s = best
+        for f in u["images"]:
+            assignment[f] = s
+        used.add(u["id"])
+        admitted[s].append(u)
+        d = deficits(assignment)
+
+    unmet = d
+    returned = {"valid": [], "test": []}
+    size_failures = {}
+    return_pool_stats = {}
+    for s in ("valid", "test"):
+        need = sum(u["n"] for u in admitted[s])
+        if need == 0:
+            continue
+        cur = counts_for(assignment)
+        cands = []
+        for u in units:
+            if u["id"] in used or u["splits"] != {s}:
+                continue
+            if all(cur[cid][s] - n >= min_per_split
+                   for cid, n in u["per_class"].items()):
+                cands.append(u)
+        return_pool_stats[s] = {
+            "need": need,
+            "pure_groups_in_split": sum(1 for u in units if u["id"] not in used
+                                        and u["splits"] == {s}),
+            "safe_candidates": len(cands),
+            "candidate_images_available": sum(u["n"] for u in cands),
+            "candidate_sizes": sorted(u["n"] for u in cands),
+        }
+        rng.shuffle(cands)
+        pick = subset_summing_to([(i, u["n"]) for i, u in enumerate(cands)], need)
+        if pick is None:
+            size_failures[s] = need
+            continue
+        for i in pick:
+            u = cands[i]
+            for f in u["images"]:
+                assignment[f] = "train"
+            used.add(u["id"])
+            returned[s].append(u)
+
+    return {"assignment": assignment, "admitted": admitted, "returned": returned,
+            "size_failures": size_failures, "return_pool_stats": return_pool_stats,
+            "unmet": unmet, "counts_after": counts_for(assignment)}
+
+
 def main():
     run_dir = ec61.make_run_dir("burst_aware_split")
     rng = random.Random(SEED)
@@ -151,47 +315,16 @@ def main():
                 per[cid] = per.get(cid, 0) + 1
         img_classes[r.filename] = per
 
-    # ---- build the atomic groups ----------------------------------------
-    groups = []   # each: {"images": [...], "splits": set, "per_class": {...}}
-    timed = [r for r in records if r.epoch is not None]
-    for cl in burst_clusters.cluster_by_device(timed, TAU, lambda r: r.device_key):
-        groups.append([r.filename for r in cl])
-
-    counter_recs = [r for r in records if r.family == "counter"]
-    if counter_recs:
-        pair_rows, _lg = counter_duplicates.score_pairs(counter_recs, boxes_by_stem)
-        stem_to_name = {r.stem: r.filename for r in counter_recs}
-        edges = [(a, b) for (a, b, _nb, _raw, ali, low, _ri, _ai) in pair_rows
-                 if not low and ali <= SCENE_EPS]
-        for comp in counter_duplicates.connected_components(
-                [r.stem for r in counter_recs], edges):
-            groups.append([stem_to_name[s] for s in comp])
-
-    # Any image not captured by either mechanism becomes its own group, so the
-    # partition is total and no image can be silently unmovable.
-    covered = {f for g in groups for f in g}
-    for r in records:
-        if r.filename not in covered:
-            groups.append([r.filename])
-
-    units = []
-    for gid, files in enumerate(groups):
-        per_class = {}
-        for f in files:
-            for cid, n in img_classes[f].items():
-                per_class[cid] = per_class.get(cid, 0) + n
-        units.append({
-            "id": gid,
-            "images": sorted(files),
-            "n": len(files),
-            "splits": {published[f] for f in files},
-            "per_class": per_class,
-            "dates": sorted({date_bucket(by_name[f]) for f in files}),
-        })
-
+    # ---- build the atomic groups, then allocate --------------------------
+    # Both steps live in module-level functions so the tau sweep drives exactly
+    # the same allocator. A second copy of this logic would be free to drift
+    # from this one, and the two sets of numbers would stop reconciling.
+    date_of = {r.filename: date_bucket(r) for r in records}
+    pair_rows, stem_to_name = counter_pair_rows(records, boxes_by_stem)
+    units = build_units(records, img_classes, published, date_of, TAU, SCENE_EPS,
+                        pair_rows, stem_to_name)
     n_straddling = sum(1 for u in units if len(u["splits"]) > 1)
 
-    # ---- deficits ---------------------------------------------------------
     def counts_for(assign):
         c = {i: {s: 0 for s in ec61.SPLITS} for i in range(nc)}
         for f, s in assign.items():
@@ -199,102 +332,15 @@ def main():
                 c[cid][s] += n
         return c
 
-    assignment = dict(published)
-    counts0 = counts_for(assignment)
+    counts0 = counts_for(published)
 
-    def deficits(assign):
-        c = counts_for(assign)
-        d = {}
-        for i in range(nc):
-            for s in ("valid", "test"):
-                short = MIN_PER_SPLIT - c[i][s]
-                if short > 0:
-                    d[(i, s)] = short
-        return d
-
-    # ---- admit whole PURE-TRAIN groups -----------------------------------
-    pure_train = [u for u in units if u["splits"] == {"train"}]
-    rng.shuffle(pure_train)   # seeded tie-break, not filename order
-
-    admitted = {"valid": [], "test": []}
-    used = set()
-    d = deficits(assignment)
-    while d:
-        best = None
-        for u in pure_train:
-            if u["id"] in used:
-                continue
-            for s in ("test", "valid"):
-                val = 0
-                for cid, n in u["per_class"].items():
-                    need = d.get((cid, s), 0)
-                    if need:
-                        val += min(n, need)
-                if val <= 0:
-                    continue
-                # Value per image moved: a 40-image burst closing the same
-                # deficit as a 3-image burst is a far worse trade, because the
-                # size budget is the scarce resource here.
-                rank = (-(val / float(u["n"])), u["n"], 0 if s == "test" else 1)
-                if best is None or rank < best[0]:
-                    best = (rank, u, s)
-        if best is None:
-            break
-        _r, u, s = best
-        for f in u["images"]:
-            assignment[f] = s
-        used.add(u["id"])
-        admitted[s].append(u)
-        d = deficits(assignment)
-
-    unmet = d
-
-    # ---- return whole groups to train, exact subset-sum -------------------
-    returned = {"valid": [], "test": []}
-    size_failures = {}
-    # Diagnostics: a bare "sizes could not be held" is not a finding. What a
-    # reader needs is WHY -- whether there were no safe groups to give back at
-    # all, or plenty but none summing exactly to the required total.
-    return_pool_stats = {}
-    for s in ("valid", "test"):
-        need = sum(u["n"] for u in admitted[s])
-        if need == 0:
-            continue
-        # Candidates: groups purely in this split, whose removal keeps every
-        # class at or above the bar.
-        cur = counts_for(assignment)
-        cands = []
-        for u in units:
-            if u["id"] in used or u["splits"] != {s}:
-                continue
-            safe = all(cur[cid][s] - n >= MIN_PER_SPLIT
-                       for cid, n in u["per_class"].items())
-            if safe:
-                cands.append(u)
-        # How many groups were rejected as unsafe, and why the pool looks as it
-        # does. Counted before the subset-sum so the two failure modes -- empty
-        # pool vs wrong granularity -- can be told apart.
-        n_pure_here = sum(1 for u in units
-                          if u["id"] not in used and u["splits"] == {s})
-        return_pool_stats[s] = {
-            "need": need,
-            "pure_groups_in_split": n_pure_here,
-            "safe_candidates": len(cands),
-            "candidate_images_available": sum(u["n"] for u in cands),
-            "candidate_sizes": sorted(u["n"] for u in cands),
-        }
-
-        rng.shuffle(cands)
-        pick = subset_summing_to([(i, u["n"]) for i, u in enumerate(cands)], need)
-        if pick is None:
-            size_failures[s] = need
-            continue
-        for i in pick:
-            u = cands[i]
-            for f in u["images"]:
-                assignment[f] = "train"
-            used.add(u["id"])
-            returned[s].append(u)
+    res = allocate(units, img_classes, published, nc, SEED)
+    assignment = res["assignment"]
+    admitted = res["admitted"]
+    returned = res["returned"]
+    size_failures = res["size_failures"]
+    return_pool_stats = res["return_pool_stats"]
+    unmet = res["unmet"]
 
     final_sizes = {s: sum(1 for v in assignment.values() if v == s)
                    for s in ec61.SPLITS}

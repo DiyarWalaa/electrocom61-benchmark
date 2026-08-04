@@ -1,0 +1,33 @@
+{
+  "allocator": "imported from burst_aware_split (not reimplemented)",
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "min_per_split": 5,
+    "scene_epsilon": 0.05,
+    "seed": 20260804,
+    "target_sizes": {
+      "test": 205,
+      "train": 1478,
+      "valid": 438
+    },
+    "taus": [
+      15,
+      20,
+      25,
+      30,
+      35,
+      45,
+      60
+    ],
+    "zero_contamination_means": "test<->train == 0 at every epsilon under both scorings"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "reconciles_with": "runs/20260804_burst_aware_split_03",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-04T19:40:19.396037Z",
+  "script": "burst_aware_tau_sweep.py",
+  "script_sha256": "656ae506d792e655271cce5c06f4160338651ae2c4cdbbb2bb409fd5a01a869a"
+}

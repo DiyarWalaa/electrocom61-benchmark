@@ -1,6 +1,10 @@
 # SUPERSEDED — do not cite this run
 
-Canonical run: `runs/20260804_burst_aware_split_02/`.
+Canonical burst-aware run: `runs/20260804_burst_aware_split_04/`.
+
+(This note originally pointed at `_02`. `_02` has since been superseded too:
+it used tau=30 and could not hold the frozen sizes. `_04` uses tau=15, chosen
+by `runs/20260804_burst_aware_tau_sweep/`, and holds 1478/438/205 exactly.)
 
 Note added 2026-08-04, after the run. The files beside it are exactly as the
 run produced them.

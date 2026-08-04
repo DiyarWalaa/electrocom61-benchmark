@@ -1,0 +1,13 @@
+state,scoring,epsilon,pairs_train_test,pairs_train_valid,pairs_valid_test,pairs_cross_split_total
+published,raw,0.01,0,0,0,0
+published,raw,0.02,0,0,0,0
+published,raw,0.05,0,1,0,1
+published,aligned,0.01,0,0,0,0
+published,aligned,0.02,0,0,0,0
+published,aligned,0.05,0,3,0,3
+burst_aware,raw,0.01,0,0,0,0
+burst_aware,raw,0.02,0,0,0,0
+burst_aware,raw,0.05,0,1,0,1
+burst_aware,aligned,0.01,0,0,0,0
+burst_aware,aligned,0.02,0,0,0,0
+burst_aware,aligned,0.05,0,3,0,3

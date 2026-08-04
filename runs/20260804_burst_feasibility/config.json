@@ -1,0 +1,29 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "burst_definition": "burst_clusters.cluster_by_device (imported)",
+    "min_per_split": 5,
+    "scene_epsilons": [
+      0.01,
+      0.02,
+      0.05
+    ],
+    "taus": [
+      3,
+      5,
+      10,
+      30,
+      60
+    ],
+    "untimestamped_analogue": "connected components of the near-duplicate graph (counter_duplicates)"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "question": "how many distinct bursts in the train-only groups contain each never-evaluated class?",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-04T19:17:12.634255Z",
+  "script": "burst_feasibility.py",
+  "script_sha256": "57244ff75535c5912f4f5ac9aba8312acd35b31b68e4e4c311f93304541224d5"
+}

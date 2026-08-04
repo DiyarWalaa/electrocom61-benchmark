@@ -139,6 +139,8 @@ python scripts/corrected_split.py        # build a split where all 61 are evalua
 python scripts/duplicate_contamination_addendum.py   # published vs corrected, 3-way
 python scripts/build_corrected_dataset.py            # materialise the split as folders
 python scripts/figure_near_duplicate.py              # figure (needs matplotlib)
+python scripts/burst_feasibility.py                  # can classes move as whole bursts?
+python scripts/burst_aware_split.py                  # CANDIDATE burst-atomic split
 python scripts/v1_provenance.py          # requires data/v1/ (see below)
 ```
 
@@ -158,6 +160,8 @@ python scripts/v1_provenance.py          # requires data/v1/ (see below)
 | `duplicate_contamination_addendum.py` | Near-duplicate contamination, published vs corrected split, broken out three ways (test↔train, valid↔train, valid↔test). Scores every candidate pair **once** and classifies it under both assignments, so the two states share buckets, pairs and scorer by construction. Reconciles with `20260802_scene_signature`. | `runs/<date>_duplicate_contamination/` |
 | `build_corrected_dataset.py` | Materialises a split manifest into real folders under `data/ElectroCom-61_corrected/` by **copying** from v2 (source never modified). Refuses to overwrite an existing tree, preflights before writing, and verifies by re-reading the built tree from disk — including SHA-256 of every copy against its source. | `runs/<date>_build_corrected_dataset/` |
 | `figure_near_duplicate.py` | Renders `figures/near_duplicate_pair.png`: the tightest cross-split near-duplicate pair, two panels, boxes labelled, per-box centre shift in pixels. **Requires matplotlib + pillow.** | `runs/<date>_figure_near_duplicate/` |
+| `burst_feasibility.py` | Answers whether the never-evaluated classes can be rescued by moving whole bursts: how many distinct groups inside the train-only sessions carry each class, and how many carry ≥5 instances. Two regimes, because the untimestamped images have no bursts — scene components stand in. τ and ε swept. | `runs/<date>_burst_feasibility/` |
+| `burst_aware_split.py` | **Candidate**, not canonical. A split whose atomic unit of movement is a whole burst (or scene component), so no group can straddle the boundary. Reports images moved, three-way near-duplicate contamination, classes unrescued, and whether 1478/438/205 survives. | `runs/<date>_burst_aware_split/` |
 | `v1_provenance.py` | Was the metadata CSV shipped in v2 ever regenerated for v2, or is it v1's metadata unchanged? Four tests of increasing strength against an actual v1 download. | `runs/<date>_v1_provenance/` |
 
 `v1_provenance.py` is the only script with an optional argument:

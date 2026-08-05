@@ -1,0 +1,4 @@
+relationship,consecutive_pairs_split_apart,comparable (same multiset),never_compared (different multiset),flagged_as_duplicates,closest_score,median_score
+test<->train,3,2,1,0,0.0599,0.5723
+valid<->train,9,7,2,0,0.0508,0.1597
+valid<->test,1,1,0,0,0.2828,0.2828

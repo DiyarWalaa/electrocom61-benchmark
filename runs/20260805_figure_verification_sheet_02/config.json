@@ -1,0 +1,22 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "limitation": "only pairs with identical class multisets are compared",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "dataset": "C:\\research\\electrocom61\\data\\ElectroCom-61_corrected",
+    "dpi": 200,
+    "epsilon_filter": "NONE -- non-qualifying pairs are the point",
+    "low_info_box_count": 2,
+    "max_bucket": 600,
+    "n_rows": 12,
+    "ranking": "min(raw_max_centre_dist, aligned_max_centre_dist)"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-05T07:55:37.569003Z",
+  "script": "figure_verification_sheet.py",
+  "script_sha256": "3c749f89ca469870271055a5216d1b16271205cf99d0369139409b3d61e3684d",
+  "split_shown": "released burst-aware tau=15"
+}

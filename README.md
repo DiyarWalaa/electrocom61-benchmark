@@ -191,6 +191,7 @@ python scripts/corrected_split.py        # build a split where all 61 are evalua
 python scripts/duplicate_contamination_addendum.py   # published vs corrected, 3-way
 python scripts/build_corrected_dataset.py            # materialise the split as folders
 python scripts/figure_near_duplicate.py              # figure (needs matplotlib)
+python scripts/figure_verification_sheet.py          # visual check of the released split
 python scripts/burst_feasibility.py                  # can classes move as whole bursts?
 python scripts/burst_aware_split.py                  # burst-atomic split (tau=15)
 python scripts/burst_aware_tau_sweep.py              # which tau satisfies both constraints?
@@ -216,6 +217,7 @@ python scripts/v1_provenance.py          # requires data/v1/ (see below)
 | `burst_feasibility.py` | Answers whether the never-evaluated classes can be rescued by moving whole bursts: how many distinct groups inside the train-only sessions carry each class, and how many carry ≥5 instances. Two regimes, because the untimestamped images have no bursts — scene components stand in. τ and ε swept. | `runs/<date>_burst_feasibility/` |
 | `burst_aware_split.py` | **Produces the released split** (τ=15 s, seed 20260804). A split whose atomic unit of movement is a whole burst (or scene component), so no group can straddle the boundary. Reports images moved, three-way near-duplicate contamination, classes unrescued, and whether 1478/438/205 survives. | `runs/<date>_burst_aware_split/` |
 | `burst_aware_tau_sweep.py` | Runs the burst-aware allocator at τ = 15/20/25/30/35/45/60 and reports, per τ: whether all 15 rescued classes keep ≥2 qualifying groups, how many test↔train near-duplicate pairs survive, and whether 1478/438/205 holds. Imports the allocator rather than copying it. | `runs/<date>_burst_aware_tau_sweep/` |
+| `figure_verification_sheet.py` | Renders `figures/split_verification_sheet.png`: the 12 most similar cross-split pairs across all relationships, beside the 12 closest test↔train pairs shown even though none qualify as duplicates. Scores every cross-split pair with **no epsilon cutoff** — non-qualifying pairs are the point. **Requires matplotlib + pillow.** | `runs/<date>_figure_verification_sheet/` |
 | `v1_provenance.py` | Was the metadata CSV shipped in v2 ever regenerated for v2, or is it v1's metadata unchanged? Four tests of increasing strength against an actual v1 download. | `runs/<date>_v1_provenance/` |
 
 `v1_provenance.py` is the only script with an optional argument:

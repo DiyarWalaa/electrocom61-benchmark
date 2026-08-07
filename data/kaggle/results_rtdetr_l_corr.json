@@ -1,7 +1,7 @@
 {
   "model": "rtdetr-l.pt",
   "run": "rtdetr_l_corr",
-  "split_set": "published",
+  "split_set": "corrected",
   "seed": 0,
   "epochs_budget": 100,
   "patience": 15,

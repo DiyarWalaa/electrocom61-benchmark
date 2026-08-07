@@ -1,0 +1,25 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "evidence": {
+    "expected": 61,
+    "test_classes_evaluated": 61,
+    "val_classes_evaluated": 61
+  },
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "edit": "single textual substitution, one occurrence",
+    "field": "split_set",
+    "from": "published",
+    "target": "C:\\research\\electrocom61\\data\\kaggle\\results_rtdetr_l_corr.json",
+    "to": "corrected"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-07T20:42:12.646486Z",
+  "script": "fix_rtdetr_corr_label.py",
+  "script_sha256": "2b6ca41db916774df288f2de0b61c58c21b17bee7fa39d68fc23e6bedffb2d70",
+  "sha256_after": "f58caeb78eb947fd50c53cbe559e14c79593e173ccff4ae5532339261189580e",
+  "sha256_before": "c9067041f79b679f2a603fc5e2a00069054eda1b35bfcc24c1474ea5dd246760"
+}

@@ -16,6 +16,20 @@
 > published data; neither allocator created them and neither removed them. Do
 > not read "zero contamination" as applying to all three cross-split
 > relationships — it applies to test↔train.
+>
+> **SCOPE OF THE CONTAMINATION FIGURES.** Contamination is measured only
+> between pairs sharing an identical class inventory. Pairs with partial
+> overlap — same background and some shared components in differing
+> arrangements — fall outside this scope. Three consecutive-numbered pairs
+> among the untimestamped images are in this category, one across train and
+> test (`IMG_5243` / `IMG_5244`), inspected visually and found to be
+> rearranged: `IMG_5243` carries an `Arduino-Uno` that `IMG_5244` does not, and
+> the shared single-instance components sit 109.6 px and 86.3 px apart on the
+> 640 px canvas. Partial overlap is pervasive in this dataset, since all images
+> in a session share a background and component pool; **no split of
+> ElectroCom61 eliminates it.** The zero above is a bounded claim about
+> identically inventoried pairs, not a guarantee that no train image resembles
+> a test image. Counts in `runs/20260805_consecutive_counter_pairs/`.
 
 # Burst-aware split (CANDIDATE)
 

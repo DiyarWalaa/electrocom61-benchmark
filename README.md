@@ -63,6 +63,27 @@ test contamination biases the headline metric, valid contamination biases model
 selection, and they are not interchangeable. Full breakdown in
 `runs/20260804_duplicate_contamination/`.
 
+### Scope of the contamination figures
+
+**Contamination is measured only between pairs sharing an identical class
+inventory.** Pairs with partial overlap — same background and some shared
+components in differing arrangements — fall outside this scope.
+
+Three consecutive-numbered pairs among the untimestamped images are in this
+category, one across train and test (`IMG_5243` / `IMG_5244`), inspected
+visually and found to be rearranged. `IMG_5243` carries six classes to
+`IMG_5244`'s five; the extra class is `Arduino-Uno`, and the two shared
+single-instance components sit 109.6 px (`ESP32`) and 86.3 px (`Sonar-Sensor`)
+apart on the 640 px canvas. A differing inventory is exactly what puts a pair
+outside the comparison, so this one was never scored — not scored as safe.
+
+Partial overlap is pervasive in this dataset, since all images in a session
+share a background and component pool. **No split of ElectroCom61 eliminates
+it.** The figures quoted above are therefore bounded claims about identically
+inventoried pairs, not a guarantee that no train image resembles a test image.
+
+Counts in `runs/20260805_consecutive_counter_pairs/`.
+
 The split makes all 61 classes *measurable*, not *well measured*. Five
 instances is a floor for existence, not a sample size to quote a confident
 per-class AP from.

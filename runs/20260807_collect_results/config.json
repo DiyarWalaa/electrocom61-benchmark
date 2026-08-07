@@ -1,0 +1,31 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "inputs": {
+    "results_rtdetr_l_corr.json": "f58caeb78eb947fd50c53cbe559e14c79593e173ccff4ae5532339261189580e",
+    "results_rtdetr_l_pub_lr1e4.json": "529345cc884b3bae8abd06fe5773194f3cfb890d135636252efe8bce0a575458",
+    "results_yolo11s_corr.json": "4538a81a5eea03ae70ecff6d127f5bab3f8f8da030f2480194d407caa0e21ab5",
+    "results_yolo11s_pub.json": "59a7b0b8085b42476fe209fd9f1a86bc2c5aa20814f6b584f56edcd729688c41",
+    "results_yolo12s_corr.json": "82e2ddca3174b6d645c0dcde21c46f37bd6dc0fdeb96f474e429f11fec0340a8",
+    "results_yolo12s_pub.json": "569a1ad64d503348cf51a42b9bc0eac62a9039c53a864070019dfe2ee31a25d8",
+    "results_yolo26s_corr.json": "f9099edaaf7b320a5bd5ba09dfb34d3013ad8ccba3074de8d561d78321457c9c",
+    "results_yolo26s_pub.json": "110f152820b9f81d18247470db9c6e87bcf3acf1d57665f601ba2529225e4cb5",
+    "results_yolov9s_corr.json": "ea02ff7e8c05b8f16ed431706720ba7b75643ac11c62a9e6f5d54a327c4a41b1",
+    "results_yolov9s_pub.json": "16c2bc9b5949d4a93bf5f3df68ccf2b7e2b98cad78db93ecf9eb156e768d805b"
+  },
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "missing_fields": [],
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "input_dir": "C:\\research\\electrocom61\\data\\kaggle",
+    "latency_policy": "left empty; see docstring",
+    "latency_source_value": "pending_unified_pass",
+    "n_runs": 10,
+    "output": "C:\\research\\electrocom61\\data\\master_results.csv"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-07T20:49:57.746468Z",
+  "script": "collect_results.py",
+  "script_sha256": "c1a0e2852ef2273232317036875301e8ed8343ef9e33e7f1940162c59352fde1"
+}

@@ -1,0 +1,11 @@
+model,run,split_set,val_mAP50,val_mAP50_95,test_mAP50,test_mAP50_95,classes_evaluated_val,classes_evaluated_test,params_fused,gflops,epochs_run,train_time_min,latency_p50_ms,latency_p95_ms,fps,preprocess_ms,inference_ms,postprocess_ms,latency_source
+rtdetr-l,rtdetr_l_corr,corrected,0.954,0.6355,0.9444,0.6164,61,61,32931431,110.16,59,132.1,,,,,,,pending_unified_pass
+rtdetr-l,rtdetr_l_pub_lr1e4,published,0.938,0.6016,0.9171,0.6045,45,46,32931431,110.16,73,163.2,,,,,,,pending_unified_pass
+yolo11s,yolo11s_corr,corrected,0.9335,0.6321,0.9313,0.6187,61,61,9451399,21.8,100,58.4,,,,,,,pending_unified_pass
+yolo11s,yolo11s_pub,published,0.9238,0.5975,0.8921,0.6084,45,46,9451399,21.8,100,58.9,,,,,,,pending_unified_pass
+yolo12s,yolo12s_corr,corrected,0.9022,0.6021,0.9197,0.6017,61,61,9276743,23.61,100,80.2,,,,,,,pending_unified_pass
+yolo12s,yolo12s_pub,published,0.894,0.5871,0.877,0.5842,45,46,9276743,23.61,100,80.0,,,,,,,pending_unified_pass
+yolo26s,yolo26s_corr,corrected,0.9359,0.6271,0.9427,0.6317,61,61,9995078,23.0,100,70.4,,,,,,,pending_unified_pass
+yolo26s,yolo26s_pub,published,0.9196,0.5944,0.9021,0.6129,45,46,9995078,23.0,100,70.5,,,,,,,pending_unified_pass
+yolov9s,yolov9s_corr,corrected,0.9426,0.6405,0.9319,0.6186,61,61,7311015,27.51,100,77.0,,,,,,,pending_unified_pass
+yolov9s,yolov9s_pub,published,0.9233,0.6021,0.9045,0.6063,45,46,7311015,27.51,100,79.8,,,,,,,pending_unified_pass

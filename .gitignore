@@ -48,6 +48,13 @@ data/kaggle/artifacts/**/*.onnx
 collected_bundle.zip
 
 # ---------------------------------------------------------------------------
+# The master results table built by scripts/collect_results.py. Derived, but
+# small text and the backbone of every accuracy figure in the paper, so it is
+# committed and diffable rather than regenerated silently.
+# ---------------------------------------------------------------------------
+!data/master_results.csv
+
+# ---------------------------------------------------------------------------
 # Python bytecode -- regenerated on every run, machine-specific.
 # ---------------------------------------------------------------------------
 __pycache__/

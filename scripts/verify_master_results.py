@@ -1,16 +1,25 @@
 """
-verify_master_results.py -- check the master table against known-good values
+verify_master_results.py -- check both derived tables against known-good values
 
-Six values were supplied independently of the pipeline that built
-data/master_results.csv. This script asserts them. It exits non-zero on any
-mismatch, so it can gate a build rather than merely inform one.
+Values supplied independently of the pipeline that built them are asserted
+here. The script exits non-zero on any mismatch, so it can gate a rebuild
+rather than merely inform one.
 
-A script rather than a one-off comparison because the table will be rebuilt --
-when the unified latency pass lands, when a run is re-trained -- and a check
-that only ran once is a check that stops being true without anyone noticing.
+A script rather than a one-off comparison because the tables get rebuilt --
+they already have been, twice -- and a check that ran once is a check that
+stops being true without anyone noticing. Two of these expectations FAILED on
+the previous table and pass now only because the source of the complexity
+columns changed; keeping them in place is what makes that visible.
 
-Expectations are declared as data at the top of the file. Adding one means
-adding a row there, not editing logic.
+Expectations are declared as data. Adding one means adding a row, not editing
+logic.
+
+TOLERANCE IS PER-EXPECTATION AND EXPLICIT
+
+Most values are compared exactly: they are copied from a results file, not
+recomputed, so any difference at all is worth seeing. The per-architecture
+means are the exception -- they are computed here from two runs and quoted
+rounded, so they carry an explicit +/- 0.01.
 """
 
 import csv
@@ -21,22 +30,37 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import ec61  # noqa: E402
 
 
-TABLE = os.path.join(ec61.DATA_DIR, "master_results.csv")
+MASTER = os.path.join(ec61.DATA_DIR, "master_results.csv")
+BY_ARCH = os.path.join(ec61.DATA_DIR, "latency_by_arch.csv")
 
-# (label, model, split_set or None for "every row of this model", column, expected)
-# split_set is None for model-level properties that must not vary by split.
+# (label, table, model, split_set|None, column, expected, tolerance|None)
+# split_set None means "every row of this model must agree on this value",
+# which is how a model-level property is checked -- and how "in both runs" is
+# expressed for post_ms.
 EXPECTATIONS = [
-    ("YOLO26s corrected test mAP@50",     "yolo26s",  "corrected", "test_mAP50",    0.9427),
-    ("YOLO26s corrected test mAP@50-95",  "yolo26s",  "corrected", "test_mAP50_95", 0.6317),
-    ("RT-DETR-l published test mAP@50",   "rtdetr-l", "published", "test_mAP50",    0.9171),
-    ("YOLOv12s published test mAP@50-95", "yolo12s",  "published", "test_mAP50_95", 0.5842),
-    ("YOLO11s params_fused",              "yolo11s",  None,        "params_fused",  9436407),
-    ("RT-DETR-l gflops",                  "rtdetr-l", None,        "gflops",        105.6),
+    # --- accuracy, unchanged since the first verification -------------------
+    ("YOLO26s corrected test mAP@50",     MASTER, "yolo26s",  "corrected", "test_mAP50",    0.9427, None),
+    ("YOLO26s corrected test mAP@50-95",  MASTER, "yolo26s",  "corrected", "test_mAP50_95", 0.6317, None),
+    ("RT-DETR-l published test mAP@50",   MASTER, "rtdetr-l", "published", "test_mAP50",    0.9171, None),
+    ("YOLOv12s published test mAP@50-95", MASTER, "yolo12s",  "published", "test_mAP50_95", 0.5842, None),
+
+    # --- complexity: both of these FAILED before the unified pass landed -----
+    ("YOLO11s params_fused",              MASTER, "yolo11s",  None, "params_fused", 9436407, None),
+    ("RT-DETR-l gflops_fused",            MASTER, "rtdetr-l", None, "gflops_fused", 105.6,   None),
+    ("YOLOv9s gflops_fused",              MASTER, "yolov9s",  None, "gflops_fused", 26.855,  None),
+
+    # --- latency: post_ms must be identical across the pair -----------------
+    ("YOLO26s post_ms (both runs)",       MASTER, "yolo26s",  None, "post_ms", 0.38, None),
+
+    # --- per-architecture means, rounded, so +/- 0.01 -----------------------
+    ("yolo11s mean p50",  BY_ARCH, "yolo11s",  None, "e2e_ms_p50_mean", 13.68, 0.01),
+    ("yolo26s mean p50",  BY_ARCH, "yolo26s",  None, "e2e_ms_p50_mean", 14.65, 0.01),
+    ("yolo12s mean p50",  BY_ARCH, "yolo12s",  None, "e2e_ms_p50_mean", 18.95, 0.01),
+    ("yolov9s mean p50",  BY_ARCH, "yolov9s",  None, "e2e_ms_p50_mean", 21.05, 0.01),
+    ("rtdetr-l mean p50", BY_ARCH, "rtdetr-l", None, "e2e_ms_p50_mean", 47.21, 0.01),
 ]
 
-# Floats are compared exactly after parsing, not with a tolerance: these are
-# values copied from a results file, not the output of a fresh computation, so
-# any difference at all is a discrepancy worth seeing rather than smoothing.
+
 def parse(v):
     if v is None or v == "":
         return None
@@ -56,78 +80,93 @@ def _fmt(v):
     return str(v)
 
 
-def main():
-    if not os.path.isfile(TABLE):
-        sys.stderr.write("table not found: %s\nRun scripts/collect_results.py\n" % TABLE)
-        return 1
+def load(path):
+    with open(path, "r", newline="", encoding="utf-8-sig") as fh:
+        return list(csv.DictReader(fh))
 
-    with open(TABLE, "r", newline="", encoding="utf-8-sig") as fh:
-        rows = list(csv.DictReader(fh))
+
+def main():
+    tables = {}
+    for path in (MASTER, BY_ARCH):
+        if not os.path.isfile(path):
+            sys.stderr.write("table not found: %s\n"
+                             "Run collect_results.py and latency_by_arch.py\n" % path)
+            return 1
+        tables[path] = load(path)
 
     results = []
-    for label, model, split, column, expected in EXPECTATIONS:
-        matching = [r for r in rows
-                    if r["model"] == model
-                    and (split is None or r["split_set"] == split)]
-        if not matching:
-            results.append((label, column, expected, None, "NO ROW", False))
+    for label, table, model, split, column, expected, tol in EXPECTATIONS:
+        rows = [r for r in tables[table]
+                if r.get("model") == model
+                and (split is None or r.get("split_set") == split)]
+        if not rows:
+            results.append((label, expected, None, "NO ROW", False))
+            continue
+        if column not in rows[0]:
+            results.append((label, expected, None, "NO COLUMN %s" % column, False))
             continue
 
-        found = sorted({parse(r[column]) for r in matching}, key=str)
+        found = sorted({parse(r[column]) for r in rows}, key=str)
         if len(found) > 1:
-            # A model-level property that differs between splits is itself a
-            # defect, whichever value happens to match.
-            results.append((label, column, expected,
+            # For a model-level property, disagreement between the rows is
+            # itself the defect -- whichever value happens to match.
+            results.append((label, expected,
                             " / ".join(_fmt(f) for f in found),
-                            "VARIES BY SPLIT", False))
+                            "DISAGREES ACROSS %d ROWS" % len(rows), False))
             continue
 
         actual = found[0]
-        results.append((label, column, expected, actual, "", actual == expected))
+        if actual is None:
+            results.append((label, expected, None, "EMPTY", False))
+            continue
+        if tol is None:
+            ok = (actual == expected)
+            note = ""
+        else:
+            ok = abs(float(actual) - float(expected)) <= tol
+            note = "within +/-%.2f" % tol if ok else "off by %.4f" % abs(
+                float(actual) - float(expected))
+        results.append((label, expected, actual, note, ok))
 
-    n_pass = sum(1 for r in results if r[5])
+    n_pass = sum(1 for r in results if r[4])
     n_fail = len(results) - n_pass
 
     width = max(len(r[0]) for r in results)
-    print("Cross-check of %s against %d known values"
-          % (os.path.basename(TABLE), len(EXPECTATIONS)))
+    print("Cross-check of master_results.csv and latency_by_arch.csv "
+          "against %d known values" % len(EXPECTATIONS))
     print()
-    for label, column, expected, actual, note, ok in results:
+    for label, expected, actual, note, ok in results:
         print("  [%s] %-*s  expected %-12s  found %-12s %s"
-              % ("PASS" if ok else "FAIL", width, label,
-                 _fmt(expected), _fmt(actual) if actual is not None else "-", note))
+              % ("PASS" if ok else "FAIL", width, label, _fmt(expected),
+                 _fmt(actual) if actual is not None else "-", note))
     print()
     print("%d passed, %d FAILED" % (n_pass, n_fail))
 
     run_dir = ec61.make_run_dir("verify_master_results")
     ec61.write_config(
         run_dir, os.path.abspath(__file__),
-        params={"table": TABLE, "n_expectations": len(EXPECTATIONS),
-                "comparison": "exact, no tolerance"},
+        params={"tables": [MASTER, BY_ARCH],
+                "n_expectations": len(EXPECTATIONS),
+                "comparison": "exact unless a tolerance is declared"},
         extra={"passed": n_pass, "failed": n_fail})
 
     ec61.write_csv(
         os.path.join(run_dir, "verification.csv"),
-        ["check", "column", "expected", "found", "note", "result"],
-        [[label, column, expected,
-          "" if actual is None else actual, note, "PASS" if ok else "FAIL"]
-         for label, column, expected, actual, note, ok in results])
+        ["check", "expected", "found", "note", "result"],
+        [[label, expected, "" if actual is None else actual, note,
+          "PASS" if ok else "FAIL"]
+         for label, expected, actual, note, ok in results])
 
-    lines = []
-    lines.append("# Master table verification")
-    lines.append("")
-    lines.append("Run directory: `%s`" % os.path.basename(run_dir))
-    lines.append("")
-    lines.append("**%d passed, %d failed** of %d known values."
-                 % (n_pass, n_fail, len(results)))
-    lines.append("")
-    lines.append("| result | check | expected | found |")
-    lines.append("|---|---|---|---|")
-    for label, column, expected, actual, note, ok in results:
-        lines.append("| %s | %s | `%s` | `%s`%s |"
+    lines = ["# Table verification", "",
+             "Run directory: `%s`" % os.path.basename(run_dir), "",
+             "**%d passed, %d failed** of %d known values."
+             % (n_pass, n_fail, len(results)), "",
+             "| result | check | expected | found | note |",
+             "|---|---|---|---|---|"]
+    for label, expected, actual, note, ok in results:
+        lines.append("| %s | %s | `%s` | `%s` | %s |"
                      % ("PASS" if ok else "**FAIL**", label, _fmt(expected),
-                        _fmt(actual) if actual is not None else "-",
-                        (" — " + note) if note else ""))
+                        _fmt(actual) if actual is not None else "-", note))
     lines.append("")
     with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")

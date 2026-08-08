@@ -1,55 +1,70 @@
 """
-collect_results.py -- one master table from the ten Kaggle results JSONs
+collect_results.py -- one master table from the Kaggle results JSONs
 
-Reads data/kaggle/results_*.json and writes data/master_results.csv, one row per
-(model, split). This is the table the paper's accuracy figures are built from,
-so every column states where it came from and nothing is silently derived.
+Reads data/kaggle/results_*.json (ten per-run training results) and
+data/kaggle/results_latency_unified.json (one unified timing pass over all ten
+checkpoints), joins them on the run slug, and writes data/master_results.csv --
+one row per (model, split).
 
-LATENCY IS DELIBERATELY LEFT EMPTY
+LATENCY NOW COMES FROM THE UNIFIED PASS
 
-Every one of these JSONs already carries a `latency_ms` block (p50, p95, mean,
-batch_size, runs, warmup) and an `fps` figure, and each `val`/`test` section
-carries a `speed_ms` breakdown. NONE of it is copied here, and the omission is
-the point rather than an oversight.
+Earlier versions of this script left the latency columns empty. They were empty
+because the only numbers available were measured inside ten separate Kaggle
+sessions, on whatever P100 each was allotted, under unknown contention -- fine
+for spotting a regression inside one session, useless for a cross-model claim.
+Those per-session `latency_ms`, `fps` and `speed_ms` fields are STILL not read
+by this script and never will be.
 
-Those numbers were measured inside ten separate Kaggle sessions, on whatever
-P100 that session was allotted, under whatever contention the host had at the
-time, with the model that had just finished training still resident. They are
-fine for spotting a gross regression inside one session and useless for a
-cross-model comparison in a paper: a 2x difference between two rows could be
-scheduling noise rather than architecture.
+What is read is results_latency_unified.json, whose protocol block records what
+makes it publication-grade: 20 warmup iterations, batch 1, imgsz 640, a
+30-image burn-in discarded before the loop, all 205 test images read once so no
+timing includes a cold file read, and perf_counter with cuda.synchronize()
+around per-image end-to-end predict(). One session, one GPU, all ten models.
 
-The project rule for latency is explicit -- warmup first, torch.cuda.synchronize(),
-report p50 AND p95, state the batch size -- and it can only be honoured by one
-unified pass over all ten checkpoints on one machine with nothing else running.
-Until that exists the columns stay empty and `latency_source` reads
-`pending_unified_pass`, so a half-populated table can never be mistaken for a
-finished one.
+FUSED AND UNFUSED ARE NOW SEPARATE COLUMNS
+
+The previous table had a column named `params_fused` fed from the training
+JSON's `params`, and a `gflops` column fed from `gflops`. Verification against
+known values showed both were UNFUSED counts: 9,451,399 against an expected
+9,436,407 for yolo11s, and 110.16 against 105.6 for rtdetr-l. The difference is
+BatchNorm folding -- fusing BN into the preceding convolution removes its
+parameters and the work of applying it.
+
+The unified JSON measures complexity both before and after model.fuse(), so all
+four figures are now carried explicitly and no column is ambiguous:
+
+    params_unfused  gflops_unfused  params_fused  gflops_fused
+
+The training JSONs' own `params` and `gflops` are cross-checked against the
+unfused pair rather than emitted, and any disagreement is reported.
+
+layers_fused IS RENAMED layers_modules
+
+The unified JSON's `layers_fused` counts nn.Module objects. Ultralytics' own
+model summary prints a "layers" number computed differently, and the two are
+not interchangeable. Storing this under the same name would invite a reader to
+compare it against a published Ultralytics layer count and conclude something
+false, so the column is `layers_modules`.
 
 FIELD MAPPING, STATED
 
-    model            <- model            (".pt" stripped)
-    run              <- run              (the slug; joins to data/kaggle/artifacts/)
-    split_set        <- split_set
-    val_mAP50        <- val.mAP50
-    val_mAP50_95     <- val.mAP50_95
-    test_mAP50       <- test.mAP50
-    test_mAP50_95    <- test.mAP50_95
-    classes_*        <- val.classes_evaluated, test.classes_evaluated
-    params_fused     <- params
-    gflops           <- gflops
-    epochs_run       <- epochs_completed
-    train_time_min   <- train_minutes
+    model            <- results: model (".pt" stripped)
+    run              <- results: run              (join key)
+    split_set        <- results: split_set
+    val_*, test_*    <- results: val.*, test.*
+    classes_*        <- results: val/test.classes_evaluated
+    epochs_run       <- results: epochs_completed
+    train_time_min   <- results: train_minutes
+    params_*         <- latency: params_unfused, params_fused
+    gflops_*         <- latency: gflops_unfused, gflops_fused
+    layers_modules   <- latency: layers_fused
+    e2e_ms_p50/p95   <- latency: e2e_ms_p50, e2e_ms_p95
+    fps_p50          <- latency: fps_p50
+    pre/inf/post_ms  <- latency: pre_ms, inf_ms, post_ms
 
-`classes_evaluated` is emitted as TWO columns rather than the one requested.
-They genuinely differ on the published split -- 45 classes evaluable in valid
-against 46 in test, because 15 classes have no instances in either and a 16th
-has none in valid. Collapsing them to a single number would erase the finding
-this whole study is built on.
-
-`params_fused` is sourced from the JSON's `params`. The JSON does not say
-whether that count is fused or unfused; the column is named as requested and
-this note is the caveat.
+`classes_evaluated` is two columns because val and test genuinely differ on the
+published split -- 45 evaluable in valid against 46 in test. Collapsing them
+would erase the finding this study is built on.
 
 Run with no arguments:
 
@@ -69,20 +84,25 @@ import ec61  # noqa: E402
 
 
 KAGGLE_DIR = os.path.join(ec61.DATA_DIR, "kaggle")
+LATENCY_JSON = os.path.join(KAGGLE_DIR, "results_latency_unified.json")
 OUT_CSV = os.path.join(ec61.DATA_DIR, "master_results.csv")
 
-LATENCY_SOURCE = "pending_unified_pass"
+LATENCY_SOURCE = "unified_pass_v3_single_P100_session_committed"
 
-# Emitted empty, on purpose. See the module docstring.
-LATENCY_COLUMNS = ("latency_p50_ms", "latency_p95_ms", "fps",
-                   "preprocess_ms", "inference_ms", "postprocess_ms")
+ACCURACY_COLUMNS = ["model", "run", "split_set",
+                    "val_mAP50", "val_mAP50_95",
+                    "test_mAP50", "test_mAP50_95",
+                    "classes_evaluated_val", "classes_evaluated_test",
+                    "epochs_run", "train_time_min"]
+COMPLEXITY_COLUMNS = ["params_unfused", "gflops_unfused",
+                      "params_fused", "gflops_fused", "layers_modules"]
+LATENCY_COLUMNS = ["e2e_ms_p50", "e2e_ms_p95", "fps_p50",
+                   "pre_ms", "inf_ms", "post_ms"]
+COLUMNS = ACCURACY_COLUMNS + COMPLEXITY_COLUMNS + LATENCY_COLUMNS + ["latency_source"]
 
-COLUMNS = (["model", "run", "split_set",
-            "val_mAP50", "val_mAP50_95",
-            "test_mAP50", "test_mAP50_95",
-            "classes_evaluated_val", "classes_evaluated_test",
-            "params_fused", "gflops", "epochs_run", "train_time_min"]
-           + list(LATENCY_COLUMNS) + ["latency_source"])
+# GFLOPs are reported to 3 decimals in the unified pass and 2 in the training
+# JSONs, so the cross-check allows rounding but nothing more.
+GFLOPS_TOLERANCE = 0.01
 
 
 def sha256_file(path):
@@ -94,7 +114,6 @@ def sha256_file(path):
 
 
 def get(d, *keys):
-    """Nested lookup returning None rather than raising on a missing branch."""
     cur = d
     for k in keys:
         if not isinstance(cur, dict) or k not in cur:
@@ -103,24 +122,56 @@ def get(d, *keys):
     return cur
 
 
+def load_latency(path):
+    """Index the unified pass by run slug.
+
+    `models` is a LIST of objects each carrying a `run` field, not an object
+    keyed by slug, so the index is built rather than assumed.
+    """
+    with open(path, "r", encoding="utf-8-sig") as fh:
+        d = json.load(fh)
+    entries = d.get("models", [])
+    by_run = {}
+    for e in entries:
+        if not isinstance(e, dict) or "run" not in e:
+            raise ValueError("latency entry without a `run` field: %r" % (e,))
+        if e["run"] in by_run:
+            raise ValueError("duplicate run slug in latency JSON: %s" % e["run"])
+        by_run[e["run"]] = e
+    return d, by_run
+
+
 def main():
-    paths = sorted(glob.glob(os.path.join(KAGGLE_DIR, "results_*.json")))
+    paths = sorted(p for p in glob.glob(os.path.join(KAGGLE_DIR, "results_*.json"))
+                   if os.path.basename(p) != os.path.basename(LATENCY_JSON))
     if not paths:
-        sys.stderr.write("no results_*.json under %s\n" % KAGGLE_DIR)
+        sys.stderr.write("no per-run results_*.json under %s\n" % KAGGLE_DIR)
         return 1
+    if not os.path.isfile(LATENCY_JSON):
+        sys.stderr.write("unified latency file not found: %s\n" % LATENCY_JSON)
+        return 1
+
+    lat_doc, lat_by_run = load_latency(LATENCY_JSON)
 
     run_dir = ec61.make_run_dir("collect_results")
 
     rows = []
     missing = []
+    unjoined = []
+    complexity_conflicts = []
+
     for p in paths:
-        with open(p, "r", encoding="utf-8") as fh:
+        with open(p, "r", encoding="utf-8-sig") as fh:
             d = json.load(fh)
 
-        model = (d.get("model") or "").rsplit(".", 1)[0] or None
+        run = d.get("run")
+        lat = lat_by_run.get(run)
+        if lat is None:
+            unjoined.append((os.path.basename(p), run))
+
         row = {
-            "model": model,
-            "run": d.get("run"),
+            "model": (d.get("model") or "").rsplit(".", 1)[0] or None,
+            "run": run,
             "split_set": d.get("split_set"),
             "val_mAP50": get(d, "val", "mAP50"),
             "val_mAP50_95": get(d, "val", "mAP50_95"),
@@ -128,120 +179,186 @@ def main():
             "test_mAP50_95": get(d, "test", "mAP50_95"),
             "classes_evaluated_val": get(d, "val", "classes_evaluated"),
             "classes_evaluated_test": get(d, "test", "classes_evaluated"),
-            "params_fused": d.get("params"),
-            "gflops": d.get("gflops"),
             "epochs_run": d.get("epochs_completed"),
             "train_time_min": d.get("train_minutes"),
-            "latency_source": LATENCY_SOURCE,
+            "latency_source": LATENCY_SOURCE if lat else "",
         }
-        # Latency stays empty. Written explicitly so a reader of this code can
-        # see the blanks are chosen, not the result of a lookup that failed.
+        for c in COMPLEXITY_COLUMNS:
+            row[c] = None
         for c in LATENCY_COLUMNS:
-            row[c] = ""
+            row[c] = None
+
+        if lat:
+            row["params_unfused"] = lat.get("params_unfused")
+            row["gflops_unfused"] = lat.get("gflops_unfused")
+            row["params_fused"] = lat.get("params_fused")
+            row["gflops_fused"] = lat.get("gflops_fused")
+            # Deliberately renamed: this counts nn.Module objects, which is NOT
+            # the "layers" figure Ultralytics prints.
+            row["layers_modules"] = lat.get("layers_fused")
+            for c in LATENCY_COLUMNS:
+                row[c] = lat.get(c)
+
+            # The training JSON's own complexity figures should equal the
+            # unified pass's UNFUSED pair. Checked, not assumed -- a mismatch
+            # would mean the two files describe different weights.
+            tp, tg = d.get("params"), d.get("gflops")
+            if tp is not None and lat.get("params_unfused") is not None \
+                    and tp != lat["params_unfused"]:
+                complexity_conflicts.append(
+                    (run, "params", tp, lat["params_unfused"]))
+            if tg is not None and lat.get("gflops_unfused") is not None \
+                    and abs(tg - lat["gflops_unfused"]) > GFLOPS_TOLERANCE:
+                complexity_conflicts.append(
+                    (run, "gflops", tg, lat["gflops_unfused"]))
 
         for k, v in row.items():
             if v is None:
                 missing.append((os.path.basename(p), k))
         rows.append(row)
 
-    # Sort by model then split so the two splits of one model sit adjacent.
     rows.sort(key=lambda r: (str(r["model"]), str(r["split_set"])))
 
     ec61.write_csv(OUT_CSV, COLUMNS,
-                   [[r.get(c, "") if r.get(c) is not None else "" for c in COLUMNS]
+                   [["" if r.get(c) is None else r.get(c) for c in COLUMNS]
                     for r in rows])
 
     ec61.write_config(
         run_dir, os.path.abspath(__file__),
-        params={"input_dir": KAGGLE_DIR, "output": OUT_CSV,
-                "n_runs": len(rows),
-                "latency_policy": "left empty; see docstring",
-                "latency_source_value": LATENCY_SOURCE},
+        params={"input_dir": KAGGLE_DIR, "latency_json": LATENCY_JSON,
+                "output": OUT_CSV, "n_runs": len(rows),
+                "latency_source_value": LATENCY_SOURCE,
+                "join_key": "run slug",
+                "gflops_tolerance": GFLOPS_TOLERANCE},
         extra={"inputs": {os.path.basename(p): sha256_file(p) for p in paths},
+               "latency_input_sha256": sha256_file(LATENCY_JSON),
+               "latency_protocol": lat_doc.get("protocol", {}),
+               "latency_environment": lat_doc.get("environment", {}),
+               "unjoined_runs": ["%s:%s" % (f, r) for f, r in unjoined],
+               "complexity_conflicts": ["%s %s train=%s unified_unfused=%s"
+                                        % c for c in complexity_conflicts],
                "missing_fields": ["%s:%s" % (f, k) for f, k in missing]})
 
-    # ---- print ------------------------------------------------------------
-    show = ["model", "split_set", "val_mAP50", "val_mAP50_95", "test_mAP50",
-            "test_mAP50_95", "classes_evaluated_val", "classes_evaluated_test",
-            "params_fused", "gflops", "epochs_run", "train_time_min"]
-    head = {"split_set": "split", "val_mAP50": "val@50", "val_mAP50_95": "val@50-95",
-            "test_mAP50": "test@50", "test_mAP50_95": "test@50-95",
-            "classes_evaluated_val": "cls_val", "classes_evaluated_test": "cls_test",
-            "params_fused": "params_fused", "gflops": "gflops",
-            "epochs_run": "epochs", "train_time_min": "train_min"}
-
+    # ---- print -------------------------------------------------------------
     def fmt(c, v):
         if v is None or v == "":
             return "-"
-        if c == "params_fused":
+        if c in ("params_unfused", "params_fused"):
             return "{:,}".format(v)
         return str(v)
 
-    widths = {}
-    for c in show:
-        widths[c] = max(len(head.get(c, c)),
-                        max(len(fmt(c, r.get(c))) for r in rows))
+    def block(cols, heads, title):
+        widths = {c: max(len(heads.get(c, c)),
+                         max(len(fmt(c, r.get(c))) for r in rows)) for c in cols}
+        line = "  ".join(heads.get(c, c).ljust(widths[c]) for c in cols)
+        print(title)
+        print(line)
+        print("-" * len(line))
+        for r in rows:
+            print("  ".join(fmt(c, r.get(c)).ljust(widths[c]) for c in cols))
+        print()
 
-    line = "  ".join(head.get(c, c).ljust(widths[c]) for c in show)
-    print(line)
-    print("-" * len(line))
-    for r in rows:
-        print("  ".join(fmt(c, r.get(c)).ljust(widths[c]) for c in show))
-    print()
-    print("latency columns (%s) are empty; latency_source = %s"
-          % (", ".join(LATENCY_COLUMNS), LATENCY_SOURCE))
-    print("wrote %s  (%d rows)" % (OUT_CSV, len(rows)))
+    h1 = {"split_set": "split", "val_mAP50": "val@50", "val_mAP50_95": "val@50-95",
+          "test_mAP50": "test@50", "test_mAP50_95": "test@50-95",
+          "classes_evaluated_val": "cls_val", "classes_evaluated_test": "cls_test",
+          "epochs_run": "epochs", "train_time_min": "train_min"}
+    h2 = {"params_unfused": "params_unfused", "gflops_unfused": "gflops_unf",
+          "params_fused": "params_fused", "gflops_fused": "gflops_fused",
+          "layers_modules": "layers_mod"}
+    h3 = {"e2e_ms_p50": "p50_ms", "e2e_ms_p95": "p95_ms", "fps_p50": "fps",
+          "pre_ms": "pre_ms", "inf_ms": "inf_ms", "post_ms": "post_ms"}
+
+    block(["model", "split_set", "val_mAP50", "val_mAP50_95", "test_mAP50",
+           "test_mAP50_95", "classes_evaluated_val", "classes_evaluated_test",
+           "epochs_run", "train_time_min"], h1,
+          "MASTER TABLE (1/3) -- accuracy")
+    block(["model", "split_set"] + COMPLEXITY_COLUMNS, h2,
+          "MASTER TABLE (2/3) -- complexity")
+    block(["model", "split_set"] + LATENCY_COLUMNS, h3,
+          "MASTER TABLE (3/3) -- latency, unified pass")
+
+    print("latency_source = %s" % LATENCY_SOURCE)
+    print("wrote %s  (%d rows, %d columns)" % (OUT_CSV, len(rows), len(COLUMNS)))
+    if unjoined:
+        print("UNJOINED RUNS (no latency row):")
+        for f, r in unjoined:
+            print("  %s -> %r" % (f, r))
+    if complexity_conflicts:
+        print("COMPLEXITY CONFLICTS (training JSON vs unified unfused):")
+        for run, field, a, b in complexity_conflicts:
+            print("  %-20s %-7s train=%s  unified=%s" % (run, field, a, b))
+    else:
+        print("complexity cross-check: training JSONs agree with the unified "
+              "unfused figures on all %d runs" % len(rows))
     if missing:
         print("MISSING FIELDS:")
         for f, k in missing:
             print("  %s -> %s" % (f, k))
 
-    # ---- summary ----------------------------------------------------------
+    # ---- summary -----------------------------------------------------------
     lines = []
     lines.append("# Master results table")
     lines.append("")
     lines.append("Run directory: `%s`" % os.path.basename(run_dir))
     lines.append("")
-    lines.append("Output: `data/master_results.csv` — %d rows from %d input files."
-                 % (len(rows), len(paths)))
+    lines.append("`data/master_results.csv` — %d rows, %d columns, from %d "
+                 "per-run files joined to the unified latency pass on the run "
+                 "slug." % (len(rows), len(COLUMNS), len(paths)))
     lines.append("")
-    lines.append("| " + " | ".join(head.get(c, c) for c in show) + " |")
-    lines.append("|" + "|".join("---" for _ in show) + "|")
-    for r in rows:
-        lines.append("| " + " | ".join(fmt(c, r.get(c)) for c in show) + " |")
-    lines.append("")
-    lines.append("## Latency")
-    lines.append("")
-    lines.append("All six latency columns are **empty** and `latency_source` is "
-                 "`%s`." % LATENCY_SOURCE)
-    lines.append("")
-    lines.append("The inputs do carry `latency_ms`, `fps` and per-section "
-                 "`speed_ms`, and none of it was copied. Those were measured in "
-                 "ten separate Kaggle sessions on whatever P100 each was "
-                 "allotted, under unknown contention. They cannot support a "
-                 "cross-model claim: a 2x gap between two rows could be "
-                 "scheduling noise. A unified pass over all ten checkpoints on "
-                 "one machine — warmup, `torch.cuda.synchronize()`, p50 and p95, "
-                 "batch size stated — is required before these columns are "
-                 "filled.")
-    lines.append("")
-    if missing:
-        lines.append("## Missing fields")
+    for title, cols, heads in [
+            ("Accuracy", ["model", "split_set", "val_mAP50", "val_mAP50_95",
+                          "test_mAP50", "test_mAP50_95", "classes_evaluated_val",
+                          "classes_evaluated_test", "epochs_run",
+                          "train_time_min"], h1),
+            ("Complexity", ["model", "split_set"] + COMPLEXITY_COLUMNS, h2),
+            ("Latency (unified pass)", ["model", "split_set"] + LATENCY_COLUMNS, h3)]:
+        lines.append("## %s" % title)
         lines.append("")
-        for f, k in missing:
-            lines.append("- `%s` has no `%s`" % (f, k))
+        lines.append("| " + " | ".join(heads.get(c, c) for c in cols) + " |")
+        lines.append("|" + "|".join("---" for _ in cols) + "|")
+        for r in rows:
+            lines.append("| " + " | ".join(fmt(c, r.get(c)) for c in cols) + " |")
         lines.append("")
+    lines.append("## Latency provenance")
+    lines.append("")
+    lines.append("`latency_source` = `%s`" % LATENCY_SOURCE)
+    lines.append("")
+    for k, v in sorted(lat_doc.get("protocol", {}).items()):
+        lines.append("- **%s**: %s" % (k, v))
+    lines.append("")
+    lines.append("The per-run JSONs' own `latency_ms`, `fps` and `speed_ms` "
+                 "fields are still not read. They were measured in ten separate "
+                 "sessions under unknown contention and cannot support a "
+                 "cross-model claim.")
+    lines.append("")
+    lines.append("## Complexity cross-check")
+    lines.append("")
+    if complexity_conflicts:
+        lines.append("**%d conflicts** between the training JSONs and the "
+                     "unified pass's unfused figures:" % len(complexity_conflicts))
+        lines.append("")
+        for run, field, a, b in complexity_conflicts:
+            lines.append("- `%s` %s: training %s, unified unfused %s"
+                         % (run, field, a, b))
+    else:
+        lines.append("The training JSONs' `params` and `gflops` agree with the "
+                     "unified pass's `params_unfused` and `gflops_unfused` on "
+                     "all %d runs (GFLOPs to within %.2f, the reporting "
+                     "precision). The two files describe the same weights."
+                     % (len(rows), GFLOPS_TOLERANCE))
+    lines.append("")
     lines.append("## What could make this misleading")
     lines.append("")
-    lines.append("- `params_fused` is copied from the JSON's `params`. The "
-                 "inputs do not state whether that count is fused or unfused.")
-    lines.append("- `classes_evaluated` is split into val and test columns "
-                 "because they differ on the published split (45 vs 46). One "
-                 "column would have hidden that.")
+    lines.append("- `layers_modules` counts nn.Module objects and is NOT the "
+                 "\"layers\" figure Ultralytics prints. Do not compare it "
+                 "against a published layer count.")
     lines.append("- Rows are not comparable across splits by accuracy alone: "
                  "the published split evaluates ~46 of 61 classes, the "
                  "corrected split all 61, so a lower corrected mAP may reflect "
                  "harder coverage rather than a worse model.")
+    lines.append("- Latency was measured on one Tesla P100. Ranking may not "
+                 "hold on other hardware, and transformer and CNN detectors do "
+                 "not scale alike across GPUs.")
     lines.append("")
     with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")

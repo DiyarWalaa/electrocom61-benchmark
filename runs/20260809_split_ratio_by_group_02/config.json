@@ -1,0 +1,49 @@
+{
+  "aggregate_pct": {
+    "test": 9.67,
+    "train": 69.68,
+    "valid": 20.65
+  },
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "expected_rounding": "none; real-valued total x ratio",
+    "near_nominal_tolerance_pp": 1.0,
+    "nominal": {
+      "test": 0.1,
+      "train": 0.7,
+      "valid": 0.2
+    },
+    "source": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\date_split_summary.csv"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-08T22:11:38.561290Z",
+  "script": "split_ratio_by_group.py",
+  "script_sha256": "0b46b8236ac2d565ebae401fbef52f105d99ec31c5acde62b1ce21df87fbd90e",
+  "shape_counts": {
+    "near-nominal": 4,
+    "skewed": 2,
+    "train-only": 3
+  },
+  "shape_members": {
+    "near-nominal": [
+      "6 Mar 2024",
+      "9 Mar 2024",
+      "17 Apr 2024",
+      "18 Nov 2024"
+    ],
+    "skewed": [
+      "28 Feb 2024",
+      "3 Mar 2024"
+    ],
+    "train-only": [
+      "19 Feb 2024",
+      "20 Feb 2024",
+      "iPhone (no timestamp)"
+    ]
+  },
+  "source_sha256": "34eda32a3a5beaffe3f8fb79d3f79046b6920e37635225f6f0a52a4e9263f439"
+}

@@ -22,9 +22,33 @@ Horizontal stacked bars, all 61 classes under the **published** split, train /
 valid / test, sorted by total descending.
 
 - Data: `runs/20260802_class_date_provenance/class_split_counts.csv`
-- Rendered size: **3.50 × 9.92 in** (1050 × 2977 px at 300 dpi)
+- Rendered size: **3.50 × 8.95 in** (1050 × 2686 px at 300 dpi)
 - 15 of 61 classes have zero valid+test instances; 22 have fewer than five test
   instances.
+
+**The caption is not drawn into the image.** It is set by LaTeX so it wraps to
+the real column, uses the document font, and reaches `\listoffigures` and
+cross-references. Removing it from the image took the height from 9.92 in to
+**8.95 in**, which fits inside the usable text height of an IEEE page. Row
+pitch and the 8 pt labels are unchanged.
+
+```latex
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/f1_class_instance_counts.pdf}
+  \caption{Per-class annotation counts, published split. 15 of 61 classes have
+  zero valid+test instances (filled marker, bold label) and cannot be evaluated
+  at all; 22 in total have fewer than five test instances --- the 15 above plus
+  seven more, including IC-Chip, the most annotated class in the dataset.}
+  \label{fig:class-instance-counts}
+\end{figure}
+```
+
+That string is **generated**, not typed: `make_figures.py` builds it from the
+source table, escapes it for LaTeX and prints it on every run. If the data ever
+changes, re-copy it from the build output rather than editing it here — and the
+build will refuse outright if IC-Chip stops being both the most-annotated class
+and a member of the under-five-test group.
 
 Built for the paper: one IEEE column wide, nothing below 8 pt, PDF with
 TrueType embedded (`pdf.fonttype 42`). The three splits are one hue at three
@@ -63,6 +87,22 @@ checked by eye instead of taken on trust.
 
 2700 × 3490 px at 200 dpi. Run `_01` used the pre-fix script (sha `bcd2c442`);
 `_02` matches the current script (`3c749f89`) and produced the committed image.
+
+## Deferred
+
+**No action on either of these now.**
+
+- **`near_duplicate_pair` → regenerate as PDF once Section 4 is drafted.**
+  It is currently PNG only. The journal wants vector, and regenerating it will
+  change an image that has already been reviewed, so it waits until the section
+  that cites it is written and its framing is settled. `figure_near_duplicate.py`
+  already reads the split from the built tree, so a PDF is a change to
+  `save_figure`, not a redraw of the content.
+
+- **`split_verification_sheet` stays PNG.** It is a photographic contact sheet
+  and appendix material: 48 thumbnails of real images, where vector output
+  would embed the same rasters at a larger file size and buy nothing. Not a
+  deferred task — a decision.
 
 ## Regenerating
 

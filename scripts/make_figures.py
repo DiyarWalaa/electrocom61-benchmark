@@ -171,6 +171,32 @@ def num_word(n):
     return _WORDS[n] if 0 <= n < len(_WORDS) else str(n)
 
 
+_LATEX_MAP = (
+    ("\\", "\\textbackslash{}"),
+    ("&", "\\&"),
+    ("%", "\\%"),
+    ("$", "\\$"),
+    ("#", "\\#"),
+    ("_", "\\_"),
+    ("{", "\\{"),
+    ("}", "\\}"),
+    ("~", "\\textasciitilde{}"),
+    ("^", "\\textasciicircum{}"),
+)
+
+
+def latex_escape(text):
+    r"""Make a caption safe to paste inside \caption{}.
+
+    Escapes the ten characters LaTeX treats specially, then converts the em
+    dash to the three-hyphen ligature LaTeX expects. Backslash is handled first
+    so the replacements it introduces are not themselves escaped.
+    """
+    for a, b in _LATEX_MAP:
+        text = text.replace(a, b)
+    return text.replace("—", "---")
+
+
 def wrap_text(text, width_in, fontsize):
     """Wrap to a pixel width, estimated from the font size.
 
@@ -211,20 +237,23 @@ def figure_1(rows):
                "including %s, the most annotated class in the dataset."
                % (len(zero_vt), n, len(under_min_test), num_word(MIN_TEST),
                   len(zero_vt), num_word(len(low_test)), top["name"]))
-    caption = wrap_text(caption, COL_W - 0.10, 8)
-    n_cap_lines = len(caption.splitlines())
+    # The caption is NOT drawn into the image. It is returned so LaTeX can set
+    # it with \caption{}, which is where a journal expects it: the text then
+    # wraps to the real column, uses the document font, and is picked up by
+    # \listoffigures and by cross-references. Keeping a bitmap copy inside the
+    # figure would also mean the same sentence existed in two places and could
+    # drift apart.
+    caption_latex = latex_escape(caption)
 
     # Vertical budget in inches, reserved before anything is drawn so nothing
-    # has to overlap: legend strip, plot body, x label, caption block.
-    h_plot = 0.132 * n
+    # has to overlap: legend strip, plot body, x label.
+    h_plot = 0.132 * n       # row pitch unchanged
     h_legend = 0.52          # two legend rows
     h_xlabel = 0.38
-    h_caption = 0.135 * n_cap_lines + 0.16
-    fig_h = h_legend + h_plot + h_xlabel + h_caption
+    fig_h = h_legend + h_plot + h_xlabel
 
     fig = plt.figure(figsize=(COL_W, fig_h))
-    ax = fig.add_axes([0.60, (h_xlabel + h_caption) / fig_h,
-                       0.37, h_plot / fig_h])
+    ax = fig.add_axes([0.60, h_xlabel / fig_h, 0.37, h_plot / fig_h])
 
     y = list(range(n))
     tr = [r["train"] for r in rows]
@@ -307,9 +336,6 @@ def figure_1(rows):
                handlelength=1.0, handletextpad=0.4, columnspacing=1.2,
                borderaxespad=0.0)
 
-    fig.text(0.012, 0.008, caption, fontsize=8, color=INK, ha="left",
-             va="bottom", linespacing=1.35)
-
     # ---- fit the left margin to the widest label, measured not guessed -----
     fig.canvas.draw()
     dpi = fig.dpi
@@ -317,7 +343,7 @@ def figure_1(rows):
     gutter = 13 / 72.0 + 0.05          # tick pad + marker clearance
     left = (widest + gutter + 0.02) / COL_W
     right_margin = 0.035
-    ax.set_position([left, (h_xlabel + h_caption) / fig_h,
+    ax.set_position([left, h_xlabel / fig_h,
                      1.0 - left - right_margin, h_plot / fig_h])
 
     counts = {
@@ -335,7 +361,8 @@ def figure_1(rows):
         "figure_height_in": round(fig_h, 3),
         "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
                                                       round(fig_h * PNG_DPI)),
-        "caption_lines": n_cap_lines,
+        "caption_plain": caption,
+        "caption_latex": caption_latex,
         "widest_label_in": round(widest, 3),
         "zero_valid_plus_test_names": [r["name"] for r in zero_vt],
         "between_1_and_4_test_names": [r["name"] for r in low_test],
@@ -386,7 +413,9 @@ def main():
     print("    %-24s %.2f in" % ("HEIGHT", counts["figure_height_in"]))
     print("    %-24s %s" % ("pixels at %d dpi" % PNG_DPI,
                             counts["figure_px_at_%d_dpi" % PNG_DPI]))
-    print("    %-24s %d" % ("caption lines", counts["caption_lines"]))
+    print()
+    print("  LaTeX caption (not drawn into the image)")
+    print("    " + counts["caption_latex"])
     print()
     print("  zero valid+test (%d):" % counts["zero_valid_plus_test"])
     for nme in counts["zero_valid_plus_test_names"]:
@@ -406,7 +435,7 @@ def main():
               "valid_instances", "test_instances", "zero_valid_plus_test",
               "fewer_than_5_test", "between_1_and_4_test",
               "largest_class", "smallest_class", "figure_width_in",
-              "figure_height_in", "caption_lines"):
+              "figure_height_in"):
         lines.append("| %s | %s |" % (k, counts[k]))
     lines.append("")
     lines.append("Classes with zero valid+test instances: %s"

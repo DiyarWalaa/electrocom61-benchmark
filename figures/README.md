@@ -138,6 +138,27 @@ same set. That is what a metadata file frozen before the final session looks
 like: the CSV describes every image except the last shoot. Worth a sentence in
 Section 3.
 
+### Filename taxonomy — a fourth pattern, for Section 4
+
+The audit's three filename families are joined by a fourth:
+
+| Pattern | Example | Count |
+|---|---|---|
+| `IMG_<date>_<time>` | `IMG_20240220_115315` | 1180 |
+| `IMG<date><time>` | `IMG20240219113638` | 743 |
+| `IMG_<counter>` | `IMG_5126` | 189 |
+| **`IMG<date><time>_NN`** | **`IMG20241118160515_01`** | **9** |
+
+**`IMG<timestamp>_NN` — 9 images, every one in train.** All carry suffix `_01`;
+dates 28 Feb (7), 6 Mar (1), 18 Nov (1). Only one of the nine has an
+un-suffixed file of the same timestamp (`IMG20240306120710`), and that pair
+scores raw 0.0116 / aligned 0.0111 — a near-duplicate, both in train.
+
+Roboflow appends such a suffix on filename collision, but eight of the nine
+have no collision partner in the dataset, which is more consistent with a
+camera burst index than with a duplicate upload. Filenames alone cannot settle
+the mechanism; the counts can be stated, the cause should not be.
+
 Composition of those 50 by filename family, from `family_vs_device.csv`:
 **49 `ts_compact` + 1 `ts_compact_sub` = 50.** The single `ts_compact_sub`
 image is `IMG20241118160515_01` — a compact timestamp carrying a burst

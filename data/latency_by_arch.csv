@@ -1,0 +1,6 @@
+model,n_runs,splits,e2e_ms_p50_mean,e2e_ms_p50_gap,e2e_ms_p50_gap_pct,e2e_ms_p95_mean,e2e_ms_p95_gap,e2e_ms_p95_gap_pct,fps_p50_mean,fps_p50_gap,fps_p50_gap_pct,pre_ms_mean,pre_ms_gap,pre_ms_gap_pct,inf_ms_mean,inf_ms_gap,inf_ms_gap_pct,post_ms_mean,post_ms_gap,post_ms_gap_pct
+yolo11s,2,corrected;published,13.68,0.24,1.7544,14.59,0.3,2.0562,73.1,1.2,1.6416,1.255,0.01,0.7968,8.395,0.01,0.1191,1.06,0.02,1.8868
+yolo26s,2,corrected;published,14.645,0.05,0.3414,15.93,0.16,1.0044,68.3,0.2,0.2928,1.275,0.01,0.7843,10.06,0.02,0.1988,0.38,0.0,0.0
+yolo12s,2,corrected;published,18.945,0.23,1.214,20.795,0.75,3.6066,52.8,0.6,1.1364,1.285,0.03,2.3346,13.65,0.34,2.4908,1.08,0.0,0.0
+yolov9s,2,corrected;published,21.045,0.13,0.6177,22.695,0.05,0.2203,47.55,0.3,0.6309,1.28,0.0,0.0,15.805,0.01,0.0633,1.065,0.01,0.939
+rtdetr-l,2,corrected;published,47.21,0.12,0.2542,49.56,0.14,0.2825,21.2,0.0,0.0,1.315,0.01,0.7605,41.885,0.01,0.0239,0.575,0.03,5.2174

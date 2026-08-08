@@ -54,6 +54,11 @@ collected_bundle.zip
 # ---------------------------------------------------------------------------
 !data/master_results.csv
 
+# Per-architecture latency means and pair gaps, built by
+# scripts/latency_by_arch.py. Same rationale: small text, and it carries the
+# repeatability statement the latency claims rest on.
+!data/latency_by_arch.csv
+
 # ---------------------------------------------------------------------------
 # Python bytecode -- regenerated on every run, machine-specific.
 # ---------------------------------------------------------------------------

@@ -157,6 +157,20 @@ def load_f1_rows(path):
     return out
 
 
+_WORDS = ("zero", "one", "two", "three", "four", "five", "six", "seven",
+          "eight", "nine", "ten", "eleven", "twelve")
+
+
+def num_word(n):
+    """Small integers as words, so caption prose reads naturally.
+
+    Still derived, never typed: the caller passes a counted value and this only
+    changes how it is spelled. Anything outside the table falls back to digits
+    rather than inventing a word.
+    """
+    return _WORDS[n] if 0 <= n < len(_WORDS) else str(n)
+
+
 def wrap_text(text, width_in, fontsize):
     """Wrap to a pixel width, estimated from the font size.
 
@@ -181,11 +195,22 @@ def figure_1(rows):
     zero_names = {r["name"] for r in zero_vt}
     low_names = {r["name"] for r in low_test}
 
+    # The caption names the most-annotated class in the whole dataset as an
+    # example of the "<5 test" group. That is only true if the top-ranked class
+    # is actually in that group, so it is checked rather than asserted in prose.
+    top = rows[0]
+    if top["name"] not in low_names:
+        raise ValueError(
+            "caption claims the most annotated class (%s) is among the "
+            "1-%d test group, but it is not" % (top["name"], MIN_TEST - 1))
+
     caption = ("Per-class annotation counts, published split. "
                "%d of %d classes have zero valid+test instances (filled marker, "
-               "bold label) and cannot be evaluated at all; %d have fewer than "
-               "%d test instances." % (len(zero_vt), n, len(under_min_test),
-                                       MIN_TEST))
+               "bold label) and cannot be evaluated at all; %d in total have "
+               "fewer than %s test instances — the %d above plus %s more, "
+               "including %s, the most annotated class in the dataset."
+               % (len(zero_vt), n, len(under_min_test), num_word(MIN_TEST),
+                  len(zero_vt), num_word(len(low_test)), top["name"]))
     caption = wrap_text(caption, COL_W - 0.10, 8)
     n_cap_lines = len(caption.splitlines())
 
@@ -222,7 +247,11 @@ def figure_1(rows):
     ax.invert_yaxis()
     ax.set_ylim(n - 0.5, -0.5)
     ax.set_xlabel("annotation instances")
-    ax.set_xlim(0, max(r["total"] for r in rows) * 1.02)
+    xmax_data = max(r["total"] for r in rows)
+    ax.set_xlim(0, xmax_data * 1.02)
+    # Ticks every 100. Generated from the data range rather than written out,
+    # so the axis stays correct if the counts ever change.
+    ax.set_xticks(list(range(0, int(xmax_data) + 1, 100)))
 
     ax.xaxis.grid(True, color=GRID, linewidth=0.4)
     ax.set_axisbelow(True)
@@ -302,6 +331,11 @@ def figure_1(rows):
         "test_instances": sum(te),
         "largest_class": "%s (%d)" % (rows[0]["name"], rows[0]["total"]),
         "smallest_class": "%s (%d)" % (rows[-1]["name"], rows[-1]["total"]),
+        "figure_width_in": round(COL_W, 3),
+        "figure_height_in": round(fig_h, 3),
+        "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
+                                                      round(fig_h * PNG_DPI)),
+        "caption_lines": n_cap_lines,
         "widest_label_in": round(widest, 3),
         "zero_valid_plus_test_names": [r["name"] for r in zero_vt],
         "between_1_and_4_test_names": [r["name"] for r in low_test],
@@ -347,6 +381,13 @@ def main():
               "largest_class", "smallest_class"):
         print("    %-24s %s" % (k, counts[k]))
     print()
+    print("  rendered size")
+    print("    %-24s %.2f in" % ("width", counts["figure_width_in"]))
+    print("    %-24s %.2f in" % ("HEIGHT", counts["figure_height_in"]))
+    print("    %-24s %s" % ("pixels at %d dpi" % PNG_DPI,
+                            counts["figure_px_at_%d_dpi" % PNG_DPI]))
+    print("    %-24s %d" % ("caption lines", counts["caption_lines"]))
+    print()
     print("  zero valid+test (%d):" % counts["zero_valid_plus_test"])
     for nme in counts["zero_valid_plus_test_names"]:
         print("    - %s" % nme)
@@ -364,7 +405,8 @@ def main():
     for k in ("n_classes", "total_instances", "train_instances",
               "valid_instances", "test_instances", "zero_valid_plus_test",
               "fewer_than_5_test", "between_1_and_4_test",
-              "largest_class", "smallest_class"):
+              "largest_class", "smallest_class", "figure_width_in",
+              "figure_height_in", "caption_lines"):
         lines.append("| %s | %s |" % (k, counts[k]))
     lines.append("")
     lines.append("Classes with zero valid+test instances: %s"

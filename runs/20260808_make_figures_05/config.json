@@ -1,0 +1,69 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "f1_counts": {
+    "between_1_and_4_test": 7,
+    "between_1_and_4_test_names": [
+      "IC-Chip",
+      "Diode",
+      "Arduino-Uno",
+      "ESP32",
+      "Fuse-Base",
+      "Heat-Sink",
+      "Servo-Motor"
+    ],
+    "caption_lines": 6,
+    "fewer_than_5_test": 22,
+    "figure_height_in": 9.922,
+    "figure_px_at_300_dpi": "1050 x 2977",
+    "figure_width_in": 3.5,
+    "largest_class": "IC-Chip (339)",
+    "n_classes": 61,
+    "smallest_class": "RFID-Scanner (153)",
+    "test_instances": 1149,
+    "total_instances": 12937,
+    "train_instances": 9188,
+    "valid_instances": 2600,
+    "widest_label_in": 1.986,
+    "zero_valid_plus_test": 15,
+    "zero_valid_plus_test_names": [
+      "Inductor",
+      "LED-Light",
+      "MLC-Capacitor",
+      "OLED-Display",
+      "Push-Switch",
+      "Buzzer",
+      "High-Voltage-Ceramic-Capacitor",
+      "Bluetooth-Module",
+      "Sonar-Sensor",
+      "Gas-Sensor",
+      "LCD-Display",
+      "Motor-Driver",
+      "LDR-Sensor",
+      "9-Volt-Battery",
+      "RFID-Scanner"
+    ]
+  },
+  "f1_source": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\class_split_counts.csv",
+  "f1_source_sha256": "71942daf481efdf007cc37a1567f1dc9fd7fb4a0bc2dd38c57b45bcce00432df",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "outputs": [
+    "C:\\research\\electrocom61\\figures\\f1_class_instance_counts.pdf",
+    "C:\\research\\electrocom61\\figures\\f1_class_instance_counts.png"
+  ],
+  "params": {
+    "column_width_in": 3.5,
+    "figures": [
+      "f1_class_instance_counts"
+    ],
+    "min_test": 5,
+    "pdf_fonttype": 42,
+    "png_dpi": 300
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-08T18:04:16.016997Z",
+  "script": "make_figures.py",
+  "script_sha256": "fa349cfc99554c2095b2af7b0e11a297f90ee410312c3e97576da52b03ca1569"
+}

@@ -10,7 +10,8 @@ from.
 
 | Figure | Script | Canonical run | Formats |
 |---|---|---|---|
-| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260808_make_figures_05/` | PDF + PNG 300 dpi |
+| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures/` | PDF + PNG 300 dpi |
+| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures/` | PDF + PNG 300 dpi |
 | `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260804_figure_near_duplicate_04/` | PNG 300 dpi |
 | `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260805_figure_verification_sheet_02/` | PNG 200 dpi |
 
@@ -55,6 +56,93 @@ TrueType embedded (`pdf.fonttype 42`). The three splits are one hue at three
 lightnesses so the encoding survives greyscale printing and colour vision
 deficiency; the singled-out classes carry a bold label, an accent colour and a
 marker, so no single channel is load-bearing.
+
+## F2 — capture-group composition
+
+`f2_capture_group_composition.pdf` / `.png`
+
+One horizontal bar per capture session under the **published** split, stacked
+train / valid / test, ordered by date. Explains F1: the classes F1 shows as
+unevaluable are unevaluable because the sessions they were shot in never
+reached valid or test.
+
+- Data: `runs/20260802_class_date_provenance/date_split_summary.csv`
+- Rendered size: **3.50 × 3.60 in** (1050 × 1080 px at 300 dpi)
+
+| Group | train | valid | test | total | train-only |
+|---|---|---|---|---|---|
+| 19 Feb 2024 | 100 | 0 | 0 | **100** | yes |
+| 20 Feb 2024 | 486 | 0 | 0 | **486** | yes |
+| 28 Feb 2024 | 173 | 266 | 43 | 482 | |
+| 3 Mar 2024 | 55 | 38 | 95 | 188 | |
+| 6 Mar 2024 | 172 | 48 | 24 | 244 | |
+| 9 Mar 2024 | 230 | 66 | 32 | 328 | |
+| 17 Apr 2024 | 38 | 10 | 6 | 54 | |
+| 18 Nov 2024 | 35 | 10 | 5 | 50 | |
+| iPhone (no timestamp) | 189 | 0 | 0 | **189** | yes |
+| **Total** | **1478** | **438** | **205** | **2121** | |
+
+Three groups totalling **775 images, 52.4% of train**, reach neither valid nor
+test. All 15 unevaluable classes occur only within them — checked at build
+time against `never_evaluated_classes.csv`, and the build raises if any of
+those classes turns up in a group that does reach valid or test.
+
+```latex
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/f2_capture_group_composition.pdf}
+  \caption{Capture-group composition of the published split. Each bar is one
+  capture session; 3 of the 9 groups reach neither valid nor test (bold label,
+  filled marker) and together hold 775 of the 1478 training images, 52.4\%.
+  All 15 classes that cannot be evaluated at all occur only within those three
+  groups.}
+  \label{fig:capture-group-composition}
+\end{figure}
+```
+
+### The iPhone label rests on a correspondence, not a join
+
+The untimestamped bar is labelled **iPhone (no timestamp)**, and that
+attribution is weaker than a row-level join — it should be described carefully
+in the paper.
+
+`date_split_summary.csv` knows the group only as `<untimestamped:counter>`: the
+filename family that encodes no capture time. It carries no device field. The
+device attribution comes from a **1:1 correspondence between two independently
+built tables**:
+
+- `family_vs_device.csv` — the `counter` family maps to `iPhone` and to nothing
+  else: 189 images, zero under every other device value.
+- `device_by_split.csv` — the `iPhone` row is 189 / 0 / 0.
+- `single_split_devices.csv` — both `iPhone` and the `counter` family are
+  recorded as train-only at 189 images.
+
+The build asserts that the untimestamped group's train/valid/test counts equal
+the iPhone row exactly, and refuses to draw the label otherwise. Agreement
+across all three splits at 189 / 0 / 0 is the evidence. **No image-level key
+links the two tables**, so this is a correspondence between aggregates, not a
+join — strong, but state it as such.
+
+### `<no CSV row>` and 18 Nov 2024 are the same 50 images
+
+A second correspondence, corroborating audit Finding 2 from an angle the four
+provenance tests do not use:
+
+- `device_by_split.csv` — the `<no CSV row>` device bucket holds **50** images,
+  split **35 / 10 / 5**.
+- `date_split_summary.csv` — the `20241118` capture group holds **50** images,
+  split **35 / 10 / 5**.
+
+The images with no metadata row and the images captured on 18 Nov 2024 are the
+same set. That is what a metadata file frozen before the final session looks
+like: the CSV describes every image except the last shoot. Worth a sentence in
+Section 3.
+
+Composition of those 50 by filename family, from `family_vs_device.csv`:
+**49 `ts_compact` + 1 `ts_compact_sub` = 50.** The single `ts_compact_sub`
+image is `IMG20241118160515_01` — a compact timestamp carrying a burst
+sub-index — dated 20241118 and sitting in train. Quoting the `ts_compact` cell
+alone gives 49 and understates the count; the audit's **50** is correct.
 
 ## Audit-phase figures
 
@@ -103,6 +191,11 @@ checked by eye instead of taken on trust.
   and appendix material: 48 thumbnails of real images, where vector output
   would embed the same rasters at a larger file size and buy nothing. Not a
   deferred task — a decision.
+
+- **`device_by_split.csv` becomes a table, not a figure.** Five rows plus a
+  total; a bar chart of five values costs a full column to say what a table
+  says in five lines. Nothing built for it. Its numbers already appear in this
+  file, above, as the evidence behind F2's iPhone label.
 
 ## Regenerating
 

@@ -87,6 +87,33 @@ F1_SOURCE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
 # The threshold the paper uses for "too few to evaluate meaningfully".
 MIN_TEST = 5
 
+# --- F2 --------------------------------------------------------------------
+F2_SOURCE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
+                         "date_split_summary.csv")
+# Read only to justify the "iPhone" label on the untimestamped bar; no bar is
+# drawn from it.
+F2_DEVICE_SOURCE = os.path.join(ec61.RUNS_DIR, "20260801_device_split",
+                                "device_by_split.csv")
+# Supplies the count of classes that cannot be evaluated, and the groups each
+# occurs in, so the caption's "only within those groups" claim is verifiable.
+F2_UNEVALUABLE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
+                              "never_evaluated_classes.csv")
+
+# The bucket key the audit uses for images whose filenames carry no capture
+# time, and the label it is drawn with.
+UNTIMESTAMPED_KEY = "<untimestamped:counter>"
+UNTIMESTAMPED_LABEL = "iPhone (no timestamp)"
+
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun",
+           "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+
+
+def pretty_date(key):
+    """YYYYMMDD -> '19 Feb 2024'. Anything else is returned unchanged."""
+    if len(key) == 8 and key.isdigit():
+        return "%d %s %s" % (int(key[6:8]), _MONTHS[int(key[4:6]) - 1], key[:4])
+    return key
+
 
 def apply_style():
     """Publication defaults. Nothing below 8 pt."""
@@ -370,6 +397,200 @@ def figure_1(rows):
     return fig, counts
 
 
+def load_f2_rows(path, device_path):
+    """Capture groups with their split composition, ordered for drawing.
+
+    The untimestamped bucket cannot be placed on the timeline, so it is sorted
+    last rather than given a fabricated position among the dates.
+
+    Before the untimestamped bar may be labelled "iPhone", the claim is checked:
+    its train/valid/test counts must equal the iPhone row of device_by_split.csv
+    exactly. The two files share no row key -- the correspondence is 1:1 between
+    the counter filename family and the CSV device value -- so agreement across
+    all three splits is the evidence, and a mismatch means the label is unearned.
+    """
+    with open(path, "r", newline="", encoding="utf-8-sig") as fh:
+        raw = list(csv.DictReader(fh))
+
+    rows = []
+    for r in raw:
+        key = r["capture_date"]
+        rows.append({
+            "key": key,
+            "label": UNTIMESTAMPED_LABEL if key == UNTIMESTAMPED_KEY
+                     else pretty_date(key),
+            "train": int(r["imgs_train"]),
+            "valid": int(r["imgs_valid"]),
+            "test": int(r["imgs_test"]),
+            "total": int(r["imgs_total"]),
+            "train_only": r["date_is_train_only"] == "yes",
+        })
+
+    bad = [r["key"] for r in rows
+           if r["train"] + r["valid"] + r["test"] != r["total"]]
+    if bad:
+        raise ValueError("imgs_total disagrees with the parts for: %s" % bad)
+
+    # The flag in the file and the numbers in the file must agree.
+    for r in rows:
+        computed = r["train"] > 0 and r["valid"] == 0 and r["test"] == 0
+        if computed != r["train_only"]:
+            raise ValueError("date_is_train_only disagrees with the counts "
+                             "for %s" % r["key"])
+
+    # --- justify the iPhone label ---------------------------------------
+    with open(device_path, "r", newline="", encoding="utf-8-sig") as fh:
+        dev = {d["device_name_csv"]: d for d in csv.DictReader(fh)}
+    untimed = [r for r in rows if r["key"] == UNTIMESTAMPED_KEY]
+    if len(untimed) != 1:
+        raise ValueError("expected exactly one %s row" % UNTIMESTAMPED_KEY)
+    u = untimed[0]
+    iphone = dev.get("iPhone")
+    if iphone is None:
+        raise ValueError("no iPhone row in %s" % device_path)
+    got = (int(iphone["train"]), int(iphone["valid"]), int(iphone["test"]))
+    want = (u["train"], u["valid"], u["test"])
+    if got != want:
+        raise ValueError(
+            "cannot label the untimestamped bar 'iPhone': counter family is "
+            "%s but the iPhone device row is %s" % (want, got))
+
+    rows.sort(key=lambda r: (r["key"] == UNTIMESTAMPED_KEY, r["key"]))
+    return rows, want
+
+
+def figure_2(rows, iphone_counts, unevaluable):
+    """Capture-group composition: which sessions reach valid and test at all.
+
+    `unevaluable` is the list of class names that cannot be evaluated at all,
+    read from the audit's never_evaluated_classes.csv. It is passed in rather
+    than counted here so the caption's claim -- that those classes occur only
+    within the train-only groups -- is checked against the same table that
+    produced them.
+    """
+    n = len(rows)
+    train_only = [r for r in rows if r["train_only"]]
+    train_only_keys = {r["key"] for r in train_only}
+    n_train_only_imgs = sum(r["total"] for r in train_only)
+    n_train_imgs = sum(r["train"] for r in rows)
+    pct = 100.0 * n_train_only_imgs / n_train_imgs
+
+    # The caption asserts the unevaluable classes occur ONLY in these groups.
+    # Verified here; a class appearing anywhere else makes the sentence false.
+    stray = sorted({g for cls in unevaluable for g in cls["groups"]}
+                   - train_only_keys)
+    if stray:
+        raise ValueError("caption claims the unevaluable classes occur only in "
+                         "train-only groups, but they also occur in: %s" % stray)
+
+    caption = ("Capture-group composition of the published split. Each bar is "
+               "one capture session; %d of the %d groups reach neither valid "
+               "nor test (bold label, filled marker) and together hold %d of "
+               "the %d training images, %.1f%%. All %d classes that cannot be "
+               "evaluated at all occur only within those three groups."
+               % (len(train_only), n, n_train_only_imgs, n_train_imgs, pct,
+                  len(unevaluable)))
+
+    # Nine rows, so a far larger pitch than F1's 61-row chart. The conventions
+    # that matter -- colours, 8 pt floor, column width, legend, marker language
+    # -- are shared; the row pitch is not one of them.
+    h_plot = 0.30 * n
+    h_legend = 0.52
+    h_xlabel = 0.38
+    fig_h = h_legend + h_plot + h_xlabel
+
+    fig = plt.figure(figsize=(COL_W, fig_h))
+    ax = fig.add_axes([0.40, h_xlabel / fig_h, 0.57, h_plot / fig_h])
+
+    y = list(range(n))
+    tr = [r["train"] for r in rows]
+    va = [r["valid"] for r in rows]
+    te = [r["test"] for r in rows]
+    left_te = [a + b for a, b in zip(tr, va)]
+
+    bh = 0.68
+    ax.barh(y, tr, height=bh, color=C_TRAIN, edgecolor="white", linewidth=0.3)
+    ax.barh(y, va, height=bh, left=tr, color=C_VALID, edgecolor="white",
+            linewidth=0.3)
+    ax.barh(y, te, height=bh, left=left_te, color=C_TEST, edgecolor="white",
+            linewidth=0.3)
+
+    ax.set_yticks(y)
+    ax.set_yticklabels([r["label"] for r in rows])
+    ax.tick_params(axis="y", pad=13)
+    ax.invert_yaxis()
+    ax.set_ylim(n - 0.5, -0.5)
+    ax.set_xlabel("images")
+
+    xmax_data = max(r["total"] for r in rows)
+    ax.set_xlim(0, xmax_data * 1.16)          # room for the value labels
+    ax.set_xticks(list(range(0, int(xmax_data) + 1, 100)))
+    ax.xaxis.grid(True, color=GRID, linewidth=0.4)
+    ax.set_axisbelow(True)
+    for side in ("top", "right", "left"):
+        ax.spines[side].set_visible(False)
+
+    # Total at the end of each bar: with nine bars there is room, and it lets a
+    # reader check 100 / 486 / 189 against the figure without the table.
+    for i, r in enumerate(rows):
+        ax.text(r["total"] + xmax_data * 0.015, i, str(r["total"]),
+                va="center", ha="left", fontsize=8,
+                color=C_ACCENT if r["train_only"] else INK,
+                fontweight="bold" if r["train_only"] else "normal")
+
+    for lbl in ax.get_yticklabels():
+        if lbl.get_text() in {r["label"] for r in train_only}:
+            lbl.set_color(C_ACCENT)
+            lbl.set_fontweight("bold")
+
+    from matplotlib.transforms import blended_transform_factory
+    tf = blended_transform_factory(ax.transAxes, ax.transData)
+    for i, r in enumerate(rows):
+        if r["train_only"]:
+            ax.plot([-0.035], [i], marker="o", markersize=3.0, color=C_ACCENT,
+                    transform=tf, clip_on=False, zorder=5)
+
+    split_handles = [Patch(facecolor=C_TRAIN, label="train"),
+                     Patch(facecolor=C_VALID, label="valid"),
+                     Patch(facecolor=C_TEST, label="test")]
+    mark_handles = [Line2D([], [], linestyle="none", marker="o", markersize=3.0,
+                           color=C_ACCENT, label="train-only group")]
+    fig.legend(handles=split_handles, ncol=3, loc="upper left",
+               bbox_to_anchor=(0.015, 1.0 - 0.04 / fig_h), frameon=False,
+               handlelength=1.0, handletextpad=0.4, columnspacing=1.2,
+               borderaxespad=0.0)
+    fig.legend(handles=mark_handles, ncol=1, loc="upper left",
+               bbox_to_anchor=(0.015, 1.0 - 0.23 / fig_h), frameon=False,
+               handlelength=1.0, handletextpad=0.4, borderaxespad=0.0)
+
+    fig.canvas.draw()
+    widest = max(t.get_window_extent().width
+                 for t in ax.get_yticklabels()) / fig.dpi
+    left = (widest + 13 / 72.0 + 0.05 + 0.02) / COL_W
+    ax.set_position([left, h_xlabel / fig_h, 1.0 - left - 0.035, h_plot / fig_h])
+
+    counts = {
+        "caption_plain": caption,
+        "caption_latex": latex_escape(caption),
+        "n_unevaluable_classes": len(unevaluable),
+        "n_groups": n,
+        "n_train_only_groups": len(train_only),
+        "train_only_groups": [r["label"] for r in train_only],
+        "train_only_images": n_train_only_imgs,
+        "train_images_total": n_train_imgs,
+        "train_only_pct_of_train": round(pct, 2),
+        "iphone_row_from_device_table": list(iphone_counts),
+        "figure_width_in": round(COL_W, 3),
+        "figure_height_in": round(fig_h, 3),
+        "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
+                                                      round(fig_h * PNG_DPI)),
+        "groups": [{"label": r["label"], "train": r["train"], "valid": r["valid"],
+                    "test": r["test"], "total": r["total"],
+                    "train_only": r["train_only"]} for r in rows],
+    }
+    return fig, counts
+
+
 def main():
     apply_style()
 
@@ -382,17 +603,6 @@ def main():
     rows = load_f1_rows(F1_SOURCE)
     fig, counts = figure_1(rows)
     pdf, png = save_figure(fig, "f1_class_instance_counts")
-
-    ec61.write_config(
-        run_dir, os.path.abspath(__file__),
-        params={"figures": ["f1_class_instance_counts"],
-                "column_width_in": COL_W, "png_dpi": PNG_DPI,
-                "min_test": MIN_TEST,
-                "pdf_fonttype": 42},
-        extra={"f1_source": F1_SOURCE,
-               "f1_source_sha256": sha256_file(F1_SOURCE),
-               "f1_counts": counts,
-               "outputs": [pdf, png]})
 
     print("F1  per-class instance counts, published split")
     print("  source : %s" % os.path.relpath(F1_SOURCE, ec61.REPO_ROOT).replace("\\", "/"))
@@ -423,6 +633,85 @@ def main():
     print("  1-4 test instances (%d):" % counts["between_1_and_4_test"])
     for nme in counts["between_1_and_4_test_names"]:
         print("    - %s" % nme)
+
+    # ---- F2 --------------------------------------------------------------
+    for p in (F2_SOURCE, F2_DEVICE_SOURCE, F2_UNEVALUABLE):
+        if not os.path.isfile(p):
+            sys.stderr.write("F2 source not found: %s\n" % p)
+            return 1
+
+    with open(F2_UNEVALUABLE, "r", newline="", encoding="utf-8-sig") as fh:
+        unevaluable = [{"name": r["class_name"],
+                        "groups": set(r["all_dates"].split(";"))}
+                       for r in csv.DictReader(fh)]
+
+    f2_rows, iphone_counts = load_f2_rows(F2_SOURCE, F2_DEVICE_SOURCE)
+    fig2, c2 = figure_2(f2_rows, iphone_counts, unevaluable)
+    pdf2, png2 = save_figure(fig2, "f2_capture_group_composition")
+
+    # One provenance record covering both figures, written once both exist so
+    # a half-built run cannot leave a config claiming figures it never made.
+    ec61.write_config(
+        run_dir, os.path.abspath(__file__),
+        params={"figures": ["f1_class_instance_counts",
+                            "f2_capture_group_composition"],
+                "column_width_in": COL_W, "png_dpi": PNG_DPI,
+                "min_test": MIN_TEST, "pdf_fonttype": 42},
+        extra={"f1_source": F1_SOURCE,
+               "f1_source_sha256": sha256_file(F1_SOURCE),
+               "f1_counts": counts,
+               "f2_source": F2_SOURCE,
+               "f2_source_sha256": sha256_file(F2_SOURCE),
+               "f2_device_source": F2_DEVICE_SOURCE,
+               "f2_device_source_sha256": sha256_file(F2_DEVICE_SOURCE),
+               "f2_unevaluable_source": F2_UNEVALUABLE,
+               "f2_unevaluable_source_sha256": sha256_file(F2_UNEVALUABLE),
+               "f2_counts": c2,
+               "outputs": [pdf, png, pdf2, png2]})
+
+    print()
+    print("F2  capture-group composition, published split")
+    print("  source : %s" % os.path.relpath(F2_SOURCE, ec61.REPO_ROOT).replace("\\", "/"))
+    print("  label  : %s (iPhone attribution checked against %s)"
+          % (UNTIMESTAMPED_LABEL,
+             os.path.relpath(F2_DEVICE_SOURCE, ec61.REPO_ROOT).replace("\\", "/")))
+    print("  pdf    : %s (%.1f KB)" % (os.path.relpath(pdf2, ec61.REPO_ROOT).replace("\\", "/"),
+                                       os.path.getsize(pdf2) / 1024))
+    print("  png    : %s (%.1f KB, %d dpi)" % (os.path.relpath(png2, ec61.REPO_ROOT).replace("\\", "/"),
+                                               os.path.getsize(png2) / 1024, PNG_DPI))
+    print()
+    print("  derived group table")
+    print("    %-22s %6s %6s %6s %7s  %s" % ("group", "train", "valid", "test",
+                                             "total", "train-only"))
+    print("    " + "-" * 62)
+    for g in c2["groups"]:
+        print("    %-22s %6d %6d %6d %7d  %s"
+              % (g["label"], g["train"], g["valid"], g["test"], g["total"],
+                 "YES" if g["train_only"] else ""))
+    print("    " + "-" * 62)
+    print("    %-22s %6d %6d %6d %7d"
+          % ("TOTAL", sum(g["train"] for g in c2["groups"]),
+             sum(g["valid"] for g in c2["groups"]),
+             sum(g["test"] for g in c2["groups"]),
+             sum(g["total"] for g in c2["groups"])))
+    print()
+    print("    train-only groups     : %d (%s)"
+          % (c2["n_train_only_groups"], ", ".join(c2["train_only_groups"])))
+    print("    train-only images     : %d" % c2["train_only_images"])
+    print("    of train images       : %d" % c2["train_images_total"])
+    print("    share of train        : %.1f%%" % c2["train_only_pct_of_train"])
+    print("    unevaluable classes   : %d, all confined to those groups"
+          % c2["n_unevaluable_classes"])
+    print("    iPhone row cross-check: %s" % c2["iphone_row_from_device_table"])
+    print()
+    print("  rendered size")
+    print("    %-24s %.2f in" % ("width", c2["figure_width_in"]))
+    print("    %-24s %.2f in" % ("HEIGHT", c2["figure_height_in"]))
+    print("    %-24s %s" % ("pixels at %d dpi" % PNG_DPI,
+                            c2["figure_px_at_%d_dpi" % PNG_DPI]))
+    print()
+    print("  LaTeX caption (not drawn into the image)")
+    print("    " + c2["caption_latex"])
 
     lines = ["# Figures", "", "Run directory: `%s`" % os.path.basename(run_dir), "",
              "## F1 — per-class instance counts (published split)", "",

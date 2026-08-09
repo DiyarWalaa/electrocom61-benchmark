@@ -281,7 +281,7 @@ the noise floor. Separable, but not by much.**
 Latency is on a log axis so the four CNNs are not compressed against RT-DETR-l.
 
 ```latex
-egin{figure}[t]
+\begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/f6_accuracy_vs_latency.pdf}
   \caption{Accuracy against latency on the corrected split. Marker area is

@@ -53,6 +53,7 @@ import ec61  # noqa: E402
 
 import matplotlib  # noqa: E402
 matplotlib.use("Agg")
+import matplotlib.ticker  # noqa: E402
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import Patch  # noqa: E402
 from matplotlib.lines import Line2D  # noqa: E402
@@ -100,6 +101,16 @@ F5_METRICS = (("test_mAP50", "test mAP@50", "a"),
 # weakest of the three channels here, not the load-bearing one.
 F5_PALETTE = ("#2a78d6", "#eb6834", "#1baf7a", "#7a3ea3", "#c81e5b")
 F5_MARKERS = ("o", "s", "^", "D", "v")
+
+
+# --- F6 --------------------------------------------------------------------
+F6_LATENCY = os.path.join(ec61.DATA_DIR, "latency_by_arch.csv")
+F6_ACCURACY = os.path.join(ec61.DATA_DIR, "master_results.csv")
+
+# Marker area is proportional to fused GFLOPs, so DIAMETER goes as its square
+# root -- the perceptually correct mapping for an area encoding.
+F6_AREA_PER_GFLOP = 3.0
+F6_SIZE_LEGEND_GFLOPS = (25, 50, 100)
 
 
 # --- F2 --------------------------------------------------------------------
@@ -952,6 +963,227 @@ def figure_5(rows):
     return fig, counts
 
 
+def load_f6_rows(latency_path, accuracy_path):
+    """Join per-architecture latency to corrected-split accuracy and size."""
+    with open(latency_path, "r", newline="", encoding="utf-8-sig") as fh:
+        lat = {r["model"]: r for r in csv.DictReader(fh)}
+    with open(accuracy_path, "r", newline="", encoding="utf-8-sig") as fh:
+        acc = {}
+        for r in csv.DictReader(fh):
+            if r["split_set"] == "corrected":
+                acc[r["model"]] = r
+
+    missing = sorted(set(lat) ^ set(acc))
+    if missing:
+        raise ValueError("latency and accuracy tables disagree on which models "
+                         "exist: %s" % missing)
+
+    out = []
+    for model in sorted(lat):
+        a, l = acc[model], lat[model]
+        for col, src in (("test_mAP50_95", a), ("gflops_fused", a),
+                         ("e2e_ms_p50_mean", l), ("e2e_ms_p50_gap", l)):
+            if src[col] == "":
+                raise ValueError("%s has no %s" % (model, col))
+        out.append({
+            "model": model,
+            "latency": float(l["e2e_ms_p50_mean"]),
+            "gap": float(l["e2e_ms_p50_gap"]),
+            "map": float(a["test_mAP50_95"]),
+            "gflops": float(a["gflops_fused"]),
+        })
+    return out
+
+
+def _pareto(rows):
+    """Models not dominated on (lower latency, higher mAP).
+
+    Returns (front, dominated) where each dominated entry carries the margin
+    by which it misses -- the amount of mAP it would need to gain to reach the
+    front. That margin matters: one of these models is excluded by less than
+    the fourth decimal place, and a front presented without it would read as a
+    firmer result than it is.
+    """
+    front, dominated = [], []
+    for r in rows:
+        beaten_by = [o for o in rows
+                     if o is not r
+                     and o["latency"] <= r["latency"]
+                     and o["map"] >= r["map"]
+                     and (o["latency"] < r["latency"] or o["map"] > r["map"])]
+        if beaten_by:
+            margin = min(o["map"] - r["map"] for o in beaten_by
+                         if o["latency"] <= r["latency"])
+            dominated.append((r, margin, sorted(o["model"] for o in beaten_by)))
+        else:
+            front.append(r)
+    front.sort(key=lambda r: r["latency"])
+    return front, dominated
+
+
+def figure_6(rows):
+    """Accuracy against latency, marker area by fused GFLOPs."""
+    front, dominated = _pareto(rows)
+    front_names = set(r["model"] for r in front)
+
+    # The rig's repeatability: the largest gap between the two timed runs of
+    # any one architecture. Differences smaller than this are not differences.
+    noise = max(r["gap"] for r in rows)
+    noisiest = max(rows, key=lambda r: r["gap"])["model"]
+
+    by_lat = sorted(rows, key=lambda r: r["latency"])
+    closest = min(((a, b) for a, b in zip(by_lat, by_lat[1:])),
+                  key=lambda p: p[1]["latency"] - p[0]["latency"])
+    closest_gap = closest[1]["latency"] - closest[0]["latency"]
+
+    tightest = min(dominated, key=lambda d: d[1]) if dominated else None
+
+    caption = (
+        "Accuracy against latency on the corrected split. Marker area is fused "
+        "GFLOPs; the shaded band behind each point spans %.2f ms, the largest "
+        "difference between the two timed runs of any one architecture (%s) "
+        "and so this rig's noise floor. The Pareto front is %s. %s and %s are "
+        "the closest pair in latency at %.2f ms apart, %.1f times the noise "
+        "floor -- separable, but not by much."
+        % (noise, noisiest, " and ".join(r["model"] for r in front),
+           closest[0]["model"], closest[1]["model"], closest_gap,
+           closest_gap / noise))
+    if tightest is not None:
+        caption += (" %s misses the front by %.4f mAP, which is below the "
+                    "precision the accuracy figures are reported at."
+                    % (tightest[0]["model"], tightest[1]))
+    caption += " Latency is on a log axis, so the four CNNs are not compressed against RT-DETR-l."
+
+    # ---- layout ------------------------------------------------------------
+    h_title = 0.20
+    h_plot = 2.35
+    h_xlabel = 0.34
+    h_sizekey = 0.52
+    h_bottom = 0.08
+    fig_h = h_title + h_plot + h_xlabel + h_sizekey + h_bottom
+
+    fig = plt.figure(figsize=(COL_W, fig_h))
+    ax = fig.add_axes([0.175, (h_sizekey + h_bottom + h_xlabel) / fig_h,
+                       0.80, h_plot / fig_h])
+    ax.set_xscale("log")
+
+    xs = [r["latency"] for r in rows]
+    ys = [r["map"] for r in rows]
+    xlo, xhi = min(xs) / 1.26, max(xs) * 1.16
+    ylo, yhi = min(ys), max(ys)
+    ypad = (yhi - ylo) * 0.22
+    ax.set_xlim(xlo, xhi)
+    ax.set_ylim(ylo - ypad, yhi + ypad)
+
+    # Pareto staircase, drawn behind the points.
+    if len(front) > 1:
+        step_x, step_y = [xlo], [front[0]["map"]]
+        for a, b in zip(front, front[1:]):
+            step_x += [b["latency"], b["latency"]]
+            step_y += [a["map"], b["map"]]
+        step_x.append(xhi)
+        step_y.append(front[-1]["map"])
+        ax.plot(step_x, step_y, linestyle=(0, (4, 2)), linewidth=0.9,
+                color="#6e6e6e", zorder=1)
+
+    # The noise floor is drawn as a full-height band per model rather than as a
+    # bar on the marker. It has to be: 0.24 ms across a 13-47 ms log axis is
+    # roughly eight pixels, while the markers are up to forty across because
+    # they encode GFLOPs, so any per-point bar disappears underneath its own
+    # disc. A band extends past the marker and stays readable, and the gap
+    # between two bands is the comparison the figure is for.
+    for r in rows:
+        ax.axvspan(r["latency"] - noise / 2.0, r["latency"] + noise / 2.0,
+                   facecolor="#d9d9d9", edgecolor="none", zorder=0)
+    for r in rows:
+        on_front = r["model"] in front_names
+        ax.scatter([r["latency"]], [r["map"]],
+                   s=r["gflops"] * F6_AREA_PER_GFLOP,
+                   facecolor=C_ACCENT if on_front else C_TRAIN,
+                   edgecolor="white", linewidth=0.6,
+                   zorder=4)
+
+    # Direct labels. Offsets are chosen per model because the two fastest
+    # points sit close enough that a single default rule collides.
+    offsets = {r["model"]: (8, 6) for r in rows}
+    # The fastest point sits hard against the y axis, so its label goes
+    # below-RIGHT: below-left would print over the tick labels.
+    offsets[by_lat[0]["model"]] = (9, -11)
+    # The slowest point is at the right edge and carries the largest marker,
+    # so its label goes left, clear of both the edge and its own disc.
+    offsets[by_lat[-1]["model"]] = (-15, 8)
+    for r in rows:
+        dx, dy = offsets[r["model"]]
+        ax.annotate("%s" % r["model"], (r["latency"], r["map"]),
+                    textcoords="offset points", xytext=(dx, dy),
+                    ha="left" if dx > 0 else "right", va="center",
+                    fontsize=8, color=INK,
+                    fontweight="bold" if r["model"] in front_names else "normal")
+
+    # Two short lines rather than one long one: a single line ran off the
+    # right edge of the column.
+    ax.text(0.025, 0.075, "bands: %.2f ms noise floor" % noise,
+            transform=ax.transAxes, fontsize=8, color=INK_MUTED,
+            ha="left", va="bottom")
+    ax.text(0.025, 0.015, "%s / %s %.2f ms apart = %.1f x"
+            % (closest[0]["model"], closest[1]["model"], closest_gap,
+               closest_gap / noise),
+            transform=ax.transAxes, fontsize=8, color=INK_MUTED,
+            ha="left", va="bottom")
+
+    ax.set_xlabel("end-to-end latency, p50 (ms, log scale)")
+    ax.set_ylabel("test mAP@50-95")
+    ax.grid(True, which="major", color=GRID, linewidth=0.4)
+    ax.set_axisbelow(True)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.set_xticks([15, 20, 30, 50])
+    ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
+    ax.get_xaxis().set_minor_formatter(matplotlib.ticker.NullFormatter())
+
+    fig.text(0.012, (fig_h - 0.02) / fig_h, "F6  accuracy vs latency",
+             fontsize=8.5, fontweight="bold", va="top", ha="left", color=INK)
+
+    # ---- size key, as its own strip below the plot -------------------------
+    key = fig.add_axes([0.175, h_bottom / fig_h, 0.80,
+                        (h_sizekey - 0.16) / fig_h])
+    key.set_xlim(0, 1)
+    key.set_ylim(0, 1)
+    key.axis("off")
+    xpos = [0.03, 0.22, 0.45]
+    for x, g in zip(xpos, F6_SIZE_LEGEND_GFLOPS):
+        key.scatter([x], [0.62], s=g * F6_AREA_PER_GFLOP, facecolor=C_TRAIN,
+                    edgecolor="white", linewidth=0.6)
+        key.text(x, 0.06, "%d" % g, ha="center", va="bottom", fontsize=8,
+                 color=INK)
+    key.text(xpos[-1] + 0.14, 0.62, "fused GFLOPs", ha="left", va="center",
+             fontsize=8, color=INK)
+    key.plot([0.02, 0.02], [0.30, 0.94], color="none")
+
+    counts = {
+        "caption_plain": caption,
+        "caption_latex": latex_escape(caption),
+        "noise_floor_ms": round(noise, 4),
+        "noise_floor_from": noisiest,
+        "pareto_front": [r["model"] for r in front],
+        "dominated": [{"model": r["model"], "misses_front_by_map": round(m, 5),
+                       "dominated_by": by} for r, m, by in dominated],
+        "closest_latency_pair": [closest[0]["model"], closest[1]["model"]],
+        "closest_latency_gap_ms": round(closest_gap, 4),
+        "closest_gap_in_noise_floors": round(closest_gap / noise, 2),
+        "figure_width_in": round(COL_W, 3),
+        "figure_height_in": round(fig_h, 3),
+        "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
+                                                      round(fig_h * PNG_DPI)),
+        "points": [{"model": r["model"], "latency_ms": r["latency"],
+                    "pair_gap_ms": r["gap"], "test_mAP50_95": r["map"],
+                    "gflops_fused": r["gflops"],
+                    "on_pareto_front": r["model"] in front_names}
+                   for r in by_lat],
+    }
+    return fig, counts
+
+
 def main():
     apply_style()
 
@@ -1017,7 +1249,8 @@ def main():
         run_dir, os.path.abspath(__file__),
         params={"figures": ["f1_class_instance_counts",
                             "f2_capture_group_composition",
-                            "f5_published_vs_corrected"],
+                            "f5_published_vs_corrected",
+                            "f6_accuracy_vs_latency"],
                 "column_width_in": COL_W, "png_dpi": PNG_DPI,
                 "min_test": MIN_TEST, "pdf_fonttype": 42},
         extra={"f1_source": F1_SOURCE,
@@ -1111,8 +1344,9 @@ def main():
     lines.append("- Sorting is by total instances, which is dominated by train. "
                  "A class high in the ordering can still be unevaluable.")
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
-        fh.write("\n".join(lines) + "\n")
+    # summary.md is written at the very end, once every figure has been built,
+    # so a run that dies half way cannot leave a summary describing figures it
+    # never produced.
 
     print()
     print("  record : %s" % os.path.relpath(run_dir, ec61.REPO_ROOT).replace("\\", "/"))
@@ -1158,6 +1392,154 @@ def main():
     print()
     print("  LaTeX caption (not drawn into the image)")
     print("    " + c5["caption_latex"])
+
+    # ---- F6 --------------------------------------------------------------
+    for p in (F6_LATENCY, F6_ACCURACY):
+        if not os.path.isfile(p):
+            sys.stderr.write("F6 source not found: %s\n" % p)
+            return 1
+    f6_rows = load_f6_rows(F6_LATENCY, F6_ACCURACY)
+    fig6, c6 = figure_6(f6_rows)
+    pdf6, png6 = save_figure(fig6, "f6_accuracy_vs_latency")
+
+    print()
+    print("F6  accuracy vs latency, corrected split")
+    print("  sources: %s + %s"
+          % (os.path.relpath(F6_LATENCY, ec61.REPO_ROOT).replace("\\", "/"),
+             os.path.relpath(F6_ACCURACY, ec61.REPO_ROOT).replace("\\", "/")))
+    print("  pdf    : %s (%.1f KB)" % (os.path.relpath(pdf6, ec61.REPO_ROOT).replace("\\", "/"),
+                                       os.path.getsize(pdf6) / 1024))
+    print("  png    : %s (%.1f KB, %d dpi)" % (os.path.relpath(png6, ec61.REPO_ROOT).replace("\\", "/"),
+                                               os.path.getsize(png6) / 1024, PNG_DPI))
+    print()
+    print("  plotted values")
+    print("    %-10s %10s %9s %12s %8s  %s"
+          % ("model", "latency", "pair gap", "mAP@50-95", "GFLOPs", "front"))
+    print("    " + "-" * 62)
+    for p6 in c6["points"]:
+        print("    %-10s %10.3f %9.2f %12.4f %8.3f  %s"
+              % (p6["model"], p6["latency_ms"], p6["pair_gap_ms"],
+                 p6["test_mAP50_95"], p6["gflops_fused"],
+                 "YES" if p6["on_pareto_front"] else ""))
+    print()
+    print("    noise floor      : %.2f ms (largest pair gap, %s)"
+          % (c6["noise_floor_ms"], c6["noise_floor_from"]))
+    print("    Pareto front     : %s" % ", ".join(c6["pareto_front"]))
+    for d in c6["dominated"]:
+        print("    dominated        : %-9s misses front by %.5f mAP (by %s)"
+              % (d["model"], d["misses_front_by_map"],
+                 ", ".join(d["dominated_by"])))
+    print("    closest in latency: %s vs %s, %.2f ms apart = %.1f noise floors"
+          % (c6["closest_latency_pair"][0], c6["closest_latency_pair"][1],
+             c6["closest_latency_gap_ms"], c6["closest_gap_in_noise_floors"]))
+    print()
+    print("  rendered size")
+    print("    %-24s %.2f in" % ("width", c6["figure_width_in"]))
+    print("    %-24s %.2f in" % ("HEIGHT", c6["figure_height_in"]))
+    print("    %-24s %s" % ("pixels at %d dpi" % PNG_DPI,
+                            c6["figure_px_at_%d_dpi" % PNG_DPI]))
+    print()
+    print("  LaTeX caption (not drawn into the image)")
+    print("    " + c6["caption_latex"])
+
+    # ---- summary sections for F5 and F6 ----------------------------------
+    a_col, b_col = F5_METRICS[0][0], F5_METRICS[1][0]
+    sa, sb = c5[a_col], c5[b_col]
+
+    lines.append("## F5 — published vs corrected test accuracy")
+    lines.append("")
+    lines.append("- source: `data/master_results.csv`")
+    lines.append("- outputs: `figures/f5_published_vs_corrected.{pdf,png}`")
+    lines.append("- rendered %.2f x %.2f in"
+                 % (c5["figure_width_in"], c5["figure_height_in"]))
+    lines.append("")
+    lines.append("| model | mAP@50 delta | mAP@50-95 delta | ratio |")
+    lines.append("|---|---|---|---|")
+    for r in c5["rows"]:
+        da = 100 * r["%s_delta" % a_col]
+        db = 100 * r["%s_delta" % b_col]
+        lines.append("| %s | %+.2f | %+.2f | %.2f |"
+                     % (r["model"], da, db, db / da))
+    lines.append("")
+    ratios = [100 * r["%s_delta" % b_col] / (100 * r["%s_delta" % a_col])
+              for r in c5["rows"]]
+    lines.append("### The gains shrink at higher IoU")
+    lines.append("")
+    lines.append("mAP@50-95 gains run **%+.2f to %+.2f points** against "
+                 "**%+.2f to %+.2f** for mAP@50 — roughly half, with the "
+                 "per-model ratio between %.2f and %.2f."
+                 % (sb["delta_range_points"][0], sb["delta_range_points"][1],
+                    sa["delta_range_points"][0], sa["delta_range_points"][1],
+                    min(ratios), max(ratios)))
+    lines.append("")
+    lines.append("The classes the corrected split makes evaluable are therefore "
+                 "**easy at IoU 0.5 but not uniformly easy at higher "
+                 "thresholds**. Detecting that they are present is most of the "
+                 "gain; localising them tightly is not.")
+    lines.append("")
+    lines.append("### Near-tie structure, and how to phrase it")
+    lines.append("")
+    mid = [m for m in sb["rank_corrected"] if m not in
+           (sb["rank_corrected"][0], sb["rank_corrected"][-1])]
+    span = {}
+    for split in ("published", "corrected"):
+        vals = [r["%s_%s" % (b_col, split)] for r in c5["rows"]
+                if r["model"] in mid]
+        span[split] = max(vals) - min(vals)
+    lines.append("On mAP@50-95 both splits show the same shape: **%s** clearly "
+                 "first, **%s** clearly last, and the three intermediate "
+                 "models (%s) spanning only **%.4f corrected** and **%.4f "
+                 "published**."
+                 % (sb["rank_corrected"][0], sb["rank_corrected"][-1],
+                    ", ".join(mid), span["corrected"], span["published"]))
+    lines.append("")
+    lines.append("So the claim **\"the ordering is identical across splits\" "
+                 "overstates it**. The defensible statement is:")
+    lines.append("")
+    lines.append("> The same model ranks first and last on both splits, while "
+                 "the three intermediate models are not separable at a single "
+                 "seed.")
+    lines.append("")
+    lines.append("Use that phrasing in the writing phase. A single training "
+                 "run gives no variance estimate, and a %.4f span is far "
+                 "inside what a seed change would plausibly move."
+                 % span["corrected"])
+    lines.append("")
+
+    lines.append("## F6 — accuracy vs latency")
+    lines.append("")
+    lines.append("- sources: `data/latency_by_arch.csv` + `data/master_results.csv`")
+    lines.append("- outputs: `figures/f6_accuracy_vs_latency.{pdf,png}`")
+    lines.append("- rendered %.2f x %.2f in"
+                 % (c6["figure_width_in"], c6["figure_height_in"]))
+    lines.append("")
+    lines.append("| model | latency p50 (ms) | pair gap | mAP@50-95 | GFLOPs | front |")
+    lines.append("|---|---|---|---|---|---|")
+    for p6 in c6["points"]:
+        lines.append("| %s | %.3f | %.2f | %.4f | %.3f | %s |"
+                     % (p6["model"], p6["latency_ms"], p6["pair_gap_ms"],
+                        p6["test_mAP50_95"], p6["gflops_fused"],
+                        "yes" if p6["on_pareto_front"] else ""))
+    lines.append("")
+    lines.append("Pareto front: **%s**. Noise floor **%.2f ms**, the largest "
+                 "gap between the two timed runs of any one architecture (%s)."
+                 % (", ".join(c6["pareto_front"]), c6["noise_floor_ms"],
+                    c6["noise_floor_from"]))
+    lines.append("")
+    for d in c6["dominated"]:
+        lines.append("- `%s` misses the front by **%.5f mAP**, dominated by %s."
+                     % (d["model"], d["misses_front_by_map"],
+                        ", ".join("`%s`" % m for m in d["dominated_by"])))
+    lines.append("")
+    lines.append("`%s` and `%s` are the closest pair in latency at **%.2f ms**, "
+                 "%.1f times the noise floor — separable, but not by much."
+                 % (c6["closest_latency_pair"][0], c6["closest_latency_pair"][1],
+                    c6["closest_latency_gap_ms"],
+                    c6["closest_gap_in_noise_floors"]))
+    lines.append("")
+
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+        fh.write("\n".join(lines) + "\n")
 
     return 0
 

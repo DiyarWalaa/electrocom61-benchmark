@@ -1,0 +1,329 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "f1_counts": {
+    "between_1_and_4_test": 7,
+    "between_1_and_4_test_names": [
+      "IC-Chip",
+      "Diode",
+      "Arduino-Uno",
+      "ESP32",
+      "Fuse-Base",
+      "Heat-Sink",
+      "Servo-Motor"
+    ],
+    "caption_latex": "Per-class annotation counts, published split. 15 of 61 classes have zero valid+test instances (filled marker, bold label) and cannot be evaluated at all; 22 in total have fewer than five test instances --- the 15 above plus seven more, including IC-Chip, the most annotated class in the dataset.",
+    "caption_plain": "Per-class annotation counts, published split. 15 of 61 classes have zero valid+test instances (filled marker, bold label) and cannot be evaluated at all; 22 in total have fewer than five test instances \u2014 the 15 above plus seven more, including IC-Chip, the most annotated class in the dataset.",
+    "fewer_than_5_test": 22,
+    "figure_height_in": 8.952,
+    "figure_px_at_300_dpi": "1050 x 2686",
+    "figure_width_in": 3.5,
+    "largest_class": "IC-Chip (339)",
+    "n_classes": 61,
+    "smallest_class": "RFID-Scanner (153)",
+    "test_instances": 1149,
+    "total_instances": 12937,
+    "train_instances": 9188,
+    "valid_instances": 2600,
+    "widest_label_in": 1.986,
+    "zero_valid_plus_test": 15,
+    "zero_valid_plus_test_names": [
+      "Inductor",
+      "LED-Light",
+      "MLC-Capacitor",
+      "OLED-Display",
+      "Push-Switch",
+      "Buzzer",
+      "High-Voltage-Ceramic-Capacitor",
+      "Bluetooth-Module",
+      "Sonar-Sensor",
+      "Gas-Sensor",
+      "LCD-Display",
+      "Motor-Driver",
+      "LDR-Sensor",
+      "9-Volt-Battery",
+      "RFID-Scanner"
+    ]
+  },
+  "f1_source": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\class_split_counts.csv",
+  "f1_source_sha256": "71942daf481efdf007cc37a1567f1dc9fd7fb4a0bc2dd38c57b45bcce00432df",
+  "f2_counts": {
+    "caption_latex": "Capture-group composition of the published split. (a) v2 image counts per session: 3 of the 9 groups reach neither valid nor test (bold label, filled marker) and together hold 775 of the 1478 training images, 52.4\\%; all 15 classes that cannot be evaluated occur only within them. (b) the same sessions before and after the v2 re-split, each normalised to its own total, dashed lines where a 70/20/10 split would fall. Under v1, 7 of 8 sessions sat within one image of 70/20/10; under v2, 3 do. Figures at right are images moved, 600 in total; the 3 sessions showing zero are identical between their pair. 18 Nov 2024 appears only in panel (a) because its 50 images were added in v2 and have no row in the v1 metadata, and v2 split that new session at exactly 35/10/5.",
+    "caption_plain": "Capture-group composition of the published split. (a) v2 image counts per session: 3 of the 9 groups reach neither valid nor test (bold label, filled marker) and together hold 775 of the 1478 training images, 52.4%; all 15 classes that cannot be evaluated occur only within them. (b) the same sessions before and after the v2 re-split, each normalised to its own total, dashed lines where a 70/20/10 split would fall. Under v1, 7 of 8 sessions sat within one image of 70/20/10; under v2, 3 do. Figures at right are images moved, 600 in total; the 3 sessions showing zero are identical between their pair. 18 Nov 2024 appears only in panel (a) because its 50 images were added in v2 and have no row in the v1 metadata, and v2 split that new session at exactly 35/10/5.",
+    "figure_height_in": 8.08,
+    "figure_px_at_300_dpi": "1050 x 2424",
+    "figure_width_in": 3.5,
+    "groups": [
+      {
+        "label": "19 Feb 2024",
+        "test": 0,
+        "total": 100,
+        "train": 100,
+        "train_only": true,
+        "valid": 0
+      },
+      {
+        "label": "20 Feb 2024",
+        "test": 0,
+        "total": 486,
+        "train": 486,
+        "train_only": true,
+        "valid": 0
+      },
+      {
+        "label": "28 Feb 2024",
+        "test": 43,
+        "total": 482,
+        "train": 173,
+        "train_only": false,
+        "valid": 266
+      },
+      {
+        "label": "3 Mar 2024",
+        "test": 95,
+        "total": 188,
+        "train": 55,
+        "train_only": false,
+        "valid": 38
+      },
+      {
+        "label": "6 Mar 2024",
+        "test": 24,
+        "total": 244,
+        "train": 172,
+        "train_only": false,
+        "valid": 48
+      },
+      {
+        "label": "9 Mar 2024",
+        "test": 32,
+        "total": 328,
+        "train": 230,
+        "train_only": false,
+        "valid": 66
+      },
+      {
+        "label": "17 Apr 2024",
+        "test": 6,
+        "total": 54,
+        "train": 38,
+        "train_only": false,
+        "valid": 10
+      },
+      {
+        "label": "18 Nov 2024",
+        "test": 5,
+        "total": 50,
+        "train": 35,
+        "train_only": false,
+        "valid": 10
+      },
+      {
+        "label": "iPhone (no timestamp)",
+        "test": 0,
+        "total": 189,
+        "train": 189,
+        "train_only": true,
+        "valid": 0
+      }
+    ],
+    "groups_unchanged": 3,
+    "images_moved_total": 600,
+    "iphone_row_from_device_table": [
+      189,
+      0,
+      0
+    ],
+    "n_groups_panel_a": 9,
+    "n_groups_panel_b": 8,
+    "n_train_only_groups": 3,
+    "n_unevaluable_classes": 15,
+    "panel_a_only_group": "18 Nov 2024",
+    "panel_a_only_split": [
+      35,
+      10,
+      5
+    ],
+    "panel_b": [
+      {
+        "changed": 30,
+        "label": "19 Feb 2024",
+        "total": 100,
+        "v1": {
+          "test": 10,
+          "train": 70,
+          "valid": 20
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 0,
+          "train": 100,
+          "valid": 0
+        },
+        "v2_shape": "train-only"
+      },
+      {
+        "changed": 145,
+        "label": "20 Feb 2024",
+        "total": 486,
+        "v1": {
+          "test": 48,
+          "train": 341,
+          "valid": 97
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 0,
+          "train": 486,
+          "valid": 0
+        },
+        "v2_shape": "train-only"
+      },
+      {
+        "changed": 292,
+        "label": "28 Feb 2024",
+        "total": 482,
+        "v1": {
+          "test": 47,
+          "train": 338,
+          "valid": 97
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 43,
+          "train": 173,
+          "valid": 266
+        },
+        "v2_shape": "skewed"
+      },
+      {
+        "changed": 77,
+        "label": "3 Mar 2024",
+        "total": 188,
+        "v1": {
+          "test": 18,
+          "train": 132,
+          "valid": 38
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 95,
+          "train": 55,
+          "valid": 38
+        },
+        "v2_shape": "skewed"
+      },
+      {
+        "changed": 0,
+        "label": "6 Mar 2024",
+        "total": 244,
+        "v1": {
+          "test": 24,
+          "train": 172,
+          "valid": 48
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 24,
+          "train": 172,
+          "valid": 48
+        },
+        "v2_shape": "near-nominal"
+      },
+      {
+        "changed": 0,
+        "label": "9 Mar 2024",
+        "total": 328,
+        "v1": {
+          "test": 32,
+          "train": 230,
+          "valid": 66
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 32,
+          "train": 230,
+          "valid": 66
+        },
+        "v2_shape": "near-nominal"
+      },
+      {
+        "changed": 0,
+        "label": "17 Apr 2024",
+        "total": 54,
+        "v1": {
+          "test": 6,
+          "train": 38,
+          "valid": 10
+        },
+        "v1_shape": "near-nominal",
+        "v2": {
+          "test": 6,
+          "train": 38,
+          "valid": 10
+        },
+        "v2_shape": "near-nominal"
+      },
+      {
+        "changed": 56,
+        "label": "iPhone (no timestamp)",
+        "total": 189,
+        "v1": {
+          "test": 20,
+          "train": 133,
+          "valid": 36
+        },
+        "v1_shape": "skewed",
+        "v2": {
+          "test": 0,
+          "train": 189,
+          "valid": 0
+        },
+        "v2_shape": "train-only"
+      }
+    ],
+    "train_images_total": 1478,
+    "train_only_groups": [
+      "19 Feb 2024",
+      "20 Feb 2024",
+      "iPhone (no timestamp)"
+    ],
+    "train_only_images": 775,
+    "train_only_pct_of_train": 52.44,
+    "v1_near_nominal_groups": 7,
+    "v2_near_nominal_groups": 3
+  },
+  "f2_device_source": "C:\\research\\electrocom61\\runs\\20260801_device_split\\device_by_split.csv",
+  "f2_device_source_sha256": "527dd528bca559149501e64999c95f300807af2e12aca21e6667da0fbaf79895",
+  "f2_source": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\date_split_summary.csv",
+  "f2_source_sha256": "34eda32a3a5beaffe3f8fb79d3f79046b6920e37635225f6f0a52a4e9263f439",
+  "f2_unevaluable_source": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\never_evaluated_classes.csv",
+  "f2_unevaluable_source_sha256": "86b3d0dd40fc878ba4353d6761f7bd8a0d64b82844f4338c4481d28d22232325",
+  "f2b_source": "C:\\research\\electrocom61\\runs\\20260809_split_v1_vs_v2_by_group_03\\split_v1_vs_v2_by_group.csv",
+  "f2b_source_sha256": "b7f25c56a708f805f45ab9e83fcded3b098e08dc016f9ee09b102dc8ab69cafa",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "outputs": [
+    "C:\\research\\electrocom61\\figures\\f1_class_instance_counts.pdf",
+    "C:\\research\\electrocom61\\figures\\f1_class_instance_counts.png",
+    "C:\\research\\electrocom61\\figures\\f2_capture_group_composition.pdf",
+    "C:\\research\\electrocom61\\figures\\f2_capture_group_composition.png"
+  ],
+  "params": {
+    "column_width_in": 3.5,
+    "figures": [
+      "f1_class_instance_counts",
+      "f2_capture_group_composition",
+      "f5_published_vs_corrected",
+      "f6_accuracy_vs_latency"
+    ],
+    "min_test": 5,
+    "pdf_fonttype": 42,
+    "png_dpi": 300
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-09T16:47:48.513056Z",
+  "script": "make_figures.py",
+  "script_sha256": "ea2838ff4d21674783aa1554430cfd47e9e6d3e78334c8481bf663d7a8146362"
+}

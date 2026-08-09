@@ -10,9 +10,10 @@ from.
 
 | Figure | Script | Canonical run | Formats |
 |---|---|---|---|
-| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_06/` | PDF + PNG 300 dpi |
-| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_06/` | PDF + PNG 300 dpi |
-| `f5_published_vs_corrected` | `scripts/make_figures.py` | `runs/20260809_make_figures_06/` | PDF + PNG 300 dpi |
+| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
+| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
+| `f5_published_vs_corrected` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
+| `f6_accuracy_vs_latency` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
 | `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260804_figure_near_duplicate_04/` | PNG 300 dpi |
 | `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260805_figure_verification_sheet_02/` | PNG 200 dpi |
 
@@ -246,6 +247,55 @@ Two pairs sit within 0.06 and 0.01 of a point of each other
 labels would print on top of one another. Labels are pushed apart to a legible
 gap and joined to their true value by a leader line — the marker stays on the
 data, and the near-tie stays visible instead of being hidden by an overlap.
+
+## F6 — accuracy vs latency
+
+`f6_accuracy_vs_latency.pdf` / `.png`
+
+Scatter on the corrected split: x is mean end-to-end p50 latency, y is test
+mAP@50-95, marker area is fused GFLOPs, models labelled directly.
+
+- Data: `data/latency_by_arch.csv` + `data/master_results.csv`
+- Rendered size: **3.50 × 3.49 in** (1050 × 1047 px at 300 dpi)
+
+| Model | latency p50 (ms) | pair gap | mAP@50-95 | GFLOPs | front |
+|---|---|---|---|---|---|
+| yolo11s | 13.680 | 0.24 | 0.6187 | 21.549 | **yes** |
+| yolo26s | 14.645 | 0.05 | 0.6317 | 20.892 | **yes** |
+| yolo12s | 18.945 | 0.23 | 0.6017 | 23.301 | |
+| yolov9s | 21.045 | 0.13 | 0.6186 | 26.855 | |
+| rtdetr-l | 47.210 | 0.12 | 0.6164 | 105.600 | |
+
+**Pareto front: `yolo11s`, `yolo26s`.** But it is a fragile front — `yolov9s`
+misses it by **0.0001 mAP**, below the precision the accuracy figures are even
+reported at. Say "two models are non-dominated", not "two models are better".
+
+The noise floor is drawn as a **full-height shaded band** per model rather than
+as an error bar on the marker. It has to be: 0.24 ms across a 13–47 ms log axis
+is about eight pixels, while the markers reach forty across because they encode
+GFLOPs, so a per-point bar vanishes underneath its own disc. As bands, the
+`yolo11s` and `yolo26s` strips are visibly separate, and the gap between them
+reads as roughly four band-widths — which is the claim: **0.96 ms apart, 4.0 ×
+the noise floor. Separable, but not by much.**
+
+Latency is on a log axis so the four CNNs are not compressed against RT-DETR-l.
+
+```latex
+egin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/f6_accuracy_vs_latency.pdf}
+  \caption{Accuracy against latency on the corrected split. Marker area is
+  fused GFLOPs; the shaded band behind each point spans 0.24 ms, the largest
+  difference between the two timed runs of any one architecture (yolo11s) and
+  so this rig's noise floor. The Pareto front is yolo11s and yolo26s. yolo11s
+  and yolo26s are the closest pair in latency at 0.96 ms apart, 4.0 times the
+  noise floor --- separable, but not by much. yolov9s misses the front by
+  0.0001 mAP, which is below the precision the accuracy figures are reported
+  at. Latency is on a log axis, so the four CNNs are not compressed against
+  RT-DETR-l.}
+  \label{fig:accuracy-vs-latency}
+\end{figure}
+```
 
 ## Audit-phase figures
 

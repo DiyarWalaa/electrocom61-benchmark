@@ -10,8 +10,8 @@ from.
 
 | Figure | Script | Canonical run | Formats |
 |---|---|---|---|
-| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures/` | PDF + PNG 300 dpi |
-| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures/` | PDF + PNG 300 dpi |
+| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_04/` | PDF + PNG 300 dpi |
+| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_04/` | PDF + PNG 300 dpi |
 | `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260804_figure_near_duplicate_04/` | PNG 300 dpi |
 | `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260805_figure_verification_sheet_02/` | PNG 200 dpi |
 
@@ -61,13 +61,20 @@ marker, so no single channel is load-bearing.
 
 `f2_capture_group_composition.pdf` / `.png`
 
-One horizontal bar per capture session under the **published** split, stacked
-train / valid / test, ordered by date. Explains F1: the classes F1 shows as
-unevaluable are unevaluable because the sessions they were shot in never
-reached valid or test.
+Two panels, explaining F1: the classes F1 shows as unevaluable are unevaluable
+because the sessions they were shot in never reached valid or test.
 
-- Data: `runs/20260802_class_date_provenance/date_split_summary.csv`
-- Rendered size: **3.50 × 3.60 in** (1050 × 1080 px at 300 dpi)
+- **(a)** v2 image counts per session — 9 groups, absolute, ordered by date.
+- **(b)** the same sessions before and after the v2 re-split, each normalised
+  to its own total, with dashed references where a perfect 70/20/10 would put
+  its segment boundaries. 8 groups.
+
+Sources:
+
+- panel (a) `runs/20260802_class_date_provenance/date_split_summary.csv`
+- panel (b) `runs/20260809_split_v1_vs_v2_by_group_03/split_v1_vs_v2_by_group.csv`
+
+Rendered size: **3.50 × 8.08 in** (1050 × 2424 px at 300 dpi)
 
 | Group | train | valid | test | total | train-only |
 |---|---|---|---|---|---|
@@ -91,14 +98,35 @@ those classes turns up in a group that does reach valid or test.
 \begin{figure}[t]
   \centering
   \includegraphics[width=\columnwidth]{figures/f2_capture_group_composition.pdf}
-  \caption{Capture-group composition of the published split. Each bar is one
-  capture session; 3 of the 9 groups reach neither valid nor test (bold label,
-  filled marker) and together hold 775 of the 1478 training images, 52.4\%.
-  All 15 classes that cannot be evaluated at all occur only within those three
-  groups.}
+  \caption{Capture-group composition of the published split. (a) v2 image
+  counts per session: 3 of the 9 groups reach neither valid nor test (bold
+  label, filled marker) and together hold 775 of the 1478 training images,
+  52.4\%; all 15 classes that cannot be evaluated occur only within them.
+  (b) the same sessions before and after the v2 re-split, each normalised to
+  its own total, dashed lines where a 70/20/10 split would fall. Under v1, 7 of
+  8 sessions sat within one image of 70/20/10; under v2, 3 do. Figures at right
+  are images moved, 600 in total; the 3 sessions showing zero are identical
+  between their pair. 18 Nov 2024 appears only in panel (a) because its 50
+  images were added in v2 and have no row in the v1 metadata, and v2 split that
+  new session at exactly 35/10/5.}
   \label{fig:capture-group-composition}
 \end{figure}
 ```
+
+Panel (b) is the strongest single result in Section 3: every v1 bar lands on
+the dashed lines, the five sessions v2 changed visibly do not, and the three it
+left alone are identical between their pair. `v1` and `v2` are written inside
+each bar as text, so which is which survives greyscale and colour vision
+deficiency without depending on bar position alone.
+
+**The v1 side is measured, not assumed.** Finding 2's T4 test compared
+`DATA_TYPE` against an actual v1 download and found the contingency table
+perfectly diagonal, with zero disagreements across all 2071 rows. The analysis
+depends on T4; it does not doubt it. v2 also split the newly added 18 Nov
+session at exactly 35/10/5, so the splitter was not malfunctioning and the
+changes are confined to pre-existing assignments — an observation, with no
+mechanism claimed. Both are recorded in
+`runs/20260809_split_v1_vs_v2_by_group_03/summary.md`.
 
 ### The iPhone label rests on a correspondence, not a join
 

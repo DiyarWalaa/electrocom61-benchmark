@@ -1,0 +1,112 @@
+\begin{table}[t]
+  \centering
+  \caption{Training configuration. Settings left at their Ultralytics default are omitted; the complete 99-setting record is in \texttt{data/config\_provenance.csv}. 99 of 99 settings are shown.}
+  \label{tab:training-config}
+  \begin{tabular}{llll}
+    \toprule
+    Setting & Value & Source & Citation \\
+    \midrule
+    model & rtdetr-l.pt | yolo11s.pt | yolo12s.pt | yolo26s.pt | yolov9s.pt &  &  \\
+    seed & 0 &  &  \\
+    patience & 15 &  &  \\
+    batch & 16 &  &  \\
+    imgsz & 640 &  &  \\
+    optimizer & AdamW &  &  \\
+    lr0 & 0.0001 | 0.01 &  &  \\
+    weight\_decay & 0.0005 &  &  \\
+    agnostic\_nms & false &  &  \\
+    amp & true &  &  \\
+    angle & 1.0 &  &  \\
+    augment & false &  &  \\
+    auto\_augment & randaugment &  &  \\
+    bgr & 0.0 &  &  \\
+    box & 7.5 &  &  \\
+    cache & false &  &  \\
+    channels\_last & false &  &  \\
+    close\_mosaic & 10 &  &  \\
+    cls & 0.5 &  &  \\
+    cls\_pw & 0.0 &  &  \\
+    cls\_remap & true &  &  \\
+    compile & false &  &  \\
+    copy\_paste & 0.0 &  &  \\
+    copy\_paste\_mode & flip &  &  \\
+    cos\_lr & false &  &  \\
+    cutmix & 0.0 &  &  \\
+    degrees & 0.0 &  &  \\
+    deterministic & true &  &  \\
+    device & '' &  &  \\
+    dfl & 1.5 &  &  \\
+    dgrad & 0.5 &  &  \\
+    dis & 6.0 &  &  \\
+    dlam & 1.0 &  &  \\
+    dlog & 1.0 &  &  \\
+    dnn & false &  &  \\
+    dropout & 0.0 &  &  \\
+    dynamic & false &  &  \\
+    epochs & 100 &  &  \\
+    erasing & 0.4 &  &  \\
+    exist\_ok & false &  &  \\
+    fliplr & 0.5 &  &  \\
+    flipud & 0.0 &  &  \\
+    format & torchscript &  &  \\
+    fraction & 1.0 &  &  \\
+    hsv\_h & 0.015 &  &  \\
+    hsv\_s & 0.7 &  &  \\
+    hsv\_v & 0.4 &  &  \\
+    iou & 0.7 &  &  \\
+    keras & false &  &  \\
+    kobj & 1.0 &  &  \\
+    lrf & 0.01 &  &  \\
+    mask\_ratio & 4 &  &  \\
+    max\_det & 300 &  &  \\
+    mixup & 0.0 &  &  \\
+    mode & train &  &  \\
+    momentum & 0.937 &  &  \\
+    mosaic & 1.0 &  &  \\
+    multi\_scale & 0.0 &  &  \\
+    nbs & 64 &  &  \\
+    nms & false &  &  \\
+    optimize & false &  &  \\
+    overlap\_mask & true &  &  \\
+    perspective & 0.0 &  &  \\
+    plots & true &  &  \\
+    pose & 12.0 &  &  \\
+    pretrained & true &  &  \\
+    profile & false &  &  \\
+    rect & false &  &  \\
+    resume & false &  &  \\
+    retina\_masks & false &  &  \\
+    rle & 1.0 &  &  \\
+    save & true &  &  \\
+    save\_conf & false &  &  \\
+    save\_crop & false &  &  \\
+    save\_frames & false &  &  \\
+    save\_json & false &  &  \\
+    save\_period & -1 &  &  \\
+    save\_txt & false &  &  \\
+    scale & 0.5 &  &  \\
+    shear & 0.0 &  &  \\
+    show & false &  &  \\
+    show\_boxes & true &  &  \\
+    show\_conf & true &  &  \\
+    show\_labels & true &  &  \\
+    simplify & true &  &  \\
+    single\_cls & false &  &  \\
+    split & val &  &  \\
+    stream\_buffer & false &  &  \\
+    task & detect &  &  \\
+    tracker & tracktrack.yaml &  &  \\
+    translate & 0.1 &  &  \\
+    val & true &  &  \\
+    verbose & true &  &  \\
+    vid\_stride & 1 &  &  \\
+    visualize & false &  &  \\
+    warmup\_bias\_lr & 0.1 &  &  \\
+    warmup\_epochs & 3.0 &  &  \\
+    warmup\_momentum & 0.8 &  &  \\
+    workers & 8 &  &  \\
+    \bottomrule
+  \end{tabular}
+  \vspace{2pt}
+  \par{\footnotesize\raggedright \textbf{Provisional:} 99 of 99 settings have no source recorded yet.\par}
+\end{table}

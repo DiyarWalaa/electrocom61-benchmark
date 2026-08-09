@@ -1,0 +1,20 @@
+\begin{table}[t]
+  \centering
+  \caption{Properties of the published split and of the corrected split released here. Near-duplicate pair counts are at $\epsilon = 0.05$ with low-information pairs excluded, reported separately for raw and aligned scoring. The corrected split holds the image counts of the published one exactly, so no accuracy difference can be attributed to training-set size.}
+  \label{tab:split-properties}
+  \begin{tabular}{lrr}
+    \toprule
+    Property & Published & Corrected \\
+    \midrule
+    Images (train / val / test) & 1,478 / 438 / 205 & 1,478 / 438 / 205 \\
+    Classes with $\geq$5 inst. in val and test & 39 of 61 & 61 of 61 \\
+    Classes with zero val+test instances & 15 & 0 \\
+    test$\leftrightarrow$train pairs (raw / aligned) & 0 / 0 & 0 / 0 \\
+    val$\leftrightarrow$train pairs (raw / aligned) & 1 / 3 & 1 / 3 \\
+    val$\leftrightarrow$test pairs (raw / aligned) & 0 / 0 & 0 / 0 \\
+    Images reassigned & --- & 68 \\
+    Grouping $\tau$ (s) & --- & 15 \\
+    Seed & --- & 20260804 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

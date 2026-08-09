@@ -1,0 +1,16 @@
+\begin{table}[t]
+  \centering
+  \caption{Latency broken down by stage, one row per architecture, averaged over each architecture's two timed runs. Preprocess is near-constant across models; inference dominates. Postprocess spans 0.38--1.08\,ms, a factor of 2.8, with yolo26s lowest and yolo12s highest. The three stages sum to slightly less than the end-to-end p50 in Table~\ref{tab:efficiency}, which also carries the per-image overhead outside these stages.}
+  \label{tab:latency-breakdown}
+  \begin{tabular}{lrrrr}
+    \toprule
+    Model & Pre (ms) & Inference (ms) & Post (ms) & Total (ms) \\
+    \midrule
+    yolo11s & 1.25 & 8.39 & 1.06 & 10.71 \\
+    yolo26s & 1.27 & 10.06 & 0.38 & 11.72 \\
+    yolo12s & 1.28 & 13.65 & 1.08 & 16.02 \\
+    yolov9s & 1.28 & 15.80 & 1.06 & 18.15 \\
+    rtdetr-l & 1.31 & 41.88 & 0.57 & 43.77 \\
+    \bottomrule
+  \end{tabular}
+\end{table}

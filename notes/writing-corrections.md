@@ -61,3 +61,62 @@ The equivalent sentence in this repository's own `README.md` has been
 corrected. Also recorded in the F4 section of the figure run summary, together
 with two related points: the criteria do not fail monotonically, and the pair
 criterion is the strict one across both scorings.
+
+---
+
+# Findings about prior work
+
+Sourced from the prior-work PDFs, which are **not** in this repository. Nothing
+here was checked against the papers by the tooling — re-verify each against the
+sources when the sentence is written.
+
+## Their augmentation pipeline is unreproducible, and it is a confound
+
+Both prior papers describe augmentation **qualitatively** — rotations, flips,
+cropping, scaling, brightness, contrast, saturation, hue, noise, blur — and
+state **no parameter values**: no probabilities, no ranges, no magnitudes.
+
+Their pipeline therefore cannot be reproduced, and it may differ substantially
+from the Ultralytics defaults this study runs under. Those defaults are
+recorded in full in `data/config_provenance.csv` (89 settings marked
+`default`), so what this study did is specified; what prior work did is not.
+
+**Why this matters for the comparison.** Copying their stated hyperparameters —
+epochs, batch, optimizer, lr0, weight decay — closes the gap on the settings
+they report and leaves the augmentation gap wide open. An accuracy difference
+between this study and theirs cannot be attributed to architecture or split
+while the augmentation pipelines are unmatched and one of them is unknown. The
+config table (`tables/t3_training_config.tex`) shows six settings marked
+`copied`; that column should not be read as "the configurations match".
+
+State the limitation explicitly rather than letting the `copied` rows imply a
+controlled comparison.
+
+## The YOLOv13 paper compares across two different evaluation protocols
+
+The YOLOv13 paper states that its **proposed model** was evaluated by
+**3-fold cross-validation over the entire dataset**, with results averaged
+across folds. The **comparison rows in the same table** match the YOLOv12
+paper's **single-split** figures.
+
+The two protocols differ in at least two ways that move the numbers:
+
+- **Evaluated image set.** Cross-validation over the whole dataset evaluates
+  every image across the folds; a single split evaluates only the held-out
+  portion. Under the published split that portion is 205 test images of 2121.
+- **Number of evaluable classes.** This repository establishes that the
+  published split leaves 15 classes with no validation or test instances and
+  16 with none in validation, so a single-split evaluation scores at most 46 of
+  61 classes. Cross-validation over the entire dataset would encounter all 61.
+  A mean over 61 classes and a mean over 46 are not the same quantity, and the
+  missing 15 are not a random sample — they are the largest classes by
+  annotation count (`tables/t1_unevaluable_classes.tex`).
+
+**The table does not state this.** A reader comparing a cross-validated row
+against single-split rows would take the difference as a result about the
+models.
+
+This is the strongest available argument for why a controlled benchmark was
+needed, and it belongs wherever the paper motivates the study. It is also a
+claim about someone else's work: state exactly what each paper says, cite the
+section, and let the reader draw the conclusion.

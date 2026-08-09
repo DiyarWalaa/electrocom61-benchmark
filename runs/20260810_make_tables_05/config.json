@@ -1,0 +1,46 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "outputs": [
+    "tables/t1_unevaluable_classes.tex",
+    "tables/t2_split_properties.tex",
+    "tables/t3_training_config.tex",
+    "tables/t4_main_results.tex",
+    "tables/t5_efficiency.tex",
+    "tables/t6_latency_breakdown.tex"
+  ],
+  "params": {
+    "epsilon": "0.05",
+    "min_per_split": 5,
+    "output_dir": "C:\\research\\electrocom61\\tables",
+    "tables": [
+      "t1_unevaluable_classes",
+      "t2_split_properties",
+      "t3_training_config",
+      "t4_main_results",
+      "t5_efficiency",
+      "t6_latency_breakdown"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-09T21:22:54.798926Z",
+  "script": "make_tables.py",
+  "script_sha256": "49b230f230d070d2f129d57907e49102ee090caa412f0dd77b86c003003c6366",
+  "sources": {
+    "data/config_provenance.csv": "efa5df940ce0fedee72550853c12eabb034065ba5f503682c85482730a72ace4",
+    "data/latency_by_arch.csv": "2015cfa73d6f8bf6efda36c0765b89af20c5f33d7cd5b74af22927569e486e30",
+    "data/master_results.csv": "76238fcee1437280acea9f2a7bef20cb0ba051050358c1e6e336cc99d5b8fa4c",
+    "runs/20260802_class_date_provenance/class_split_counts.csv": "71942daf481efdf007cc37a1567f1dc9fd7fb4a0bc2dd38c57b45bcce00432df",
+    "runs/20260802_class_date_provenance/date_split_summary.csv": "34eda32a3a5beaffe3f8fb79d3f79046b6920e37635225f6f0a52a4e9263f439",
+    "runs/20260802_class_date_provenance/never_evaluated_classes.csv": "86b3d0dd40fc878ba4353d6761f7bd8a0d64b82844f4338c4481d28d22232325",
+    "runs/20260804_build_corrected_dataset_02/class_counts_built.csv": "9d2a8cefa2f4a1509335ff2d5273242a41185e41b37b7b60d9f1b3d2f4a2f661",
+    "runs/20260804_build_corrected_dataset_02/config.json": "f6de81dfd8a38514e4ac31b2ffec7546b0d0066dbe94becaad8c6f70c8091dfb",
+    "runs/20260804_burst_aware_split_04/config.json": "f30abcfa7989ed9a22f8f7f8a96a682cbf93df98e3f100ca99ac76cb4e001fbc",
+    "runs/20260804_burst_aware_split_04/contamination_comparison.csv": "c71795850758c9332ff5a538121fcdb4bfa3c7077a3135756e885701b4fb341a",
+    "runs/20260804_burst_aware_split_04/moves.csv": "5d0d85d7d6eb96ae0208fbc328b6b5179c789ae0c924f9e27a897fd91bb76ca4",
+    "runs/20260804_burst_aware_split_04/split_manifest.csv": "b441f1df273102514b6d12b15cbc0d8a16807a6057dd388778e4023d1870dc4b"
+  }
+}

@@ -1,112 +1,26 @@
-\begin{table}[t]
+\begin{table*}[t]
   \centering
-  \caption{Training configuration. Settings left at their Ultralytics default are omitted; the complete 99-setting record is in \texttt{data/config\_provenance.csv}. 99 of 99 settings are shown.}
+  \caption{Training configuration, showing only the 14 settings that were decided. The other 89 are Ultralytics defaults; the complete 103-setting record is in \texttt{data/config\_provenance.csv}. \emph{copied} (6) stated by both prior papers and reproduced here; \emph{added} (6) stated by neither and introduced by this study; \emph{constrained} (1) fixed by the data rather than chosen; \emph{differs} (1) stated by prior work but at a different value.}
   \label{tab:training-config}
-  \begin{tabular}{llll}
+  \footnotesize
+  \begin{tabular}{lllp{0.34\textwidth}}
     \toprule
     Setting & Value & Source & Citation \\
     \midrule
-    model & rtdetr-l.pt | yolo11s.pt | yolo12s.pt | yolo26s.pt | yolov9s.pt &  &  \\
-    seed & 0 &  &  \\
-    patience & 15 &  &  \\
-    batch & 16 &  &  \\
-    imgsz & 640 &  &  \\
-    optimizer & AdamW &  &  \\
-    lr0 & 0.0001 | 0.01 &  &  \\
-    weight\_decay & 0.0005 &  &  \\
-    agnostic\_nms & false &  &  \\
-    amp & true &  &  \\
-    angle & 1.0 &  &  \\
-    augment & false &  &  \\
-    auto\_augment & randaugment &  &  \\
-    bgr & 0.0 &  &  \\
-    box & 7.5 &  &  \\
-    cache & false &  &  \\
-    channels\_last & false &  &  \\
-    close\_mosaic & 10 &  &  \\
-    cls & 0.5 &  &  \\
-    cls\_pw & 0.0 &  &  \\
-    cls\_remap & true &  &  \\
-    compile & false &  &  \\
-    copy\_paste & 0.0 &  &  \\
-    copy\_paste\_mode & flip &  &  \\
-    cos\_lr & false &  &  \\
-    cutmix & 0.0 &  &  \\
-    degrees & 0.0 &  &  \\
-    deterministic & true &  &  \\
-    device & '' &  &  \\
-    dfl & 1.5 &  &  \\
-    dgrad & 0.5 &  &  \\
-    dis & 6.0 &  &  \\
-    dlam & 1.0 &  &  \\
-    dlog & 1.0 &  &  \\
-    dnn & false &  &  \\
-    dropout & 0.0 &  &  \\
-    dynamic & false &  &  \\
-    epochs & 100 &  &  \\
-    erasing & 0.4 &  &  \\
-    exist\_ok & false &  &  \\
-    fliplr & 0.5 &  &  \\
-    flipud & 0.0 &  &  \\
-    format & torchscript &  &  \\
-    fraction & 1.0 &  &  \\
-    hsv\_h & 0.015 &  &  \\
-    hsv\_s & 0.7 &  &  \\
-    hsv\_v & 0.4 &  &  \\
-    iou & 0.7 &  &  \\
-    keras & false &  &  \\
-    kobj & 1.0 &  &  \\
-    lrf & 0.01 &  &  \\
-    mask\_ratio & 4 &  &  \\
-    max\_det & 300 &  &  \\
-    mixup & 0.0 &  &  \\
-    mode & train &  &  \\
-    momentum & 0.937 &  &  \\
-    mosaic & 1.0 &  &  \\
-    multi\_scale & 0.0 &  &  \\
-    nbs & 64 &  &  \\
-    nms & false &  &  \\
-    optimize & false &  &  \\
-    overlap\_mask & true &  &  \\
-    perspective & 0.0 &  &  \\
-    plots & true &  &  \\
-    pose & 12.0 &  &  \\
-    pretrained & true &  &  \\
-    profile & false &  &  \\
-    rect & false &  &  \\
-    resume & false &  &  \\
-    retina\_masks & false &  &  \\
-    rle & 1.0 &  &  \\
-    save & true &  &  \\
-    save\_conf & false &  &  \\
-    save\_crop & false &  &  \\
-    save\_frames & false &  &  \\
-    save\_json & false &  &  \\
-    save\_period & -1 &  &  \\
-    save\_txt & false &  &  \\
-    scale & 0.5 &  &  \\
-    shear & 0.0 &  &  \\
-    show & false &  &  \\
-    show\_boxes & true &  &  \\
-    show\_conf & true &  &  \\
-    show\_labels & true &  &  \\
-    simplify & true &  &  \\
-    single\_cls & false &  &  \\
-    split & val &  &  \\
-    stream\_buffer & false &  &  \\
-    task & detect &  &  \\
-    tracker & tracktrack.yaml &  &  \\
-    translate & 0.1 &  &  \\
-    val & true &  &  \\
-    verbose & true &  &  \\
-    vid\_stride & 1 &  &  \\
-    visualize & false &  &  \\
-    warmup\_bias\_lr & 0.1 &  &  \\
-    warmup\_epochs & 3.0 &  &  \\
-    warmup\_momentum & 0.8 &  &  \\
-    workers & 8 &  &  \\
+    epochs & 100 & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
+    batch & 16 & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
+    imgsz & 640 & constrained & dataset stored at 640x640; neither paper states imgsz as a training argument \\
+    optimizer & AdamW & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
+    lr0 & 0.01 & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
+    lr0 (RT-DETR-l) & 0.0001 & added & reduced from 0.01; transformer diverged at the YOLO learning rate \\
+    weight\_decay & 0.0005 & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
+    patience & 15 & added &  \\
+    seed & 0 & added &  \\
+    deterministic & true & added &  \\
+    pretrained & true & added & COCO weights \\
+    gpu & Tesla P100-PCIE-16GB & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
+    ultralytics & 8.4.115 & added & stated by neither paper \\
+    torch & 2.5.1+cu121 & differs & prior work states PyTorch 2.0.0 \\
     \bottomrule
   \end{tabular}
-  \vspace{2pt}
-  \par{\footnotesize\raggedright \textbf{Provisional:} 99 of 99 settings have no source recorded yet.\par}
-\end{table}
+\end{table*}

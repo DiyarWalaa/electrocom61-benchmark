@@ -126,11 +126,20 @@ def commas(n):
 MIDRULE = "<<MIDRULE>>"
 
 
-def booktabs(label, caption, colspec, header, rows, notes=None):
-    """One LaTeX table. `rows` is a list of lists of already-escaped strings."""
-    out = ["\\begin{table}[t]", "  \\centering",
-           "  \\caption{%s}" % caption, "  \\label{%s}" % label,
-           "  \\begin{tabular}{%s}" % colspec, "    \\toprule",
+def booktabs(label, caption, colspec, header, rows, notes=None,
+             star=False, size=None):
+    """One LaTeX table. `rows` is a list of lists of already-escaped strings.
+
+    `star` emits table*, spanning both columns -- needed when a column holds
+    prose rather than numbers. `size` inserts a font size command inside the
+    float.
+    """
+    env = "table*" if star else "table"
+    out = ["\\begin{%s}[t]" % env, "  \\centering",
+           "  \\caption{%s}" % caption, "  \\label{%s}" % label]
+    if size:
+        out.append("  \\%s" % size)
+    out += ["  \\begin{tabular}{%s}" % colspec, "    \\toprule",
            "    " + " & ".join(header) + " \\\\", "    \\midrule"]
     for r in rows:
         if r == MIDRULE:
@@ -145,7 +154,7 @@ def booktabs(label, caption, colspec, header, rows, notes=None):
         out.append("  \\vspace{2pt}")
         out.append("  \\par{\\footnotesize\\raggedright %s\\par}"
                    % " ".join(notes))
-    out.append("\\end{table}")
+    out.append("\\end{%s}" % env)
     return "\n".join(out) + "\n"
 
 
@@ -304,15 +313,32 @@ def t3():
     body = [[tex(r["setting"]), tex(r["value"]), tex(r["source"]),
              tex(r["citation"])] for r in shown]
 
-    caption = ("Training configuration. Settings left at their Ultralytics "
-               "default are omitted; the complete %d-setting record is in "
-               "\\texttt{data/config\\_provenance.csv}. %d of %d settings are "
-               "shown." % (total, len(shown), total))
+    # Legend built from the values actually present, so it cannot describe a
+    # category the table does not contain.
+    from collections import Counter
+    present = Counter(r["source"].strip().lower() for r in shown)
+    meanings = {
+        "copied": "stated by both prior papers and reproduced here",
+        "added": "stated by neither and introduced by this study",
+        "constrained": "fixed by the data rather than chosen",
+        "differs": "stated by prior work but at a different value",
+    }
+    legend = "; ".join("\\emph{%s} (%d) %s" % (k, present[k], meanings[k])
+                       for k in ("copied", "added", "constrained", "differs")
+                       if present.get(k))
+
+    caption = ("Training configuration, showing only the %d settings that were "
+               "decided. The other %d are Ultralytics defaults; the complete "
+               "%d-setting record is in "
+               "\\texttt{data/config\\_provenance.csv}. %s."
+               % (len(shown), len(default), total, legend))
     notes = None
     if blank:
         notes = ["\\textbf{Provisional:} %d of %d settings have no source "
                  "recorded yet." % (len(blank), total)]
-    latex = booktabs("tab:training-config", caption, "llll", header, body, notes)
+    latex = booktabs("tab:training-config", caption,
+                     "lllp{0.34\\textwidth}",
+                     header, body, notes, star=True, size="footnotesize")
 
     plain = [[r["setting"], r["value"], r["source"] or "(blank)",
               r["citation"] or "(blank)"] for r in shown]

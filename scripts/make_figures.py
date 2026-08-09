@@ -88,6 +88,20 @@ F1_SOURCE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
 # The threshold the paper uses for "too few to evaluate meaningfully".
 MIN_TEST = 5
 
+# --- F5 --------------------------------------------------------------------
+F5_SOURCE = os.path.join(ec61.DATA_DIR, "master_results.csv")
+
+# The two metrics, as (column, axis label, panel letter).
+F5_METRICS = (("test_mAP50", "test mAP@50", "a"),
+              ("test_mAP50_95", "test mAP@50-95", "b"))
+
+# Five models, so colour alone cannot carry identity in greyscale. Each line
+# also gets its own marker AND a direct label at its right end; colour is the
+# weakest of the three channels here, not the load-bearing one.
+F5_PALETTE = ("#2a78d6", "#eb6834", "#1baf7a", "#7a3ea3", "#c81e5b")
+F5_MARKERS = ("o", "s", "^", "D", "v")
+
+
 # --- F2 --------------------------------------------------------------------
 F2_SOURCE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
                          "date_split_summary.csv")
@@ -721,6 +735,223 @@ def figure_2(rows_a, iphone_counts, unevaluable, rows_b):
     return fig, counts
 
 
+def load_f5_rows(path):
+    """Per-model published and corrected accuracy, from the master table."""
+    with open(path, "r", newline="", encoding="utf-8-sig") as fh:
+        raw = list(csv.DictReader(fh))
+
+    by_model = {}
+    for r in raw:
+        by_model.setdefault(r["model"], {})[r["split_set"]] = r
+
+    out = []
+    for model in sorted(by_model):
+        got = by_model[model]
+        missing = [s2 for s2 in ("published", "corrected") if s2 not in got]
+        if missing:
+            raise ValueError("%s has no %s row" % (model, " or ".join(missing)))
+        if len(got) != 2:
+            raise ValueError("%s has %d split rows, expected 2" % (model, len(got)))
+        rec = {"model": model}
+        for col, _lbl, _p in F5_METRICS:
+            for split in ("published", "corrected"):
+                v = got[split][col]
+                if v == "":
+                    raise ValueError("%s %s has no %s" % (model, split, col))
+                rec[(col, split)] = float(v)
+            rec[(col, "delta")] = (rec[(col, "corrected")]
+                                   - rec[(col, "published")])
+        out.append(rec)
+    return out
+
+
+def _spread(values, min_gap, lo, hi):
+    """Push labels apart to `min_gap` while preserving their order.
+
+    Two of these models differ by 0.01 of a point on mAP@50-95, so their labels
+    would print on top of each other at any readable size. Displacing them and
+    drawing a leader line keeps the label legible while the marker stays at the
+    true value -- the alternative, letting them overlap, hides exactly the
+    near-tie the figure exists to show.
+    """
+    order = sorted(range(len(values)), key=lambda i: values[i])
+    out = list(values)
+    for k in range(1, len(order)):
+        prev, cur = order[k - 1], order[k]
+        if out[cur] - out[prev] < min_gap:
+            out[cur] = out[prev] + min_gap
+    top = order[-1]
+    if out[top] > hi:
+        shift = out[top] - hi
+        for i in order:
+            out[i] -= shift
+    bot = order[0]
+    if out[bot] < lo:
+        shift = lo - out[bot]
+        for i in order:
+            out[i] += shift
+    return out
+
+
+def _ranks(rows, col, split):
+    """Model names ordered best-first on one metric and split."""
+    return [r["model"] for r in sorted(rows, key=lambda r: -r[(col, split)])]
+
+
+def figure_5(rows):
+    """Published vs corrected accuracy, one line per model, two metrics."""
+    from matplotlib.transforms import blended_transform_factory
+    n = len(rows)
+    order = sorted(rows, key=lambda r: -r[(F5_METRICS[0][0], "corrected")])
+
+    stats = {}
+    for col, label, _p in F5_METRICS:
+        deltas = {r["model"]: r[(col, "delta")] for r in rows}
+        rp = _ranks(rows, col, "published")
+        rc = _ranks(rows, col, "corrected")
+        moved = [m for m in rp if rp.index(m) != rc.index(m)]
+        stats[col] = {
+            "label": label,
+            "deltas": deltas,
+            "rank_published": rp,
+            "rank_corrected": rc,
+            "rank_changed": moved,
+            "all_rise": all(d > 0 for d in deltas.values()),
+            "min_delta": min(deltas.values()),
+            "max_delta": max(deltas.values()),
+        }
+
+    a_col = F5_METRICS[0][0]
+    b_col = F5_METRICS[1][0]
+    caption = (
+        "Test accuracy under the published and the corrected split, one line "
+        "per model. (a) mAP@50: every model rises, by %.2f to %.2f points, and "
+        "the ranking changes -- %d of %d models occupy a different position. "
+        "(b) mAP@50-95: every model rises again, by %.2f to %.2f points, but "
+        "the ranking is unchanged. The contrast is the point: a metric that "
+        "reorders under a change of split is reporting the split as much as "
+        "the model."
+        % (100 * stats[a_col]["min_delta"], 100 * stats[a_col]["max_delta"],
+           len(stats[a_col]["rank_changed"]), n,
+           100 * stats[b_col]["min_delta"], 100 * stats[b_col]["max_delta"]))
+
+    # ---- vertical budget, inches ------------------------------------------
+    h_title = 0.20
+    h_plot = 1.95
+    h_xlabel = 0.30
+    h_gap = 0.40
+    h_bottom = 0.10
+    fig_h = 2 * (h_title + h_plot + h_xlabel) + h_gap + h_bottom
+
+    fig = plt.figure(figsize=(COL_W, fig_h))
+
+    # Left margin for the y tick labels; the model labels sit in a zone to the
+    # RIGHT of the axes, positioned in axes fractions rather than data units.
+    # Data units would tie the label zone's width to the plot's width, and the
+    # first version of this figure printed the model names on top of their own
+    # deltas for exactly that reason.
+    left = 0.155
+    plot_w = 0.30
+    label_ax = 1.12         # axes fractions: 1.0 is the right spine
+    delta_ax = 2.62
+
+    axes = []
+    for idx, (col, ylabel, letter) in enumerate(F5_METRICS):
+        top = idx * (h_title + h_plot + h_xlabel + h_gap) + h_title
+        ax = fig.add_axes([left, (fig_h - top - h_plot) / fig_h,
+                           plot_w, h_plot / fig_h])
+        axes.append(ax)
+
+        for i, r in enumerate(order):
+            colour = F5_PALETTE[i % len(F5_PALETTE)]
+            marker = F5_MARKERS[i % len(F5_MARKERS)]
+            ax.plot([0, 1], [r[(col, "published")], r[(col, "corrected")]],
+                    color=colour, linewidth=1.3, marker=marker, markersize=3.6,
+                    markerfacecolor=colour, markeredgecolor="white",
+                    markeredgewidth=0.5, zorder=3, clip_on=False)
+
+        vals = [r[(col, "corrected")] for r in order]
+        lo_v, hi_v = min(vals), max(vals)
+        pub = [r[(col, "published")] for r in order]
+        span_lo = min(lo_v, min(pub))
+        span_hi = max(hi_v, max(pub))
+        pad = (span_hi - span_lo) * 0.16
+        ax.set_ylim(span_lo - pad, span_hi + pad)
+        ax.set_xlim(-0.06, 1.06)
+        tf = blended_transform_factory(ax.transAxes, ax.transData)
+
+        ax.set_xticks([0, 1])
+        ax.set_xticklabels(["published", "corrected"])
+        ax.set_ylabel(ylabel)
+        ax.yaxis.grid(True, color=GRID, linewidth=0.4)
+        ax.set_axisbelow(True)
+        for side in ("top", "right"):
+            ax.spines[side].set_visible(False)
+        ax.spines["bottom"].set_bounds(0, 1)
+        ax.tick_params(axis="x", length=0, pad=4)
+
+        # Label positions: true values, then pushed apart just enough to read.
+        y0, y1 = ax.get_ylim()
+        line_h_data = (y1 - y0) * (0.115 / h_plot)
+        placed = _spread(vals, line_h_data, y0 + line_h_data * 0.6,
+                         y1 - line_h_data * 0.6)
+
+        for i, r in enumerate(order):
+            colour = F5_PALETTE[i % len(F5_PALETTE)]
+            ytrue, ylab = vals[i], placed[i]
+            if abs(ylab - ytrue) > line_h_data * 0.12:
+                ax.plot([1.01, label_ax - 0.05], [ytrue, ylab], color=colour,
+                        linewidth=0.5, alpha=0.75, zorder=2, transform=tf,
+                        clip_on=False)
+            ax.text(label_ax, ylab, r["model"], va="center", ha="left",
+                    fontsize=8, color=INK, transform=tf, clip_on=False)
+            d = 100 * r[(col, "delta")]
+            ax.text(delta_ax, ylab, "%+.2f" % d, va="center", ha="right",
+                    fontsize=8, color=C_ACCENT, fontweight="bold",
+                    transform=tf, clip_on=False)
+
+        fig.text(0.012, (fig_h - top + 0.02) / fig_h,
+                 "(%s)  %s" % (letter, ylabel), fontsize=8.5,
+                 fontweight="bold", va="bottom", ha="left", color=INK)
+
+    # One shared explanation of the accent column, above the first panel.
+    axes[0].text(delta_ax, axes[0].get_ylim()[1], "delta (pts)", va="bottom",
+                 ha="right", fontsize=8, color=INK, style="italic",
+                 transform=blended_transform_factory(axes[0].transAxes,
+                                                     axes[0].transData),
+                 clip_on=False)
+
+    counts = {
+        "caption_plain": caption,
+        "caption_latex": latex_escape(caption),
+        "n_models": n,
+        "figure_width_in": round(COL_W, 3),
+        "figure_height_in": round(fig_h, 3),
+        "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
+                                                      round(fig_h * PNG_DPI)),
+    }
+    for col, label, _p in F5_METRICS:
+        st = stats[col]
+        counts[col] = {
+            "label": label,
+            "deltas_points": {m: round(100 * d, 2)
+                              for m, d in st["deltas"].items()},
+            "all_models_rise": st["all_rise"],
+            "delta_range_points": [round(100 * st["min_delta"], 2),
+                                   round(100 * st["max_delta"], 2)],
+            "rank_published": st["rank_published"],
+            "rank_corrected": st["rank_corrected"],
+            "models_changing_rank": st["rank_changed"],
+        }
+    counts["rows"] = [
+        {"model": r["model"],
+         **{"%s_%s" % (c, k): round(r[(c, k)], 4)
+            for c, _l, _p in F5_METRICS
+            for k in ("published", "corrected", "delta")}}
+        for r in order]
+    return fig, counts
+
+
 def main():
     apply_style()
 
@@ -785,7 +1016,8 @@ def main():
     ec61.write_config(
         run_dir, os.path.abspath(__file__),
         params={"figures": ["f1_class_instance_counts",
-                            "f2_capture_group_composition"],
+                            "f2_capture_group_composition",
+                            "f5_published_vs_corrected"],
                 "column_width_in": COL_W, "png_dpi": PNG_DPI,
                 "min_test": MIN_TEST, "pdf_fonttype": 42},
         extra={"f1_source": F1_SOURCE,
@@ -884,7 +1116,51 @@ def main():
 
     print()
     print("  record : %s" % os.path.relpath(run_dir, ec61.REPO_ROOT).replace("\\", "/"))
+
+    # ---- F5 --------------------------------------------------------------
+    if not os.path.isfile(F5_SOURCE):
+        sys.stderr.write("F5 source not found: %s\n" % F5_SOURCE)
+        return 1
+    f5_rows = load_f5_rows(F5_SOURCE)
+    fig5, c5 = figure_5(f5_rows)
+    pdf5, png5 = save_figure(fig5, "f5_published_vs_corrected")
+
+    print()
+    print("F5  published vs corrected test accuracy")
+    print("  source : %s" % os.path.relpath(F5_SOURCE, ec61.REPO_ROOT).replace("\\", "/"))
+    print("  pdf    : %s (%.1f KB)" % (os.path.relpath(pdf5, ec61.REPO_ROOT).replace("\\", "/"),
+                                       os.path.getsize(pdf5) / 1024))
+    print("  png    : %s (%.1f KB, %d dpi)" % (os.path.relpath(png5, ec61.REPO_ROOT).replace("\\", "/"),
+                                               os.path.getsize(png5) / 1024, PNG_DPI))
+    for col, label, letter in F5_METRICS:
+        st = c5[col]
+        print()
+        print("  (%s) %s" % (letter, label))
+        print("    %-10s %9s %9s %9s" % ("model", "published", "corrected", "delta"))
+        print("    " + "-" * 42)
+        for r in c5["rows"]:
+            print("    %-10s %9.4f %9.4f %+9.2f"
+                  % (r["model"], r["%s_published" % col], r["%s_corrected" % col],
+                     100 * r["%s_delta" % col]))
+        print("    all models rise: %s   range %+.2f to %+.2f points"
+              % (st["all_models_rise"], st["delta_range_points"][0],
+                 st["delta_range_points"][1]))
+        print("    rank published : %s" % " > ".join(st["rank_published"]))
+        print("    rank corrected : %s" % " > ".join(st["rank_corrected"]))
+        print("    changing rank  : %s"
+              % (", ".join(st["models_changing_rank"]) or "none"))
+    print()
+    print("  rendered size")
+    print("    %-24s %.2f in" % ("width", c5["figure_width_in"]))
+    print("    %-24s %.2f in" % ("HEIGHT", c5["figure_height_in"]))
+    print("    %-24s %s" % ("pixels at %d dpi" % PNG_DPI,
+                            c5["figure_px_at_%d_dpi" % PNG_DPI]))
+    print()
+    print("  LaTeX caption (not drawn into the image)")
+    print("    " + c5["caption_latex"])
+
     return 0
+
 
 
 if __name__ == "__main__":

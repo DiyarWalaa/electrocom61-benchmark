@@ -10,8 +10,9 @@ from.
 
 | Figure | Script | Canonical run | Formats |
 |---|---|---|---|
-| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_04/` | PDF + PNG 300 dpi |
-| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_04/` | PDF + PNG 300 dpi |
+| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_06/` | PDF + PNG 300 dpi |
+| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_06/` | PDF + PNG 300 dpi |
+| `f5_published_vs_corrected` | `scripts/make_figures.py` | `runs/20260809_make_figures_06/` | PDF + PNG 300 dpi |
 | `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260804_figure_near_duplicate_04/` | PNG 300 dpi |
 | `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260805_figure_verification_sheet_02/` | PNG 200 dpi |
 
@@ -193,6 +194,59 @@ image is `IMG20241118160515_01` — a compact timestamp carrying a burst
 sub-index — dated 20241118 and sitting in train. Quoting the `ts_compact` cell
 alone gives 49 and understates the count; the audit's **50** is correct.
 
+## F5 — published vs corrected test accuracy
+
+`f5_published_vs_corrected.pdf` / `.png`
+
+Slope chart. Two x positions, five models, one line each, labelled at the right
+end with the model name and its delta in points.
+
+- **(a)** test mAP@50
+- **(b)** test mAP@50-95
+
+- Data: `data/master_results.csv`
+- Rendered size: **3.50 × 5.40 in** (1050 × 1620 px at 300 dpi)
+
+| Model | mAP@50 pub → corr | Δ | mAP@50-95 pub → corr | Δ |
+|---|---|---|---|---|
+| rtdetr-l | 0.9171 → 0.9444 | **+2.73** | 0.6045 → 0.6164 | +1.19 |
+| yolo26s | 0.9021 → 0.9427 | **+4.06** | 0.6129 → 0.6317 | +1.88 |
+| yolov9s | 0.9045 → 0.9319 | **+2.74** | 0.6063 → 0.6186 | +1.23 |
+| yolo11s | 0.8921 → 0.9313 | **+3.92** | 0.6084 → 0.6187 | +1.03 |
+| yolo12s | 0.8770 → 0.9197 | **+4.27** | 0.5842 → 0.6017 | +1.75 |
+
+Every model rises on both metrics. **The ranking changes under mAP@50 and does
+not under mAP@50-95** — that contrast is the figure's argument:
+
+- mAP@50 published: `rtdetr-l > yolov9s > yolo26s > yolo11s > yolo12s`
+- mAP@50 corrected: `rtdetr-l > yolo26s > yolov9s > yolo11s > yolo12s`
+- mAP@50-95: `yolo26s > yolo11s > yolov9s > rtdetr-l > yolo12s` — identical
+  before and after.
+
+```latex
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/f5_published_vs_corrected.pdf}
+  \caption{Test accuracy under the published and the corrected split, one line
+  per model. (a) mAP@50: every model rises, by 2.73 to 4.27 points, and the
+  ranking changes --- 2 of 5 models occupy a different position.
+  (b) mAP@50-95: every model rises again, by 1.03 to 1.88 points, but the
+  ranking is unchanged. The contrast is the point: a metric that reorders under
+  a change of split is reporting the split as much as the model.}
+  \label{fig:published-vs-corrected}
+\end{figure}
+```
+
+Five series is past the point where colour alone can carry identity in
+greyscale, so each line also has its own marker and a direct label; colour is
+the weakest of the three channels here rather than the load-bearing one.
+
+Two pairs sit within 0.06 and 0.01 of a point of each other
+(`yolov9s`/`yolo11s` on mAP@50, `yolo11s`/`yolov9s` on mAP@50-95), so their
+labels would print on top of one another. Labels are pushed apart to a legible
+gap and joined to their true value by a leader line — the marker stays on the
+data, and the near-tie stays visible instead of being hidden by an overlap.
+
 ## Audit-phase figures
 
 These two predate the figures phase and are included in the paper **as-is**.
@@ -224,6 +278,30 @@ checked by eye instead of taken on trust.
 
 2700 × 3490 px at 200 dpi. Run `_01` used the pre-fix script (sha `bcd2c442`);
 `_02` matches the current script (`3c749f89`) and produced the committed image.
+
+## Open layout note — page budget for Section 3
+
+**Parked. Revisit at LaTeX time; no changes made.**
+
+F1 renders at 3.50 × 8.95 in and F2 at 3.50 × 8.08 in. Two near-full-column
+figures back to back is a large share of Section 3's vertical budget, and the
+right resolution depends on a venue and a draft that do not exist yet. Three
+options, in preference order:
+
+1. **F1 to full-page-width landscape** *(preferred)*. Two columns of ~31
+   classes each across `\textwidth` would cut its height to roughly a third
+   while keeping all 61 classes and the 8 pt floor. Costs a `figure*` and a
+   page-top placement.
+2. **F1 split in two.** The 22 problem classes in-paper — the ones the argument
+   actually needs — and all 61 in an appendix for completeness. Cheapest on
+   page budget, but the reader loses the visual context that makes the 22 look
+   exceptional rather than typical.
+3. **F2 panel (b) standalone**, with panel (a) demoted to a table. Panel (b)
+   carries the Section 3 argument by itself and is the stronger half; (a) is
+   nine rows of counts that a table states in less space.
+
+None of these is a data change — all three are re-renders from the same
+committed sources, and the numbers do not move.
 
 ## Deferred
 

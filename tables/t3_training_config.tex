@@ -1,12 +1,14 @@
 \begin{table*}[t]
   \centering
-  \caption{Training configuration, showing only the 14 settings that were decided. The other 89 are Ultralytics defaults; the complete 103-setting record is in \texttt{data/config\_provenance.csv}. \emph{copied} (6) stated by both prior papers and reproduced here; \emph{added} (6) stated by neither and introduced by this study; \emph{constrained} (1) fixed by the data rather than chosen; \emph{differs} (1) stated by prior work but at a different value.}
+  \caption{Training configuration, showing only the 16 settings that were decided. The other 88 are Ultralytics defaults; the complete 104-setting record is in \texttt{data/config\_provenance.csv}. \emph{copied} (7) stated by both prior papers and reproduced here; \emph{added} (7) stated by neither and introduced by this study; \emph{constrained} (1) fixed by the data rather than chosen; \emph{differs} (1) stated by prior work but at a different value.}
   \label{tab:training-config}
   \footnotesize
   \begin{tabular}{lllp{0.34\textwidth}}
     \toprule
     Setting & Value & Source & Citation \\
     \midrule
+    models (replicated) & yolov9s, yolo11s, yolo12s & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV, comparison tables \\
+    models (new) & yolo26s, rtdetr-l & added & no prior study on this dataset uses either \\
     epochs & 100 & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
     batch & 16 & copied & [YOLOv12] Sec. IV; [YOLOv13] Sec. IV \\
     imgsz & 640 & constrained & dataset stored at 640x640; neither paper states imgsz as a training argument \\

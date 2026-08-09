@@ -1,4 +1,6 @@
 setting,value,source,citation
+models (replicated),"yolov9s, yolo11s, yolo12s",copied,"[YOLOv12] Sec. IV; [YOLOv13] Sec. IV, comparison tables"
+models (new),"yolo26s, rtdetr-l",added,no prior study on this dataset uses either
 epochs,100,copied,[YOLOv12] Sec. IV; [YOLOv13] Sec. IV
 batch,16,copied,[YOLOv12] Sec. IV; [YOLOv13] Sec. IV
 imgsz,640,constrained,dataset stored at 640x640; neither paper states imgsz as a training argument
@@ -58,7 +60,6 @@ mask_ratio,4,default,
 max_det,300,default,
 mixup,0.0,default,
 mode,train,default,
-model,rtdetr-l.pt | yolo11s.pt | yolo12s.pt | yolo26s.pt | yolov9s.pt,default,
 momentum,0.937,default,
 mosaic,1.0,default,
 multi_scale,0.0,default,

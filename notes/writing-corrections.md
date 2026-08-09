@@ -120,3 +120,48 @@ This is the strongest available argument for why a controlled benchmark was
 needed, and it belongs wherever the paper motivates the study. It is also a
 claim about someone else's work: state exactly what each paper says, cite the
 section, and let the reader draw the conclusion.
+
+## The unevaluable classes are the biggest ones, not the smallest
+
+Derived from `runs/20260802_class_date_provenance/class_split_counts.csv` and
+asserted at build time; the assertion fails if the claim ever stops holding.
+
+**All 10 of the most-annotated classes in the dataset have fewer than 5
+test instances under the published split, and 8 of them have zero in both
+validation and test.**
+
+| Rank | Class | Total inst. | Valid | Test |
+|---|---|---|---|---|
+| 1 | IC-Chip | 339 | 4 | 2 |
+| 2 | Inductor | 293 | 0 | **0** |
+| 3 | LED-Light | 293 | 0 | **0** |
+| 4 | MLC-Capacitor | 292 | 0 | **0** |
+| 5 | OLED-Display | 279 | 0 | **0** |
+| 6 | Push-Switch | 277 | 0 | **0** |
+| 7 | Buzzer | 272 | 0 | **0** |
+| 8 | Diode | 265 | 6 | 2 |
+| 9 | High-Voltage-Ceramic-Capacitor | 257 | 0 | **0** |
+| 10 | Bluetooth-Module | 249 | 0 | **0** |
+
+Those 10 classes hold **21.8%** of the dataset's annotations.
+
+**The cliff is at rank 11.** No class in the top 10 has more than
+2 test instances. The next class down, `IC-Base-14-Pin`, has **22**.
+The transition is not a gradient — it is a step, which is what a
+session-assigned split produces and what a size-driven shortage does not.
+
+### Why this answers the class-imbalance objection
+
+If the unevaluable classes were an artefact of imbalance, the classes with the
+*fewest* annotations would be the ones without test instances. The data shows
+the exact opposite: the top of the frequency distribution is the part that
+cannot be evaluated. `Inductor` has 293 annotations and is scored on none of
+them.
+
+Imbalance predicts a gradient — evaluation coverage thinning as classes get
+rarer. What the split shows is a step at rank 11, with the whole top of
+the distribution on the wrong side of it. Rarity does not explain that;
+capture-session assignment does, and F2 shows the mechanism.
+
+This belongs in Section 3's opening, before the reader forms the imbalance
+hypothesis and reads the rest of the section through it.

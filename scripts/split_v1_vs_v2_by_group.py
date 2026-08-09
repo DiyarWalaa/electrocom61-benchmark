@@ -34,11 +34,18 @@ valid to train, test to train, and so on. A group can preserve its ratios while
 churning every image inside them, and only the transitions distinguish that
 from a group left alone.
 
-CAVEATS THIS SCRIPT CANNOT REMOVE
+THE v1 COLUMN IS VERIFIED, NOT ASSUMED
 
-The v1 labels are trusted to be v1's. That rests on Finding 2, not on anything
-measured here. If the CSV were instead a partially-updated v2 artefact, every
-"change" below would be an artefact of that.
+That DATA_TYPE describes v1 is not taken on trust here. Finding 2's fourth
+provenance test (runs/20260802_v1_provenance, T4) compared the column against
+an actual v1 download from Mendeley and found the contingency table perfectly
+diagonal: 1454 train, 412 valid, 205 test, and ZERO disagreements across all
+2071 rows. t4_disagreements.csv is empty.
+
+So this analysis has a DEPENDENCY, not a doubt. Every "change" below is a
+change relative to a v1 assignment that was checked against v1 itself. If T4
+were ever overturned the dependency would matter; while it stands, the v1
+column is measured.
 
 The nominal 70/20/10 is inferred from the aggregate, not documented.
 
@@ -130,10 +137,17 @@ def main():
         g["trans"][(raw, r.split)] += 1
 
     # Groups present on disk but absent from the CSV entirely.
+    # Groups absent from the CSV entirely. Their v2 composition IS known -- it
+    # is the folder they sit in -- so it is captured here even though they have
+    # no v1 side to compare against.
     all_groups = {date_bucket(r) for r in recs}
     excluded_groups = {}
     for gkey in sorted(all_groups - set(per_group)):
-        excluded_groups[gkey] = sum(1 for r in excluded if date_bucket(r) == gkey)
+        members = [r for r in excluded if date_bucket(r) == gkey]
+        excluded_groups[gkey] = {
+            "n": len(members),
+            "v2": {s: sum(1 for r in members if r.split == s) for s in SPLITS},
+        }
 
     order = sorted(per_group, key=lambda k: (k == UNTIMESTAMPED_KEY, k))
 
@@ -220,8 +234,10 @@ def main():
           % (tot_n, n_missing))
     if excluded_groups:
         for k, v in excluded_groups.items():
-            print("  EXCLUDED: %s -- %d images, none carry a CSV row"
-                  % (pretty(k), v))
+            print("  EXCLUDED: %s -- %d images, none carry a CSV row; "
+                  "v2 split them %d/%d/%d"
+                  % (pretty(k), v["n"], v["v2"]["train"], v["v2"]["valid"],
+                     v["v2"]["test"]))
     if bad_type:
         print("  WARNING: %d rows with an unrecognised DATA_TYPE" % len(bad_type))
     print()
@@ -279,8 +295,10 @@ def main():
     lines.append("")
     for k, v in excluded_groups.items():
         lines.append("- **Excluded: %s** — %d images, none of which carry a CSV "
-                     "row, so it has no v1 label to compare against."
-                     % (pretty(k), v))
+                     "row, so it has no v1 label to compare against. v2 split "
+                     "them %d/%d/%d."
+                     % (pretty(k), v["n"], v["v2"]["train"], v["v2"]["valid"],
+                        v["v2"]["test"]))
     lines.append("")
     lines.append(_fmt_markdown_table(
         ["group", "imgs", "v1 tr/va/te %", "v1 shape", "v2 tr/va/te %",
@@ -334,12 +352,53 @@ def main():
                  "percentage points and no aggregate could ever pass it."
                  % (tot_n, 100.0 * NEAR_IMGS / tot_n))
     lines.append("")
+    lines.append("## Two clarifications")
+    lines.append("")
+    lines.append("### The v1 column is verified, not assumed")
+    lines.append("")
+    lines.append("That `DATA_TYPE` describes v1 is established, not inferred. "
+                 "Finding 2's fourth provenance test (`runs/20260802_v1_provenance`, "
+                 "T4) compared the column against an actual v1 download and "
+                 "found the contingency table perfectly diagonal — 1454 train, "
+                 "412 valid, 205 test — with **zero disagreements across all "
+                 "2071 rows**; `t4_disagreements.csv` is empty.")
+    lines.append("")
+    lines.append("This analysis therefore carries a **dependency on T4**, not "
+                 "an open doubt. Every change reported above is a change "
+                 "relative to a v1 assignment that was checked against v1 "
+                 "itself. Phrase it that way in the paper: if T4 were "
+                 "overturned the dependency would matter, but while it stands "
+                 "the v1 column is a measurement.")
+    lines.append("")
+    if excluded_groups:
+        newk = sorted(excluded_groups)[0]
+        lines.append("### v2 split the newly added session correctly")
+        lines.append("")
+        ex = excluded_groups[newk]
+        exp = {s2: ex["n"] * NOMINAL[s2] for s2 in SPLITS}
+        worst_ex = max(abs(ex["v2"][s2] - exp[s2]) for s2 in SPLITS)
+        lines.append("`%s` is the one session absent from v1 — its %d images "
+                     "were added in v2 and have no CSV row. v2 split it "
+                     "**%d / %d / %d of %d**, which is %.1f / %.1f / %.1f "
+                     "percent — worst deviation from 70/20/10 across the three "
+                     "cells: **%.1f images**."
+                     % (pretty(newk), ex["n"], ex["v2"]["train"],
+                        ex["v2"]["valid"], ex["v2"]["test"], ex["n"],
+                        100.0 * ex["v2"]["train"] / ex["n"],
+                        100.0 * ex["v2"]["valid"] / ex["n"],
+                        100.0 * ex["v2"]["test"] / ex["n"], worst_ex))
+        lines.append("")
+        lines.append("Recorded as an observation. Whatever produced the v2 "
+                     "split handled a brand-new session at the nominal ratio, "
+                     "so the changes documented above are confined to "
+                     "assignments that already existed. No mechanism is "
+                     "claimed here for why the pre-existing ones changed.")
+        lines.append("")
     lines.append("## What could make this misleading")
     lines.append("")
-    lines.append("- The v1 labels are trusted to be v1's, which rests on audit "
-                 "Finding 2 rather than on anything measured here. If the CSV "
-                 "were a partially-updated v2 artefact, every change below "
-                 "would be an artefact of that.")
+    lines.append("- The v1 column rests on T4 (see above). That is a "
+                 "dependency on a passing test, not an assumption, but it is "
+                 "still a dependency.")
     lines.append("- 70/20/10 is inferred from the aggregate, not documented by "
                  "the dataset authors.")
     lines.append("- Ratios are over images, not annotation instances.")

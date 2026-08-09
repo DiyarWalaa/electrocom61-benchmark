@@ -1,0 +1,9 @@
+capture_group,label,imgs_in_csv,v1_train,v1_valid,v1_test,v2_train,v2_valid,v2_test,v1_pct_train,v1_pct_valid,v1_pct_test,v2_pct_train,v2_pct_valid,v2_pct_test,v1_dev_train_imgs,v1_dev_valid_imgs,v1_dev_test_imgs,v2_dev_train_imgs,v2_dev_valid_imgs,v2_dev_test_imgs,v1_shape,v2_shape,imgs_changed_split,imgs_unchanged,pct_changed
+20240219,19 Feb 2024,100,70,20,10,100,0,0,70.0,20.0,10.0,100.0,0.0,0.0,0.0,0.0,0.0,30.0,-20.0,-10.0,near-nominal,train-only,30,70,30.0
+20240220,20 Feb 2024,486,341,97,48,486,0,0,70.16,19.96,9.88,100.0,0.0,0.0,0.8,-0.2,-0.6,145.8,-97.2,-48.6,near-nominal,train-only,145,341,29.8
+20240228,28 Feb 2024,482,338,97,47,173,266,43,70.12,20.12,9.75,35.89,55.19,8.92,0.6,0.6,-1.2,-164.4,169.6,-5.2,near-nominal,skewed,292,190,60.6
+20240303,3 Mar 2024,188,132,38,18,55,38,95,70.21,20.21,9.57,29.26,20.21,50.53,0.4,0.4,-0.8,-76.6,0.4,76.2,near-nominal,skewed,77,111,41.0
+20240306,6 Mar 2024,244,172,48,24,172,48,24,70.49,19.67,9.84,70.49,19.67,9.84,1.2,-0.8,-0.4,1.2,-0.8,-0.4,near-nominal,near-nominal,0,244,0.0
+20240309,9 Mar 2024,328,230,66,32,230,66,32,70.12,20.12,9.76,70.12,20.12,9.76,0.4,0.4,-0.8,0.4,0.4,-0.8,near-nominal,near-nominal,0,328,0.0
+20240417,17 Apr 2024,54,38,10,6,38,10,6,70.37,18.52,11.11,70.37,18.52,11.11,0.2,-0.8,0.6,0.2,-0.8,0.6,near-nominal,near-nominal,0,54,0.0
+<untimestamped:counter>,iPhone (no timestamp),189,133,36,20,189,0,0,70.37,19.05,10.58,100.0,0.0,0.0,0.7,-1.8,1.1,56.7,-37.8,-18.9,skewed,train-only,56,133,29.6

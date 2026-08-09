@@ -79,6 +79,7 @@ C_TEST = "#c6dbef"
 C_ACCENT = "#d94801"
 
 INK = "#111111"
+INK_MUTED = "#75746e"
 GRID = "#cccccc"
 
 F1_SOURCE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
@@ -98,6 +99,13 @@ F2_DEVICE_SOURCE = os.path.join(ec61.RUNS_DIR, "20260801_device_split",
 # occurs in, so the caption's "only within those groups" claim is verifiable.
 F2_UNEVALUABLE = os.path.join(ec61.RUNS_DIR, "20260802_class_date_provenance",
                               "never_evaluated_classes.csv")
+# Panel (b): the same sessions labelled twice, from the CSV's DATA_TYPE (v1)
+# and from the folders (v2), restricted to the images the CSV covers.
+F2B_SOURCE = os.path.join(ec61.RUNS_DIR, "20260809_split_v1_vs_v2_by_group_03",
+                          "split_v1_vs_v2_by_group.csv")
+
+# Where a perfect 70/20/10 puts its segment boundaries on a 0-100 axis.
+NOMINAL_BOUNDARIES = (70.0, 90.0)
 
 # The bucket key the audit uses for images whose filenames carry no capture
 # time, and the label it is drawn with.
@@ -459,134 +467,256 @@ def load_f2_rows(path, device_path):
     return rows, want
 
 
-def figure_2(rows, iphone_counts, unevaluable):
-    """Capture-group composition: which sessions reach valid and test at all.
+def load_f2b_rows(path):
+    """v1 and v2 composition per capture group, from the comparison run."""
+    with open(path, "r", newline="", encoding="utf-8-sig") as fh:
+        raw = list(csv.DictReader(fh))
+    out = []
+    for r in raw:
+        rec = {
+            "key": r["capture_group"], "label": r["label"],
+            "total": int(r["imgs_in_csv"]),
+            "v1": {"train": int(r["v1_train"]), "valid": int(r["v1_valid"]),
+                   "test": int(r["v1_test"])},
+            "v2": {"train": int(r["v2_train"]), "valid": int(r["v2_valid"]),
+                   "test": int(r["v2_test"])},
+            "v1_shape": r["v1_shape"], "v2_shape": r["v2_shape"],
+            "changed": int(r["imgs_changed_split"]),
+        }
+        for tag in ("v1", "v2"):
+            if sum(rec[tag].values()) != rec["total"]:
+                raise ValueError("%s parts do not sum to the total for %s"
+                                 % (tag, rec["key"]))
+        out.append(rec)
+    out.sort(key=lambda r: (r["key"] == UNTIMESTAMPED_KEY, r["key"]))
+    return out
 
-    `unevaluable` is the list of class names that cannot be evaluated at all,
-    read from the audit's never_evaluated_classes.csv. It is passed in rather
-    than counted here so the caption's claim -- that those classes occur only
-    within the train-only groups -- is checked against the same table that
-    produced them.
+
+def _stack(ax, y, parts, total, height, scale100=False):
+    """Draw one stacked horizontal bar."""
+    left = 0.0
+    for key, colour in (("train", C_TRAIN), ("valid", C_VALID), ("test", C_TEST)):
+        w = parts[key] * (100.0 / total) if scale100 else parts[key]
+        ax.barh([y], [w], height=height, left=[left], color=colour,
+                edgecolor="white", linewidth=0.3, zorder=2)
+        left += w
+
+
+def figure_2(rows_a, iphone_counts, unevaluable, rows_b):
+    """Two panels: v2 composition in images, and v1 vs v2 as shares.
+
+    Panel (a) is the single-panel F2 unchanged. Panel (b) puts each session's
+    v1 and v2 composition side by side, normalised so sessions of different
+    sizes are comparable, with dashed references where a perfect 70/20/10
+    would place its segment boundaries. A session that did not change draws
+    two identical bars; one that did is obvious without reading a number.
     """
-    n = len(rows)
-    train_only = [r for r in rows if r["train_only"]]
+    n_a = len(rows_a)
+    n_b = len(rows_b)
+
+    train_only = [r for r in rows_a if r["train_only"]]
     train_only_keys = {r["key"] for r in train_only}
     n_train_only_imgs = sum(r["total"] for r in train_only)
-    n_train_imgs = sum(r["train"] for r in rows)
+    n_train_imgs = sum(r["train"] for r in rows_a)
     pct = 100.0 * n_train_only_imgs / n_train_imgs
 
-    # The caption asserts the unevaluable classes occur ONLY in these groups.
-    # Verified here; a class appearing anywhere else makes the sentence false.
     stray = sorted({g for cls in unevaluable for g in cls["groups"]}
                    - train_only_keys)
     if stray:
         raise ValueError("caption claims the unevaluable classes occur only in "
                          "train-only groups, but they also occur in: %s" % stray)
 
-    caption = ("Capture-group composition of the published split. Each bar is "
-               "one capture session; %d of the %d groups reach neither valid "
-               "nor test (bold label, filled marker) and together hold %d of "
-               "the %d training images, %.1f%%. All %d classes that cannot be "
-               "evaluated at all occur only within those three groups."
-               % (len(train_only), n, n_train_only_imgs, n_train_imgs, pct,
-                  len(unevaluable)))
+    # The group in (a) but absent from (b) is the session added in v2, which
+    # has no row in the v1 metadata. Identified, not assumed, and required to
+    # be unique.
+    keys_b = set(r["key"] for r in rows_b)
+    only_a = [r for r in rows_a if r["key"] not in keys_b]
+    if len(only_a) != 1:
+        raise ValueError("expected exactly one group in (a) and absent from "
+                         "(b), found %d" % len(only_a))
+    newcomer = only_a[0]
 
-    # Nine rows, so a far larger pitch than F1's 61-row chart. The conventions
-    # that matter -- colours, 8 pt floor, column width, legend, marker language
-    # -- are shared; the row pitch is not one of them.
-    h_plot = 0.30 * n
+    n_v1_near = sum(1 for r in rows_b if r["v1_shape"] == "near-nominal")
+    n_v2_near = sum(1 for r in rows_b if r["v2_shape"] == "near-nominal")
+    n_unchanged = sum(1 for r in rows_b if r["changed"] == 0)
+    total_moved = sum(r["changed"] for r in rows_b)
+
+    caption = (
+        "Capture-group composition of the published split. "
+        "(a) v2 image counts per session: %d of the %d groups reach neither "
+        "valid nor test (bold label, filled marker) and together hold %d of "
+        "the %d training images, %.1f%%; all %d classes that cannot be "
+        "evaluated occur only within them. "
+        "(b) the same sessions before and after the v2 re-split, each "
+        "normalised to its own total, dashed lines where a 70/20/10 split "
+        "would fall. Under v1, %d of %d sessions sat within one image of "
+        "70/20/10; under v2, %d do. Figures at right are images moved, %d in "
+        "total; the %d sessions showing zero are identical between their "
+        "pair. %s appears only in panel (a) because its %d images were added "
+        "in v2 and have no row in the v1 metadata, and v2 split that new "
+        "session at exactly %d/%d/%d."
+        % (len(train_only), n_a, n_train_only_imgs, n_train_imgs, pct,
+           len(unevaluable), n_v1_near, n_b, n_v2_near, total_moved,
+           n_unchanged, newcomer["label"], newcomer["total"],
+           newcomer["train"], newcomer["valid"], newcomer["test"]))
+
+    # ---- vertical budget, in inches ---------------------------------------
     h_legend = 0.52
-    h_xlabel = 0.38
-    fig_h = h_legend + h_plot + h_xlabel
+    h_title = 0.20
+    h_xlabel = 0.34
+    h_plot_a = 0.30 * n_a
+    h_gap = 0.34
+    h_plot_b = 0.42 * n_b
+    h_bottom = 0.08
+    fig_h = (h_legend + h_title + h_plot_a + h_xlabel + h_gap
+             + h_title + h_plot_b + h_xlabel + h_bottom)
 
     fig = plt.figure(figsize=(COL_W, fig_h))
-    ax = fig.add_axes([0.40, h_xlabel / fig_h, 0.57, h_plot / fig_h])
 
-    y = list(range(n))
-    tr = [r["train"] for r in rows]
-    va = [r["valid"] for r in rows]
-    te = [r["test"] for r in rows]
-    left_te = [a + b for a, b in zip(tr, va)]
+    def rect(top_in, height_in, left_frac, width_frac):
+        return [left_frac, (fig_h - top_in - height_in) / fig_h,
+                width_frac, height_in / fig_h]
 
-    bh = 0.68
-    ax.barh(y, tr, height=bh, color=C_TRAIN, edgecolor="white", linewidth=0.3)
-    ax.barh(y, va, height=bh, left=tr, color=C_VALID, edgecolor="white",
-            linewidth=0.3)
-    ax.barh(y, te, height=bh, left=left_te, color=C_TEST, edgecolor="white",
-            linewidth=0.3)
-
-    ax.set_yticks(y)
-    ax.set_yticklabels([r["label"] for r in rows])
-    ax.tick_params(axis="y", pad=13)
-    ax.invert_yaxis()
-    ax.set_ylim(n - 0.5, -0.5)
-    ax.set_xlabel("images")
-
-    xmax_data = max(r["total"] for r in rows)
-    ax.set_xlim(0, xmax_data * 1.16)          # room for the value labels
-    ax.set_xticks(list(range(0, int(xmax_data) + 1, 100)))
-    ax.xaxis.grid(True, color=GRID, linewidth=0.4)
-    ax.set_axisbelow(True)
-    for side in ("top", "right", "left"):
-        ax.spines[side].set_visible(False)
-
-    # Total at the end of each bar: with nine bars there is room, and it lets a
-    # reader check 100 / 486 / 189 against the figure without the table.
-    for i, r in enumerate(rows):
-        ax.text(r["total"] + xmax_data * 0.015, i, str(r["total"]),
-                va="center", ha="left", fontsize=8,
-                color=C_ACCENT if r["train_only"] else INK,
-                fontweight="bold" if r["train_only"] else "normal")
-
-    for lbl in ax.get_yticklabels():
-        if lbl.get_text() in {r["label"] for r in train_only}:
-            lbl.set_color(C_ACCENT)
-            lbl.set_fontweight("bold")
+    top_a = h_legend + h_title
+    top_b = top_a + h_plot_a + h_xlabel + h_gap + h_title
+    ax_a = fig.add_axes(rect(top_a, h_plot_a, 0.40, 0.57))
+    ax_b = fig.add_axes(rect(top_b, h_plot_b, 0.40, 0.57))
 
     from matplotlib.transforms import blended_transform_factory
-    tf = blended_transform_factory(ax.transAxes, ax.transData)
-    for i, r in enumerate(rows):
+
+    # ---- panel (a), unchanged ---------------------------------------------
+    for i, r in enumerate(rows_a):
+        _stack(ax_a, i, r, r["total"], 0.68)
+    ax_a.set_yticks(list(range(n_a)))
+    ax_a.set_yticklabels([r["label"] for r in rows_a])
+    ax_a.tick_params(axis="y", pad=13)
+    ax_a.invert_yaxis()
+    ax_a.set_ylim(n_a - 0.5, -0.5)
+    ax_a.set_xlabel("images")
+    xmax_a = max(r["total"] for r in rows_a)
+    ax_a.set_xlim(0, xmax_a * 1.16)
+    ax_a.set_xticks(list(range(0, int(xmax_a) + 1, 100)))
+    ax_a.xaxis.grid(True, color=GRID, linewidth=0.4)
+    ax_a.set_axisbelow(True)
+    for side in ("top", "right", "left"):
+        ax_a.spines[side].set_visible(False)
+    for i, r in enumerate(rows_a):
+        ax_a.text(r["total"] + xmax_a * 0.015, i, str(r["total"]),
+                  va="center", ha="left", fontsize=8,
+                  color=C_ACCENT if r["train_only"] else INK,
+                  fontweight="bold" if r["train_only"] else "normal")
+    labels_train_only = set(r["label"] for r in train_only)
+    for lbl in ax_a.get_yticklabels():
+        if lbl.get_text() in labels_train_only:
+            lbl.set_color(C_ACCENT)
+            lbl.set_fontweight("bold")
+    tf_a = blended_transform_factory(ax_a.transAxes, ax_a.transData)
+    for i, r in enumerate(rows_a):
         if r["train_only"]:
-            ax.plot([-0.035], [i], marker="o", markersize=3.0, color=C_ACCENT,
-                    transform=tf, clip_on=False, zorder=5)
+            ax_a.plot([-0.035], [i], marker="o", markersize=3.0, color=C_ACCENT,
+                      transform=tf_a, clip_on=False, zorder=5)
+
+    # ---- panel (b) ---------------------------------------------------------
+    OFF = 0.22
+    BH = 0.40
+    for i, r in enumerate(rows_b):
+        _stack(ax_b, i - OFF, r["v1"], r["total"], BH, scale100=True)
+        _stack(ax_b, i + OFF, r["v2"], r["total"], BH, scale100=True)
+        # Which bar is which, as text rather than colour, so the distinction
+        # survives greyscale and colour vision deficiency alike.
+        for tag, dy in (("v1", -OFF), ("v2", OFF)):
+            ax_b.text(1.8, i + dy, tag, va="center", ha="left", fontsize=8,
+                      color="white", zorder=4)
+
+    ax_b.set_yticks(list(range(n_b)))
+    ax_b.set_yticklabels([r["label"] for r in rows_b])
+    ax_b.tick_params(axis="y", pad=13)
+    ax_b.invert_yaxis()
+    ax_b.set_ylim(n_b - 0.5, -0.5)
+    ax_b.set_xlabel("share of the session (%)")
+    ax_b.set_xlim(0, 126)
+    ax_b.set_xticks([0, 50, 100])
+    for side in ("top", "right", "left"):
+        ax_b.spines[side].set_visible(False)
+
+    # Dashed references at the 70/20/10 boundaries, mid-grey so they read
+    # against the dark train segment and the pale test segment alike.
+    for xb in NOMINAL_BOUNDARIES:
+        ax_b.plot([xb, xb], [-0.5, n_b - 0.5], linestyle=(0, (2, 2)),
+                  linewidth=0.9, color="#6e6e6e", zorder=4)
+
+    for i, r in enumerate(rows_b):
+        moved = r["changed"]
+        ax_b.text(103, i, str(moved), va="center", ha="left", fontsize=8,
+                  color=C_ACCENT if moved else INK_MUTED,
+                  fontweight="bold" if moved else "normal")
+    ax_b.text(103, -0.92, "moved", va="center", ha="left", fontsize=8,
+              color=INK, style="italic")
+
+    # ---- titles and legend -------------------------------------------------
+    fig.text(0.012, (fig_h - h_legend - 0.02) / fig_h,
+             "(a)  v2 composition, images", fontsize=8.5, fontweight="bold",
+             va="top", ha="left", color=INK)
+    fig.text(0.012, (fig_h - (top_b - h_title) - 0.02) / fig_h,
+             "(b)  v1 vs v2, share of each session", fontsize=8.5,
+             fontweight="bold", va="top", ha="left", color=INK)
 
     split_handles = [Patch(facecolor=C_TRAIN, label="train"),
                      Patch(facecolor=C_VALID, label="valid"),
                      Patch(facecolor=C_TEST, label="test")]
     mark_handles = [Line2D([], [], linestyle="none", marker="o", markersize=3.0,
-                           color=C_ACCENT, label="train-only group")]
+                           color=C_ACCENT, label="train-only"),
+                    Line2D([], [], linestyle=(0, (2, 2)), linewidth=0.9,
+                           color="#6e6e6e", label="70/20/10")]
     fig.legend(handles=split_handles, ncol=3, loc="upper left",
                bbox_to_anchor=(0.015, 1.0 - 0.04 / fig_h), frameon=False,
                handlelength=1.0, handletextpad=0.4, columnspacing=1.2,
                borderaxespad=0.0)
-    fig.legend(handles=mark_handles, ncol=1, loc="upper left",
+    fig.legend(handles=mark_handles, ncol=2, loc="upper left",
                bbox_to_anchor=(0.015, 1.0 - 0.23 / fig_h), frameon=False,
-               handlelength=1.0, handletextpad=0.4, borderaxespad=0.0)
+               handlelength=1.4, handletextpad=0.4, columnspacing=1.2,
+               borderaxespad=0.0)
 
+    # ---- fit the shared left margin to the widest label in either panel ----
     fig.canvas.draw()
     widest = max(t.get_window_extent().width
-                 for t in ax.get_yticklabels()) / fig.dpi
+                 for ax in (ax_a, ax_b) for t in ax.get_yticklabels()) / fig.dpi
     left = (widest + 13 / 72.0 + 0.05 + 0.02) / COL_W
-    ax.set_position([left, h_xlabel / fig_h, 1.0 - left - 0.035, h_plot / fig_h])
+    width = 1.0 - left - 0.035
+    ax_a.set_position(rect(top_a, h_plot_a, left, width))
+    ax_b.set_position(rect(top_b, h_plot_b, left, width))
 
     counts = {
         "caption_plain": caption,
         "caption_latex": latex_escape(caption),
         "n_unevaluable_classes": len(unevaluable),
-        "n_groups": n,
+        "n_groups_panel_a": n_a,
+        "n_groups_panel_b": n_b,
         "n_train_only_groups": len(train_only),
         "train_only_groups": [r["label"] for r in train_only],
         "train_only_images": n_train_only_imgs,
         "train_images_total": n_train_imgs,
         "train_only_pct_of_train": round(pct, 2),
         "iphone_row_from_device_table": list(iphone_counts),
+        "v1_near_nominal_groups": n_v1_near,
+        "v2_near_nominal_groups": n_v2_near,
+        "groups_unchanged": n_unchanged,
+        "images_moved_total": total_moved,
+        "panel_a_only_group": newcomer["label"],
+        "panel_a_only_split": [newcomer["train"], newcomer["valid"],
+                               newcomer["test"]],
         "figure_width_in": round(COL_W, 3),
         "figure_height_in": round(fig_h, 3),
         "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
                                                       round(fig_h * PNG_DPI)),
-        "groups": [{"label": r["label"], "train": r["train"], "valid": r["valid"],
-                    "test": r["test"], "total": r["total"],
-                    "train_only": r["train_only"]} for r in rows],
+        "groups": [{"label": r["label"], "train": r["train"],
+                    "valid": r["valid"], "test": r["test"],
+                    "total": r["total"], "train_only": r["train_only"]}
+                   for r in rows_a],
+        "panel_b": [{"label": r["label"], "total": r["total"],
+                     "v1": r["v1"], "v2": r["v2"], "changed": r["changed"],
+                     "v1_shape": r["v1_shape"], "v2_shape": r["v2_shape"]}
+                    for r in rows_b],
     }
     return fig, counts
 
@@ -635,7 +765,7 @@ def main():
         print("    - %s" % nme)
 
     # ---- F2 --------------------------------------------------------------
-    for p in (F2_SOURCE, F2_DEVICE_SOURCE, F2_UNEVALUABLE):
+    for p in (F2_SOURCE, F2_DEVICE_SOURCE, F2_UNEVALUABLE, F2B_SOURCE):
         if not os.path.isfile(p):
             sys.stderr.write("F2 source not found: %s\n" % p)
             return 1
@@ -646,7 +776,8 @@ def main():
                        for r in csv.DictReader(fh)]
 
     f2_rows, iphone_counts = load_f2_rows(F2_SOURCE, F2_DEVICE_SOURCE)
-    fig2, c2 = figure_2(f2_rows, iphone_counts, unevaluable)
+    f2b_rows = load_f2b_rows(F2B_SOURCE)
+    fig2, c2 = figure_2(f2_rows, iphone_counts, unevaluable, f2b_rows)
     pdf2, png2 = save_figure(fig2, "f2_capture_group_composition")
 
     # One provenance record covering both figures, written once both exist so
@@ -666,6 +797,8 @@ def main():
                "f2_device_source_sha256": sha256_file(F2_DEVICE_SOURCE),
                "f2_unevaluable_source": F2_UNEVALUABLE,
                "f2_unevaluable_source_sha256": sha256_file(F2_UNEVALUABLE),
+               "f2b_source": F2B_SOURCE,
+               "f2b_source_sha256": sha256_file(F2B_SOURCE),
                "f2_counts": c2,
                "outputs": [pdf, png, pdf2, png2]})
 

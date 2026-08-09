@@ -103,6 +103,13 @@ F5_PALETTE = ("#2a78d6", "#eb6834", "#1baf7a", "#7a3ea3", "#c81e5b")
 F5_MARKERS = ("o", "s", "^", "D", "v")
 
 
+# --- F4 --------------------------------------------------------------------
+F4_SWEEP = os.path.join(ec61.RUNS_DIR, "20260804_burst_aware_tau_sweep",
+                        "tau_sweep.csv")
+F4_DETAIL = os.path.join(ec61.RUNS_DIR, "20260804_burst_aware_tau_sweep",
+                         "tau_sweep_detail.csv")
+
+
 # --- F6 --------------------------------------------------------------------
 F6_LATENCY = os.path.join(ec61.DATA_DIR, "latency_by_arch.csv")
 F6_ACCURACY = os.path.join(ec61.DATA_DIR, "master_results.csv")
@@ -1184,6 +1191,184 @@ def figure_6(rows):
     return fig, counts
 
 
+def load_f4_rows(sweep_path, detail_path):
+    """The tau sweep: what each value cost and whether it was admissible."""
+    with open(sweep_path, "r", newline="", encoding="utf-8-sig") as fh:
+        sweep = {r["tau_seconds"]: r for r in csv.DictReader(fh)}
+    with open(detail_path, "r", newline="", encoding="utf-8-sig") as fh:
+        detail = {r["tau_seconds"]: r for r in csv.DictReader(fh)}
+    if set(sweep) != set(detail):
+        raise ValueError("sweep and detail tables cover different taus: %s"
+                         % sorted(set(sweep) ^ set(detail)))
+
+    def yes(v):
+        return str(v).strip().lower().startswith("yes") or "YES" in str(v)
+
+    out = []
+    for key in sorted(sweep, key=int):
+        a, d = sweep[key], detail[key]
+        out.append({
+            "tau": int(key),
+            "owes": int(d["test_images_to_return"]),
+            "gives": int(d["test_images_available_to_return"]),
+            "feasible": yes(a["all_15_have_2_qualifying_groups"]),
+            "sizes_held": yes(a["sizes_held"]),
+            "zero_contam": yes(a["zero_at_every_epsilon"]),
+            "pairs_raw": int(a["test_train_pairs_raw_005"]),
+            "pairs_aligned": int(a["test_train_pairs_aligned_005"]),
+            "moved": int(a["images_moved"]),
+            "sizes_after": a["sizes_after"],
+            "chosen": yes(a["satisfies_both"]),
+        })
+    return out
+
+
+def figure_4(rows):
+    """Why tau = 15: feasibility never bound, the return budget did."""
+    taus = [r["tau"] for r in rows]
+    admissible = [r for r in rows
+                  if r["feasible"] and r["sizes_held"] and r["zero_contam"]]
+    chosen = min(admissible, key=lambda r: r["tau"]) if admissible else None
+
+    always_feasible = all(r["feasible"] for r in rows)
+    first_break = next((r for r in rows if not r["sizes_held"]), None)
+
+    caption = (
+        "Why the released split uses tau = %d s. (a) the size constraint: at "
+        "each tau, the images the test split owes back after admitting whole "
+        "groups, against the images it can safely return. The two cross "
+        "between %d and %d s, and past that point the split cannot be "
+        "rebalanced -- at tau = %d s test owes %d and can return only %d, "
+        "ending at %s instead of 1478/438/205. (b) the three admissibility "
+        "criteria. Class feasibility is satisfied at every tau tested, so it "
+        "never bound the choice; what bound it was the collapsing return "
+        "budget in (a). tau = %d s is the smallest value meeting all three."
+        % (chosen["tau"] if chosen else -1,
+           chosen["tau"] if chosen else -1,
+           first_break["tau"] if first_break else -1,
+           first_break["tau"] if first_break else -1,
+           first_break["owes"] if first_break else -1,
+           first_break["gives"] if first_break else -1,
+           first_break["sizes_after"] if first_break else "?",
+           chosen["tau"] if chosen else -1))
+
+    # ---- layout ------------------------------------------------------------
+    h_title = 0.20
+    h_plot_a = 1.75
+    h_xlabel = 0.34
+    h_gap = 0.40
+    h_plot_b = 0.92
+    h_bottom = 0.42
+    fig_h = h_title + h_plot_a + h_xlabel + h_gap + h_title + h_plot_b + h_bottom
+
+    fig = plt.figure(figsize=(COL_W, fig_h))
+    left, width = 0.215, 0.755
+
+    def rect(top_in, height_in):
+        return [left, (fig_h - top_in - height_in) / fig_h, width,
+                height_in / fig_h]
+
+    top_a = h_title
+    ax = fig.add_axes(rect(top_a, h_plot_a))
+
+    owes = [r["owes"] for r in rows]
+    gives = [r["gives"] for r in rows]
+
+    # Shade the region where the split can still be rebalanced.
+    held = [r["tau"] for r in rows if r["sizes_held"]]
+    if held:
+        edge = (max(held) + min(t for t in taus if t > max(held))) / 2.0 \
+            if any(t > max(held) for t in taus) else max(held)
+        ax.axvspan(min(taus) - 2, edge, facecolor="#eef3f9", edgecolor="none",
+                   zorder=0)
+        ax.text(min(taus) - 1, max(gives) * 0.045, "sizes hold", fontsize=8,
+                color=C_TRAIN, ha="left", va="bottom")
+
+    ax.plot(taus, gives, color=C_TRAIN, linewidth=1.4, marker="o",
+            markersize=3.6, markerfacecolor=C_TRAIN, markeredgecolor="white",
+            markeredgewidth=0.5, zorder=3, label="test can return")
+    ax.plot(taus, owes, color=C_ACCENT, linewidth=1.4, marker="s",
+            markersize=3.6, markerfacecolor=C_ACCENT, markeredgecolor="white",
+            markeredgewidth=0.5, zorder=3, label="test owes")
+
+    ax.set_xlim(min(taus) - 2, max(taus) + 2)
+    ax.set_ylim(0, max(gives) * 1.18)
+    ax.set_ylabel("images")
+    ax.set_xticks(taus)
+    ax.grid(True, color=GRID, linewidth=0.4)
+    ax.set_axisbelow(True)
+    for side in ("top", "right"):
+        ax.spines[side].set_visible(False)
+    ax.legend(loc="upper right", frameon=False, fontsize=8, handlelength=1.4,
+              handletextpad=0.5, borderaxespad=0.3, labelspacing=0.3)
+
+    fig.text(0.012, (fig_h - 0.02) / fig_h,
+             "(a)  size constraint: owed vs returnable",
+             fontsize=8.5, fontweight="bold", va="top", ha="left", color=INK)
+
+    # ---- panel (b): the three criteria as a pass/fail grid -----------------
+    top_b = top_a + h_plot_a + h_xlabel + h_gap + h_title
+    axb = fig.add_axes(rect(top_b, h_plot_b))
+    criteria = [
+        ("class feasibility", "feasible"),
+        ("sizes hold", "sizes_held"),
+        ("no test-train pairs", "zero_contam"),
+    ]
+    for j, (label, key) in enumerate(criteria):
+        y = len(criteria) - 1 - j
+        for r in rows:
+            ok = r[key]
+            axb.plot([r["tau"]], [y], marker="o" if ok else "X",
+                     markersize=5.2 if ok else 5.0,
+                     markerfacecolor=C_TRAIN if ok else "white",
+                     markeredgecolor=C_TRAIN if ok else C_ACCENT,
+                     markeredgewidth=0.8 if ok else 1.3,
+                     linestyle="none", clip_on=False, zorder=3)
+    axb.set_yticks(range(len(criteria)))
+    axb.set_yticklabels([c[0] for c in reversed(criteria)])
+    axb.set_ylim(-0.6, len(criteria) - 0.4)
+    axb.set_xlim(min(taus) - 2, max(taus) + 2)
+    axb.set_xticks(taus)
+    axb.set_xlabel("tau (seconds)")
+    axb.xaxis.grid(True, color=GRID, linewidth=0.4)
+    axb.set_axisbelow(True)
+    for side in ("top", "right", "left"):
+        axb.spines[side].set_visible(False)
+    axb.tick_params(axis="y", length=0, pad=6)
+
+    if chosen:
+        axb.axvline(chosen["tau"], color=INK_MUTED, linewidth=0.8,
+                    linestyle=(0, (2, 2)), zorder=1)
+
+    fig.text(0.012, (fig_h - (top_b - h_title) - 0.02) / fig_h,
+             "(b)  admissibility (filled = met)",
+             fontsize=8.5, fontweight="bold", va="top", ha="left", color=INK)
+
+    fig.canvas.draw()
+    widest = max(t.get_window_extent().width
+                 for a2 in (ax, axb) for t in a2.get_yticklabels()) / fig.dpi
+    new_left = (widest + 6 / 72.0 + 0.06) / COL_W
+    new_width = 1.0 - new_left - 0.035
+    ax.set_position([new_left, ax.get_position().y0, new_width,
+                     ax.get_position().height])
+    axb.set_position([new_left, axb.get_position().y0, new_width,
+                      axb.get_position().height])
+
+    counts = {
+        "caption_plain": caption,
+        "caption_latex": latex_escape(caption),
+        "chosen_tau": chosen["tau"] if chosen else None,
+        "feasible_at_every_tau": always_feasible,
+        "first_tau_sizes_break": first_break["tau"] if first_break else None,
+        "figure_width_in": round(COL_W, 3),
+        "figure_height_in": round(fig_h, 3),
+        "figure_px_at_%d_dpi" % PNG_DPI: "%d x %d" % (round(COL_W * PNG_DPI),
+                                                      round(fig_h * PNG_DPI)),
+        "rows": rows,
+    }
+    return fig, counts
+
+
 def main():
     apply_style()
 
@@ -1250,7 +1435,8 @@ def main():
         params={"figures": ["f1_class_instance_counts",
                             "f2_capture_group_composition",
                             "f5_published_vs_corrected",
-                            "f6_accuracy_vs_latency"],
+                            "f6_accuracy_vs_latency",
+                            "f4_tau_sweep"],
                 "column_width_in": COL_W, "png_dpi": PNG_DPI,
                 "min_test": MIN_TEST, "pdf_fonttype": 42},
         extra={"f1_source": F1_SOURCE,
@@ -1536,6 +1722,124 @@ def main():
                  % (c6["closest_latency_pair"][0], c6["closest_latency_pair"][1],
                     c6["closest_latency_gap_ms"],
                     c6["closest_gap_in_noise_floors"]))
+    lines.append("")
+
+    # ---- F4 --------------------------------------------------------------
+    for p in (F4_SWEEP, F4_DETAIL):
+        if not os.path.isfile(p):
+            sys.stderr.write("F4 source not found: %s\n" % p)
+            return 1
+    f4_rows = load_f4_rows(F4_SWEEP, F4_DETAIL)
+    fig4, c4 = figure_4(f4_rows)
+    pdf4, png4 = save_figure(fig4, "f4_tau_sweep")
+
+    print()
+    print("F4  tau sweep: why tau = %s" % c4["chosen_tau"])
+    print("  sources: %s + %s"
+          % (os.path.relpath(F4_SWEEP, ec61.REPO_ROOT).replace("\\", "/"),
+             os.path.relpath(F4_DETAIL, ec61.REPO_ROOT).replace("\\", "/")))
+    print("  pdf    : %s (%.1f KB)" % (os.path.relpath(pdf4, ec61.REPO_ROOT).replace("\\", "/"),
+                                       os.path.getsize(pdf4) / 1024))
+    print("  png    : %s (%.1f KB, %d dpi)" % (os.path.relpath(png4, ec61.REPO_ROOT).replace("\\", "/"),
+                                               os.path.getsize(png4) / 1024, PNG_DPI))
+    print()
+    print("  derived table")
+    print("    %4s %6s %6s %10s %8s %14s %8s %6s"
+          % ("tau", "owes", "gives", "feasible", "held", "sizes", "0 pairs", "moved"))
+    print("    " + "-" * 72)
+    for r in c4["rows"]:
+        print("    %4d %6d %6d %10s %8s %14s %8s %6d"
+              % (r["tau"], r["owes"], r["gives"],
+                 "yes" if r["feasible"] else "NO",
+                 "yes" if r["sizes_held"] else "NO",
+                 r["sizes_after"],
+                 "yes" if r["zero_contam"] else "NO",
+                 r["moved"]))
+    print()
+    print("    feasible at every tau tested : %s" % c4["feasible_at_every_tau"])
+    print("    first tau where sizes break  : %s" % c4["first_tau_sizes_break"])
+    print("    chosen                       : tau = %s" % c4["chosen_tau"])
+    print()
+    print("  rendered size")
+    print("    %-24s %.2f in" % ("width", c4["figure_width_in"]))
+    print("    %-24s %.2f in" % ("HEIGHT", c4["figure_height_in"]))
+    print("    %-24s %s" % ("pixels at %d dpi" % PNG_DPI,
+                            c4["figure_px_at_%d_dpi" % PNG_DPI]))
+    print()
+    print("  LaTeX caption (not drawn into the image)")
+    print("    " + c4["caption_latex"])
+
+    # ---- F6: how to frame the Pareto result ------------------------------
+    pts = {p6["model"]: p6 for p6 in c6["points"]}
+    front = c6["pareto_front"]
+    fastest = min((pts[m] for m in front), key=lambda p: p["latency_ms"])
+    most_acc = max((pts[m] for m in front), key=lambda p: p["test_mAP50_95"])
+    noise = c6["noise_floor_ms"]
+    tight = min(c6["dominated"], key=lambda d: d["misses_front_by_map"])
+    tp = pts[tight["model"]]
+    lat_excess = tp["latency_ms"] - fastest["latency_ms"]
+
+    lines.append("### How to frame the Pareto result")
+    lines.append("")
+    lines.append("Two models are non-dominated: **%s** (lowest latency) and "
+                 "**%s** (highest mAP@50-95)."
+                 % (fastest["model"], most_acc["model"]))
+    lines.append("")
+    lines.append("**%s is excluded on latency, not on accuracy.** It matches "
+                 "`%s` to within **%.4f mAP**, but is **%.1f ms slower** — "
+                 "about %.0f times the measured run-to-run spread of %.2f ms."
+                 % (tight["model"], fastest["model"],
+                    tight["misses_front_by_map"], lat_excess,
+                    lat_excess / noise, noise))
+    lines.append("")
+    others = [d for d in c6["dominated"] if d["model"] != tight["model"]]
+    for d in others:
+        p6 = pts[d["model"]]
+        lines.append("- `%s` is dominated on both axes: %.1f ms slower than "
+                     "`%s` (%.0f x the noise floor) and %.4f mAP below `%s`."
+                     % (d["model"], p6["latency_ms"] - fastest["latency_ms"],
+                        fastest["model"],
+                        (p6["latency_ms"] - fastest["latency_ms"]) / noise,
+                        most_acc["test_mAP50_95"] - p6["test_mAP50_95"],
+                        most_acc["model"]))
+    lines.append("")
+    lines.append("This keeps the %.4f disclosed while making clear the "
+                 "practical conclusion does not rest on it: `%s` would not "
+                 "join the front even if that accuracy difference were "
+                 "reversed, because its latency cost is thirty times the "
+                 "measurement noise."
+                 % (tight["misses_front_by_map"], tight["model"]))
+    lines.append("")
+
+    lines.append("## F4 — tau sweep")
+    lines.append("")
+    lines.append("- sources: `runs/20260804_burst_aware_tau_sweep/tau_sweep.csv` "
+                 "+ `tau_sweep_detail.csv`")
+    lines.append("- outputs: `figures/f4_tau_sweep.{pdf,png}`")
+    lines.append("- rendered %.2f x %.2f in"
+                 % (c4["figure_width_in"], c4["figure_height_in"]))
+    lines.append("")
+    lines.append("| tau | test owes | test can return | feasible | sizes hold |"
+                 " sizes after | zero pairs | moved |")
+    lines.append("|---|---|---|---|---|---|---|---|")
+    for r in c4["rows"]:
+        lines.append("| %d | %d | %d | %s | %s | %s | %s | %d |"
+                     % (r["tau"], r["owes"], r["gives"],
+                        "yes" if r["feasible"] else "**no**",
+                        "yes" if r["sizes_held"] else "**no**",
+                        r["sizes_after"],
+                        "yes" if r["zero_contam"] else "**no**", r["moved"]))
+    lines.append("")
+    lines.append("**Feasibility never bound the choice.** All 15 rescued "
+                 "classes have two or more qualifying groups at every tau "
+                 "tested, so the criterion the tau was originally chosen to "
+                 "satisfy was satisfied everywhere. What bound it was the "
+                 "return budget: as groups grow, the number of images the test "
+                 "split can safely give back collapses — %s at tau=15 down to "
+                 "%s at tau=60 — while the number it owes rises. They cross "
+                 "between %s and %s s."
+                 % (c4["rows"][0]["gives"], c4["rows"][-1]["gives"],
+                    c4["chosen_tau"], c4["first_tau_sizes_break"]))
     lines.append("")
 
     with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:

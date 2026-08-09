@@ -10,10 +10,11 @@ from.
 
 | Figure | Script | Canonical run | Formats |
 |---|---|---|---|
-| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
-| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
-| `f5_published_vs_corrected` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
-| `f6_accuracy_vs_latency` | `scripts/make_figures.py` | `runs/20260809_make_figures_09/` | PDF + PNG 300 dpi |
+| `f1_class_instance_counts` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
+| `f2_capture_group_composition` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
+| `f5_published_vs_corrected` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
+| `f6_accuracy_vs_latency` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
+| `f4_tau_sweep` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
 | `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260804_figure_near_duplicate_04/` | PNG 300 dpi |
 | `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260805_figure_verification_sheet_02/` | PNG 200 dpi |
 
@@ -296,6 +297,76 @@ Latency is on a log axis so the four CNNs are not compressed against RT-DETR-l.
   \label{fig:accuracy-vs-latency}
 \end{figure}
 ```
+
+## F4 — tau sweep
+
+`f4_tau_sweep.pdf` / `.png`
+
+Why the released split uses tau = 15 s. Two panels.
+
+- **(a)** the size constraint: images the test split owes back after admitting
+  whole groups, against the images it can safely return.
+- **(b)** the three admissibility criteria at each tau, filled where met.
+
+- Data: `runs/20260804_burst_aware_tau_sweep/tau_sweep.csv` +
+  `tau_sweep_detail.csv`, joined on `tau_seconds`
+- Rendered size: **3.50 × 4.23 in** (1050 × 1269 px at 300 dpi)
+
+| tau | owes | can return | feasible | sizes hold | sizes after | no pairs | moved |
+|---|---|---|---|---|---|---|---|
+| 15 | 15 | **59** | yes | **yes** | 1478/438/205 | yes | 68 |
+| 20 | 19 | 47 | yes | yes | 1478/438/205 | yes | 78 |
+| 25 | 19 | 26 | yes | yes | 1478/438/205 | yes | 80 |
+| 30 | 20 | **10** | yes | **no** | 1458/438/225 | yes | 64 |
+| 35 | 24 | 9 | yes | no | 1454/438/229 | **no** | 74 |
+| 45 | 30 | 3 | yes | no | 1448/438/235 | yes | 88 |
+| 60 | 31 | 1 | yes | no | 1408/477/236 | **no** | 70 |
+
+**Feasibility never bound the choice.** Panel (b)'s top row is filled at every
+tau tested: all 15 rescued classes have two or more qualifying groups
+throughout. The criterion tau was originally selected to satisfy was satisfied
+everywhere.
+
+What bound it was the **return budget**. As groups grow, the images the test
+split can safely give back collapse — 59 at tau=15 down to 1 at tau=60 — while
+the images it owes rise from 15 to 31. The two cross between 25 and 30 s, and
+past the crossing the split cannot be rebalanced: at tau=30 test owes 20 and can
+return 10, ending at 1458/438/225 instead of 1478/438/205.
+
+tau=15 is the smallest value meeting all three criteria, and it also leaves the
+widest margin — 59 returnable against 15 owed.
+
+```latex
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{figures/f4_tau_sweep.pdf}
+  \caption{Why the released split uses $\tau = 15$~s. (a) the size constraint:
+  at each $\tau$, the images the test split owes back after admitting whole
+  groups, against the images it can safely return. The two cross between 25 and
+  30~s, and past that point the split cannot be rebalanced --- at $\tau = 30$~s
+  test owes 20 and can return only 10, ending at 1458/438/225 instead of
+  1478/438/205. (b) the three admissibility criteria. Class feasibility is
+  satisfied at every $\tau$ tested, so it never bound the choice; what bound it
+  was the collapsing return budget in (a). $\tau = 15$~s is the smallest value
+  meeting all three.}
+  \label{fig:tau-sweep}
+\end{figure}
+```
+
+## Maintenance rule
+
+**Generate LaTeX with Python file I/O. Never through a shell heredoc.**
+
+A `\begin{figure}` in this file was once silently replaced by a backspace
+character: the shell collapsed a doubled backslash, and Python then read `\b`
+as a valid escape. It is uniquely dangerous — `\c`, `\e`, `\i` and `\l` are
+*invalid* escapes, so Python leaves them alone and warns, while `\b` is valid
+and is destroyed without a word.
+
+`scripts/check_figures_readme.py` is the backstop. It fails on any control
+character, on unbalanced fences or figure environments, on a block missing
+`\includegraphics` / `\caption` / `\label`, and on a referenced figure that is
+not present in `figures/`. Run it after any regeneration.
 
 ## Audit-phase figures
 

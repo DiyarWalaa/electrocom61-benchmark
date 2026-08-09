@@ -59,6 +59,13 @@ collected_bundle.zip
 # repeatability statement the latency claims rest on.
 !data/latency_by_arch.csv
 
+# Training-configuration provenance. Scaffolded from the committed args.yaml
+# by scripts/scaffold_config_provenance.py, then hand-filled: the source and
+# citation columns are a citation rather than a measurement and exist nowhere
+# else in the repository. It must be versioned, and it must never be
+# regenerated over -- the scaffold script refuses to overwrite it.
+!data/config_provenance.csv
+
 # ---------------------------------------------------------------------------
 # Python bytecode -- regenerated on every run, machine-specific.
 # ---------------------------------------------------------------------------

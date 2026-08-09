@@ -50,7 +50,9 @@ cannot straddle the boundary. See `figures/near_duplicate_pair.png`.
 **Why τ = 15 s.** `runs/20260804_burst_aware_tau_sweep/` swept 15/20/25/30/35/45/60.
 Class feasibility holds at every value, so it does not decide. What decides is
 how many images the test split can give back: 59 available at τ=15 against 10
-at τ=30. Only 15/20/25 hold the frozen sizes, and τ=15 moves the fewest images.
+at τ=30. Only 15/20/25 hold the frozen sizes, and of those three τ=15 moves the
+fewest images — 68, against 78 at τ=20 and 80 at τ=25. It is **not** the fewest
+overall: τ=30 moves 64, but breaks the sizes to 1458/438/225.
 
 ### One thing not to overstate
 

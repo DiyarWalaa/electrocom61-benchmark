@@ -1251,6 +1251,10 @@ def figure_4(rows):
            first_break["gives"] if first_break else -1,
            first_break["sizes_after"] if first_break else "?",
            chosen["tau"] if chosen else -1))
+    caption += (" The pair criterion is the strict one: zero test-train "
+                "near-duplicates at every epsilon under BOTH raw and aligned "
+                "scoring. Raw scoring is zero at every tau tested, so the two "
+                "crosses in that row are aligned-scoring failures only.")
 
     # ---- layout ------------------------------------------------------------
     h_title = 0.20
@@ -1820,16 +1824,71 @@ def main():
                  % (c4["figure_width_in"], c4["figure_height_in"]))
     lines.append("")
     lines.append("| tau | test owes | test can return | feasible | sizes hold |"
-                 " sizes after | zero pairs | moved |")
-    lines.append("|---|---|---|---|---|---|---|---|")
+                 " sizes after | raw pairs | aligned pairs | no pairs | moved |")
+    lines.append("|---|---|---|---|---|---|---|---|---|---|")
     for r in c4["rows"]:
-        lines.append("| %d | %d | %d | %s | %s | %s | %s | %d |"
+        lines.append("| %d | %d | %d | %s | %s | %s | %d | %d | %s | %d |"
                      % (r["tau"], r["owes"], r["gives"],
                         "yes" if r["feasible"] else "**no**",
                         "yes" if r["sizes_held"] else "**no**",
-                        r["sizes_after"],
+                        r["sizes_after"], r["pairs_raw"], r["pairs_aligned"],
                         "yes" if r["zero_contam"] else "**no**", r["moved"]))
     lines.append("")
+    lines.append("### Which scoring the pair column reports")
+    lines.append("")
+    lines.append("`no pairs` is the **strict** criterion: zero test-train "
+                 "near-duplicates at every epsilon under **both** raw and "
+                 "aligned scoring. The audit keeps those two apart and so does "
+                 "the underlying table — the `raw pairs` and `aligned pairs` "
+                 "columns above are at eps=0.05.")
+    lines.append("")
+    raw_all_zero = all(r["pairs_raw"] == 0 for r in c4["rows"])
+    aligned_fail = [r["tau"] for r in c4["rows"] if r["pairs_aligned"] > 0]
+    if raw_all_zero and aligned_fail:
+        lines.append("Raw scoring is zero at **every** tau tested. Every "
+                     "failure in that column is therefore an aligned-scoring "
+                     "failure only, at tau = %s. Collapsing the two would hide "
+                     "that the raw signal never fires."
+                     % ", ".join(str(t) for t in aligned_fail))
+        lines.append("")
+    lines.append("### The criteria do not fail monotonically")
+    lines.append("")
+    clean_but_broken = [r for r in c4["rows"]
+                        if r["zero_contam"] and not r["sizes_held"]]
+    if clean_but_broken:
+        def _join(items):
+            items = list(items)
+            if len(items) == 1:
+                return items[0]
+            return ", ".join(items[:-1]) + " and " + items[-1]
+
+        lines.append("A larger tau is not uniformly worse. %s %s clean on "
+                     "contamination but fail on sizes, while %s each carry one "
+                     "aligned pair despite sitting between them."
+                     % (_join("tau=%d" % r["tau"] for r in clean_but_broken),
+                        "is" if len(clean_but_broken) == 1 else "are",
+                        _join("tau=%d" % t for t in aligned_fail)))
+        lines.append("")
+        lines.append("So the three rows of panel (b) have to be shown "
+                     "separately: no single ordering of tau satisfies them in "
+                     "sequence, and a reader given only a summary verdict "
+                     "could not tell which criterion failed where.")
+        lines.append("")
+    lines.append("### Fewest images moved, scoped correctly")
+    lines.append("")
+    held = [r for r in c4["rows"] if r["sizes_held"]]
+    best_held = min(held, key=lambda r: r["moved"]) if held else None
+    best_any = min(c4["rows"], key=lambda r: r["moved"])
+    if best_held is not None and best_any["tau"] != best_held["tau"]:
+        lines.append("tau=%d moves **the fewest images among the values that "
+                     "hold the split sizes** — %d, against %s. It is not the "
+                     "fewest overall: tau=%d moves %d, but ends at %s."
+                     % (best_held["tau"], best_held["moved"],
+                        " and ".join("%d at tau=%d" % (r["moved"], r["tau"])
+                                     for r in held if r["tau"] != best_held["tau"]),
+                        best_any["tau"], best_any["moved"],
+                        best_any["sizes_after"]))
+        lines.append("")
     lines.append("**Feasibility never bound the choice.** All 15 rescued "
                  "classes have two or more qualifying groups at every tau "
                  "tested, so the criterion the tau was originally chosen to "

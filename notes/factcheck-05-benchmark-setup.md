@@ -281,3 +281,89 @@ stub. Section 3 has no content. A resolved reference to an empty section is
 worse than a broken one: it prints a plausible number, and no undefined-
 reference warning will ever flag it. Re-check when Section 3 is written that it
 actually establishes what 5.4 says it does.
+
+---
+
+# Fact-check: subsection 5.5 (2026-08-11)
+
+`Efficiency measurement`, inserted verbatim. Prose not edited. No cross-
+references to convert -- 5.5 cites no section or table by number.
+
+Verification script: `scripts/verify_efficiency_claims.py`, run directory
+`runs/20260811_verify_efficiency_claims_02/`.
+
+## Verified
+
+| Claim | Verdict |
+|---|---|
+| YOLO26s 9,995,078 / 22.998 -> 9,488,787 / 20.892 | PASS, exact |
+| RT-DETR-l 32,931,431 / 110.159 -> 32,109,095 / 105.6 | PASS, exact |
+| parameter reduction spans 0.2% to 5.1% | PASS -- actual 0.1586% (yolo11s) to 5.0654% (yolo26s), which to one decimal is exactly 0.2% and 5.1% |
+| batch size one | PASS -- `batch: 1` |
+| 640 pixels | PASS -- `imgsz: 640` |
+| Tesla P100 | PASS -- `Tesla P100-PCIE-16GB` |
+| twenty inferences discarded before timing | PASS -- `warmup: 20` |
+| `torch.cuda.synchronize()` before stopping the clock | PASS -- in the timer description |
+| median and 95th percentile reported | PASS -- p50 and p95 |
+| all ten checkpoints in a single session | PASS -- 10 model entries in one pass |
+| all 205 images read once before timing | PASS -- `file_cache` |
+| largest pair difference 0.24 ms, 1.75% | PASS, exact -- yolo11s, and the ms and % maxima are the same architecture |
+| five architectures | PASS |
+
+Both complexity figures agree between the two runs of every architecture, as
+they must if the two rows describe the same weights.
+
+## The 23% figure -- correct, but on a different basis from the 1.75%
+
+The per-session measurements do vary by roughly this much, but the exact
+percentage depends on a choice the prose does not state:
+
+| yolov9s | 18.58 vs 24.23 ms, gap 5.65 ms |
+|---|---|
+| of the smaller | 30.41% |
+| of the larger | **23.32%** |
+| of the mean | 26.40% |
+
+Only division by the larger reproduces 23%. That is a legitimate convention.
+The problem is that the 1.75% pair gap in the same subsection comes from
+`latency_by_arch.csv`, which -- verified from its own columns, not assumed --
+divides by the **mean**. On that basis the cross-session figure would be 26.4%.
+
+So the subsection states two spreads on two different bases. Neither number is
+wrong. Recommend either stating the convention or recomputing 23% as 26.4% for
+consistency with the figure it is implicitly being contrasted against.
+
+Worth noting the claim survives on any basis: the smallest of the three, 23.3%,
+is still an order of magnitude above the 1.75% within-session resolution, which
+is the argument the paragraph is making.
+
+## Omission, not an error
+
+The protocol records a precaution the prose does not mention:
+
+    burn_in: "30 images on one model before the loop, discarded"
+
+This is separate from the 20-iteration warmup, and separate again from the
+205-image pre-read that the prose does describe. The paragraph says "Three
+precautions were taken" and then names warmup, synchronisation and percentile
+choice; the burn-in is a fourth. Given the subsection's argument is that
+efficiency protocols are under-reported, leaving one of its own steps out is
+worth fixing.
+
+## Not verifiable from committed sources
+
+The debugging narrative in the fourth paragraph:
+
+- "Two further complete passes were required before the protocol was stable"
+- "the first model measured returned an end-to-end time approximately 4 ms
+  above its identical counterpart while its inference time matched to within
+  0.4%"
+
+Only the final pass is committed. The only corroboration is the
+`latency_source` string `unified_pass_v3_...`, whose `v3` is consistent with
+two earlier passes but does not establish what they showed. The diagnosis --
+first read from network-mounted storage -- is likewise not reconstructible from
+anything in the repository.
+
+The claim that fusion status "is rarely stated" in other papers is a claim
+about the literature and needs a citation or softening.

@@ -1,7 +1,14 @@
 \section{Benchmark Setup}
 \label{sec:benchmark-setup}
 
-% TODO: 5.1 through 5.4 are drafted below. The subsection list is complete.
+% TODO: 5.1 through 5.5 are drafted below.
+%
+% 5.5 states two percentages on DIFFERENT BASES. The 1.75% pair gap comes from
+% latency_by_arch.csv, which divides by the mean of the pair. The 23%
+% cross-session figure is only reproducible by dividing by the LARGER of the
+% pair; on the mean it is 26.4% and on the smaller 30.4%. Neither is wrong,
+% but the subsection should say which it uses. See
+% runs/20260811_verify_efficiency_claims_02/.
 %
 % 5.4 references sec:dataset-audit. That label EXISTS on the Section 3 stub, so
 % the reference resolves and prints "Section 3" -- but Section 3 has no content
@@ -163,3 +170,54 @@ rather than specified here. We record this as an instance of the same reporting
 gap identified above: an evaluation configuration can be documented in full and
 still contain a threshold determined by a library version, which is precisely
 why that version must be reported.
+
+\subsection{Efficiency measurement}
+\label{sec:efficiency-measurement}
+
+Model complexity is reported after fusing batch normalisation into the preceding
+convolution, since that is the form in which a model is deployed. Both figures
+were measured. Fusion reduces YOLO26s from 9{,}995{,}078 parameters and 22.998
+GFLOPs to 9{,}488{,}787 and 20.892, and RT-DETR-l from 32{,}931{,}431 and
+110.159 to 32{,}109{,}095 and 105.6. The reduction ranges from 0.2\% to 5.1\% of
+parameters depending on architecture. Which of the two a study reports is rarely
+stated, and the difference is large enough to matter when parameter counts are
+compared across papers.
+
+Latency was measured at batch size one, at 640 pixels, on the same Tesla P100
+used for training. Batch size one is the quantity of interest: it is the time to
+process a single image, which is what a conveyor-belt application experiences.
+Larger batches measure throughput, a different property.
+
+Three precautions were taken. Twenty inferences were run and discarded before
+timing began, because the first inferences after a model is loaded are several
+times slower while CUDA kernels compile and the device raises its clock.
+\texttt{torch.cuda.synchronize()} was called before stopping the clock on each
+image, because GPU execution is asynchronous and timing without it measures how
+quickly Python enqueues work rather than how quickly the device completes it.
+The median and 95th percentile are reported rather than the mean, because a
+single outlier distorts a mean and because, for a conveyor application, the
+near-worst case is more informative than the average.
+
+All ten checkpoints were measured consecutively within a single session. This was
+necessary rather than convenient: an earlier set of measurements taken across ten
+separate sessions varied by up to 23\% for the same architecture, a difference
+attributable to session conditions rather than to the models. Two further
+complete passes were required before the protocol was stable. In both, the first
+model measured returned an end-to-end time approximately 4~ms above its identical
+counterpart while its inference time matched to within 0.4\%, placing the
+discrepancy outside the measured stages. The cause was the first read of each
+image file from network-mounted storage; reading all 205 images once before
+timing eliminated it. The released protocol includes this step.
+
+Because latency is a property of the architecture rather than of the split a
+model was trained on, the two runs of each architecture constitute duplicate
+measurements. Across five architectures the largest difference between a pair was
+0.24~ms, or 1.75\%. This is reported as the resolution of the measurement, and
+differences of that order between models are not treated as meaningful.
+
+Two distinct timing quantities are reported. The framework's own
+preprocess, inference and postprocess breakdown measures the stages it controls;
+the end-to-end duration of the \texttt{predict()} call is larger, the difference
+being framework overhead such as result-object construction and format
+conversion. Reporting only the former would make a model appear faster than an
+application using it would observe.

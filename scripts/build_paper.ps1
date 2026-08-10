@@ -1,0 +1,206 @@
+<#
+.SYNOPSIS
+    Compile paper/main.tex and report problems in readable form.
+
+.DESCRIPTION
+    Runs the standard four-pass sequence from paper/:
+
+        pdflatex -> bibtex -> pdflatex -> pdflatex
+
+    Three pdflatex passes are needed because the first writes the .aux, bibtex
+    resolves the bibliography from it, and the last two settle cross-references
+    and citations. Fewer passes leave ?? wherever a \ref or \cite should be.
+
+    Rather than dumping the LaTeX log, this parses it and reports errors,
+    missing files, undefined references, undefined citations and duplicate
+    labels as a short list.
+
+    THE INSTALLER IS DISABLED BY DEFAULT.
+
+    MiKTeX's on-the-fly package installer opens a GUI dialog. In a
+    non-interactive shell that dialog is invisible and pdflatex simply blocks
+    until something kills it -- which is what happened the first time this was
+    run here. With the installer off, a missing package fails immediately with
+    a message naming the file, which is actionable. Pass -AllowInstall to turn
+    it back on when running interactively.
+
+.PARAMETER AllowInstall
+    Permit MiKTeX to download missing packages. Only use this from an
+    interactive terminal: it can open a dialog and block otherwise.
+
+.PARAMETER Clean
+    Delete the auxiliary files before building.
+
+.EXAMPLE
+    powershell -File scripts\build_paper.ps1
+    powershell -File scripts\build_paper.ps1 -AllowInstall -Clean
+#>
+[CmdletBinding()]
+param(
+    [switch]$AllowInstall,
+    [switch]$Clean
+)
+
+$ErrorActionPreference = 'Continue'
+
+$repoRoot  = Split-Path -Parent $PSScriptRoot
+$paperDir  = Join-Path $repoRoot 'paper'
+$jobName   = 'main'
+$logPath   = Join-Path $paperDir "$jobName.log"
+$blgPath   = Join-Path $paperDir "$jobName.blg"
+$pdfPath   = Join-Path $paperDir "$jobName.pdf"
+
+function Find-Tool {
+    param([string]$Name)
+    $cmd = Get-Command $Name -ErrorAction SilentlyContinue
+    if ($null -ne $cmd) { return $cmd.Source }
+    # MiKTeX installs per-user by default and its PATH entry does not reach a
+    # shell that was already open. Look in the usual places before giving up.
+    $candidates = @(
+        (Join-Path $env:LOCALAPPDATA "Programs\MiKTeX\miktex\bin\x64\$Name.exe"),
+        (Join-Path $env:LOCALAPPDATA "Programs\MiKTeX\miktex\bin\$Name.exe"),
+        (Join-Path $env:ProgramFiles "MiKTeX\miktex\bin\x64\$Name.exe"),
+        (Join-Path ${env:ProgramFiles(x86)} "MiKTeX\miktex\bin\$Name.exe")
+    )
+    foreach ($c in $candidates) { if (Test-Path $c) { return $c } }
+    return $null
+}
+
+Write-Host ''
+Write-Host '=== toolchain ===' -ForegroundColor Cyan
+$pdflatex = Find-Tool 'pdflatex'
+$bibtex   = Find-Tool 'bibtex'
+if ($null -eq $pdflatex -or $null -eq $bibtex) {
+    Write-Host 'pdflatex or bibtex could not be found.' -ForegroundColor Red
+    Write-Host 'Install MiKTeX or TeX Live, or add its bin directory to PATH.'
+    exit 2
+}
+Write-Host "  pdflatex : $pdflatex"
+Write-Host "  bibtex   : $bibtex"
+
+Push-Location $paperDir
+try {
+    $auxExt = @('.aux', '.log', '.bbl', '.blg', '.out', '.toc')
+    if ($Clean) {
+        foreach ($e in $auxExt) {
+            $f = "$jobName$e"
+            if (Test-Path $f) { Remove-Item $f -Force }
+        }
+        Write-Host '  cleaned auxiliary files'
+    }
+
+    $texArgs = @('-interaction=nonstopmode', '-file-line-error')
+    if (-not $AllowInstall) { $texArgs += '--disable-installer' }
+
+    $passes = @(
+        @{ Name = 'pdflatex (1/3)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
+        @{ Name = 'bibtex';         Exe = $bibtex;   Args = @($jobName) },
+        @{ Name = 'pdflatex (2/3)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
+        @{ Name = 'pdflatex (3/3)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") }
+    )
+
+    Write-Host ''
+    Write-Host '=== passes ===' -ForegroundColor Cyan
+    $fatal = $false
+    foreach ($p in $passes) {
+        $null = & $p.Exe $p.Args
+        $code = $LASTEXITCODE
+        if ($code -eq 0) {
+            Write-Host ("  {0,-16} ok" -f $p.Name)
+        } else {
+            Write-Host ("  {0,-16} exit {1}" -f $p.Name, $code) -ForegroundColor Yellow
+            # bibtex returns non-zero for warnings alone; only pdflatex failing
+            # is worth abandoning the sequence for.
+            if ($p.Name -like 'pdflatex*') { $fatal = $true; break }
+        }
+    }
+
+    if (-not (Test-Path $logPath)) {
+        Write-Host ''
+        Write-Host 'No log file was produced; nothing to report.' -ForegroundColor Red
+        exit 1
+    }
+    $log = Get-Content $logPath
+
+    # --- parse ---------------------------------------------------------------
+    $errors      = $log | Select-String -Pattern '^(.+?):(\d+): (.+)$' | ForEach-Object { $_.Line }
+    $bangs       = $log | Select-String -Pattern '^! ' | ForEach-Object { $_.Line }
+    $missing     = $log | Select-String -Pattern "File ``(.+?)' not found" |
+                   ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique
+    $undefRef    = $log | Select-String -Pattern "Reference ``(.+?)' on page" |
+                   ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique
+    $undefCite   = $log | Select-String -Pattern "Citation ``(.+?)' on page" |
+                   ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique
+    $multiLabel  = $log | Select-String -Pattern "Label ``(.+?)' multiply defined" |
+                   ForEach-Object { $_.Matches[0].Groups[1].Value } | Sort-Object -Unique
+    $overfull    = ($log | Select-String -Pattern '^Overfull \\[hv]box' | Measure-Object).Count
+    $underfull   = ($log | Select-String -Pattern '^Underfull \\[hv]box' | Measure-Object).Count
+    $rerun       = ($log | Select-String -Pattern 'Rerun to get' | Measure-Object).Count
+
+    Write-Host ''
+    Write-Host '=== result ===' -ForegroundColor Cyan
+    $built = Test-Path $pdfPath
+    if ($built -and -not $fatal) {
+        $size = [math]::Round((Get-Item $pdfPath).Length / 1KB, 1)
+        $pages = ($log | Select-String -Pattern 'Output written on .+ \((\d+) page')
+        $pageCount = ''
+        if ($null -ne $pages) { $pageCount = ", $($pages.Matches[0].Groups[1].Value) pages" }
+        Write-Host "  COMPILED  main.pdf ($size KB$pageCount)" -ForegroundColor Green
+    } else {
+        Write-Host '  FAILED    no usable PDF produced' -ForegroundColor Red
+    }
+
+    if ($missing.Count -gt 0) {
+        Write-Host ''
+        Write-Host 'Missing files (LaTeX packages that are not installed):' -ForegroundColor Red
+        foreach ($m in $missing) { Write-Host "  - $m" }
+        Write-Host ''
+        Write-Host '  MiKTeX has these but has not downloaded them. Either:' -ForegroundColor Yellow
+        Write-Host '    open MiKTeX Console -> Updates -> check, then Packages -> install; or'
+        Write-Host '    re-run this script with -AllowInstall from an interactive terminal.'
+    }
+
+    if ($bangs.Count -gt 0) {
+        Write-Host ''
+        Write-Host 'Errors:' -ForegroundColor Red
+        foreach ($e in ($bangs | Select-Object -First 20)) { Write-Host "  $e" }
+    } elseif ($errors.Count -gt 0) {
+        Write-Host ''
+        Write-Host 'Errors:' -ForegroundColor Red
+        foreach ($e in ($errors | Select-Object -First 20)) { Write-Host "  $e" }
+    }
+
+    if ($undefRef.Count -gt 0) {
+        Write-Host ''
+        Write-Host "Undefined references ($($undefRef.Count)):" -ForegroundColor Yellow
+        foreach ($r in $undefRef) { Write-Host "  - $r" }
+    }
+    if ($undefCite.Count -gt 0) {
+        Write-Host ''
+        Write-Host "Undefined citations ($($undefCite.Count)):" -ForegroundColor Yellow
+        foreach ($c in $undefCite) { Write-Host "  - $c" }
+    }
+    if ($multiLabel.Count -gt 0) {
+        Write-Host ''
+        Write-Host "Labels defined more than once ($($multiLabel.Count)):" -ForegroundColor Yellow
+        foreach ($l in $multiLabel) { Write-Host "  - $l" }
+    }
+
+    if (Test-Path $blgPath) {
+        $blg = Get-Content $blgPath | Select-String -Pattern '^(Warning|I couldn''t|I found no)'
+        if ($null -ne $blg) {
+            Write-Host ''
+            Write-Host 'BibTeX:' -ForegroundColor Yellow
+            foreach ($b in $blg) { Write-Host "  $($b.Line)" }
+        }
+    }
+
+    Write-Host ''
+    Write-Host "Boxes: $overfull overfull, $underfull underfull.  Rerun requests: $rerun."
+
+    if ($fatal -or -not $built) { exit 1 }
+    exit 0
+}
+finally {
+    Pop-Location
+}

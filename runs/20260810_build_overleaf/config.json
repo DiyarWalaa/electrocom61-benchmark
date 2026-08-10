@@ -1,0 +1,51 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "files": [
+    "figures/f1_class_instance_counts.pdf",
+    "figures/f2_capture_group_composition.pdf",
+    "figures/f4_tau_sweep.pdf",
+    "figures/f5_published_vs_corrected.pdf",
+    "figures/f6_accuracy_vs_latency.pdf",
+    "figures/near_duplicate_pair.png",
+    "figures/split_verification_sheet.png",
+    "main.tex",
+    "references.bib",
+    "sections/01-introduction.tex",
+    "sections/02-related-work.tex",
+    "sections/03-dataset-audit.tex",
+    "sections/04-corrected-split.tex",
+    "sections/05-benchmark-setup.tex",
+    "sections/06-results.tex",
+    "sections/07-discussion.tex",
+    "sections/08-limitations.tex",
+    "sections/09-conclusion.tex",
+    "tables/t1_unevaluable_classes.tex",
+    "tables/t2_split_properties.tex",
+    "tables/t3_training_config.tex",
+    "tables/t4_main_results.tex",
+    "tables/t5_efficiency.tex",
+    "tables/t6_latency_breakdown.tex"
+  ],
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "2991c9224bd49586955da6567995b797fc955976e1e48420fae008030973b6f6",
+  "params": {
+    "figure_policy": "PDF where one exists, else PNG",
+    "package_dir": "C:\\research\\electrocom61\\overleaf",
+    "zip": "C:\\research\\electrocom61\\overleaf\\electrocom61-paper.zip"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "png_only_figures": [
+    "near_duplicate_pair.png",
+    "split_verification_sheet.png"
+  ],
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-10T17:37:24.412782Z",
+  "script": "build_overleaf.py",
+  "script_sha256": "c1737a38081b18a37e45129de3005b1b4c75ae6c1865aee059983eafcabc4795",
+  "uncompressed_bytes": 5660811,
+  "unresolved_refs": [
+    "sec:rtdetr-lr"
+  ],
+  "zip_entries": 24
+}

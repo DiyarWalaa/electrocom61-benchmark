@@ -1,0 +1,9 @@
+run,mode,split,conf,iou,max_det
+rtdetr_l_corr,train,val,null,0.7,300
+rtdetr_l_pub_lr1e4,train,val,null,0.7,300
+yolo11s_corr,train,val,null,0.7,300
+yolo11s_pub,train,val,null,0.7,300
+yolo12s_corr,train,val,null,0.7,300
+yolo12s_pub,train,val,null,0.7,300
+yolo26s_corr,train,val,null,0.7,300
+yolo26s_pub,train,val,null,0.7,300

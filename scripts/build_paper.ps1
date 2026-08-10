@@ -52,10 +52,15 @@ $pdfPath   = Join-Path $paperDir "$jobName.pdf"
 
 function Find-Tool {
     param([string]$Name)
+    # Prefer the bare name. Returning $cmd.Source here would work, but it makes
+    # every pass invoke a different absolute path, which reads as a new and
+    # unrecognised binary to anything auditing commands. If it is on PATH, call
+    # it the way a person would.
     $cmd = Get-Command $Name -ErrorAction SilentlyContinue
-    if ($null -ne $cmd) { return $cmd.Source }
-    # MiKTeX installs per-user by default and its PATH entry does not reach a
-    # shell that was already open. Look in the usual places before giving up.
+    if ($null -ne $cmd) { return $Name }
+    # Fallback only. MiKTeX installs per-user by default, so its PATH entry does
+    # not reach a shell that was already open when it was installed -- a fresh
+    # shell sees it, this one may not. Look in the usual places before giving up.
     $candidates = @(
         (Join-Path $env:LOCALAPPDATA "Programs\MiKTeX\miktex\bin\x64\$Name.exe"),
         (Join-Path $env:LOCALAPPDATA "Programs\MiKTeX\miktex\bin\$Name.exe"),
@@ -187,7 +192,12 @@ try {
     }
 
     if (Test-Path $blgPath) {
-        $blg = Get-Content $blgPath | Select-String -Pattern '^(Warning|I couldn''t|I found no)'
+        # -CaseSensitive matters: BibTeX ends every log with a statistics block
+        # listing its built-in functions, one of which is literally `warning$`.
+        # A case-insensitive '^Warning' matches that counter and reports
+        # "warning$ -- 0" as though it were a warning. Match the real prefixes.
+        $blg = Get-Content $blgPath |
+               Select-String -CaseSensitive -Pattern '^(Warning--|I couldn''t|I found no|Repeated entry)'
         if ($null -ne $blg) {
             Write-Host ''
             Write-Host 'BibTeX:' -ForegroundColor Yellow

@@ -20,6 +20,16 @@
 \documentclass[11pt,a4paper]{article}
 
 \usepackage[utf8]{inputenc}
+% lmodern MUST be loaded before fontenc, and both are load-bearing.
+%
+% T1 encoding alone switches Computer Modern to the EC fonts, which are
+% distributed only as METAFONT sources. TeX then renders them as bitmaps, and
+% the resulting PDF carries Type 3 fonts: text does not extract cleanly (the
+% fi/ff ligatures come out as garbage, so "configuration" and "differs" break)
+% and IEEE PDF eXpress rejects the file outright. Latin Modern is the same
+% design as Computer Modern with the same T1 glyph coverage, but shipped as
+% Type 1 outlines, so this one line makes the output scalable and searchable.
+\usepackage{lmodern}
 \usepackage[T1]{fontenc}
 \usepackage[margin=1in]{geometry}
 

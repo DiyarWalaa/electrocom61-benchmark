@@ -142,3 +142,67 @@ Left as-is because the brief specified the substitution.
 No en-dash substitutions were made: the prose contains no numeric ranges. No
 characters needed escaping — there are no ampersands, percent signs,
 underscores or braces in the text.
+
+---
+
+# Fact-check: subsection 5.3 (2026-08-10)
+
+`A configuration that is uniform but not neutral`, inserted verbatim. Prose not
+edited. Two substitutions applied per the brief: `Section 6` ->
+`Section~\ref{sec:results}`, `Table 3` -> `Table~\ref{tab:training-config}`.
+
+## Verified against committed sources
+
+| Claim | Source | Verdict |
+|---|---|---|
+| lr0 reduced 0.01 -> 0.0001 | `data/config_provenance.csv` rows `lr0`, `lr0 (RT-DETR-l)` | PASS |
+| "a factor of one hundred" | 0.01 / 0.0001 = 100 exactly | PASS |
+| converged run val mAP@50 0.938 | `results_rtdetr_l_pub_lr1e4.json` `val.mAP50` | PASS |
+| converged run test mAP@50 0.9171 | same file, `test.mAP50` | PASS |
+| best checkpoint at epoch 58 | `rtdetr_l_pub_lr1e4_training_curves.csv`, argmax of Ultralytics fitness (0.1*mAP50 + 0.9*mAP50-95) = epoch 58, fitness 0.635047 | PASS |
+| "the ten runs" | `master_results.csv` has 10 rows | PASS |
+| lr0 is the only non-architecture difference among runs | `config_provenance.csv`: `lr0 (RT-DETR-l)` is the sole per-model override | PASS |
+
+Note on epoch 58: the run ran to epoch 73, exactly 15 beyond the best epoch,
+which independently corroborates `patience = 15`. Epoch 58 is best by FITNESS,
+not by mAP@50 alone -- epoch 63 scores higher on mAP@50 (0.94041). The claim is
+correct because Ultralytics selects `best.pt` by fitness, but it is only correct
+under that definition.
+
+## FAILED
+
+**"the same value that trains five convolutional detectors to convergence"** --
+should be FOUR. `master_results.csv` holds five distinct models: `yolo11s`,
+`yolo12s`, `yolo26s`, `yolov9s` (convolutional) and `rtdetr-l` (transformer).
+The sentence contrasts the convolutional detectors against the transformer, so
+counting the transformer among them inflates the evidence and contradicts the
+clause it sits in. Not edited; flagged for the author.
+
+## NOT YET VERIFIABLE -- awaiting the recovered run
+
+Every number describing the diverged run itself. Nothing committed contains
+them; they need `data/kaggle/results_rtdetr_l_pub.json` and
+`data/kaggle/artifacts/rtdetr_l_pub/rtdetr_l_pub_training_curves.csv`:
+
+- losses finite through epoch 6, NaN from epoch 7 (per-term onset unconfirmed)
+- validation mAP@50 exactly zero from epoch 7 onward
+- early stopping at epoch 19
+- best checkpoint from epoch 4
+- 0.0039 mAP@50 validation, 0.0057 test
+
+Also unverified: "Both runs are retained in the repository" -- currently only
+the lr1e4 run is. Becomes true on ingestion.
+
+## Untraceable claim needing a citation
+
+"Transformer-based detectors are commonly trained at learning rates one to two
+orders of magnitude below those used for convolutional detectors." Plausible and
+consistent with this study's own evidence, but stated as established practice
+with no citation. Same category as the untraceable claims logged for 5.1/5.2.
+
+## Scope note
+
+"This is the single respect in which the ten runs differ" is standalone in 5.3,
+where 5.2 says "Apart from the architecture under test". Read alone, 5.3 is
+false -- the architecture differs too. Read after 5.2, the qualifier carries.
+Not an error; a dependency on reading order worth being aware of.

@@ -1,18 +1,21 @@
 \section{Benchmark Setup}
 \label{sec:benchmark-setup}
 
-% TODO: 5.1 and 5.2 are drafted below. Still to write:
-%   - subsection 5.3, the RT-DETR learning-rate deviation. It MUST be
-%     labelled sec:rtdetr-lr (written without the command here so a grep for
-%     defined labels does not match this comment). Two references to it
-%     already exist below, and until the label is defined LaTeX prints ?? and
-%     warns. That is deliberate: a visibly broken reference beats a silently
-%     wrong number.
+% TODO: 5.1, 5.2 and 5.3 are drafted below. Still to write:
 %   - the evaluation protocol.
 %
 % Fact-check findings for the drafted prose are in
-% notes/factcheck-05-benchmark-setup.md. Five corrections from it have been
-% applied; the remaining findings are untraceable claims needing citations.
+% notes/factcheck-05-benchmark-setup.md.
+%
+% 5.3 CARRIES TWO KNOWN DEFECTS, LEFT IN THE PROSE DELIBERATELY. They are the
+% author's to fix, not the toolchain's:
+%   - "five convolutional detectors" should be FOUR. master_results.csv holds
+%     five models: yolo11s, yolo12s, yolo26s, yolov9s and rtdetr-l. Four are
+%     convolutional; the fifth is the transformer the sentence contrasts them
+%     against. Counting it on both sides overstates the evidence.
+%   - the numbers describing the diverged run (epochs 6/7/19/4, 0.0039,
+%     0.0057) are NOT yet verifiable from anything committed. They await
+%     data/kaggle/results_rtdetr_l_pub.json and its artifacts.
 
 \subsection{Models evaluated}
 \label{sec:models-evaluated}
@@ -87,3 +90,32 @@ The optimiser was specified explicitly rather than left at the Ultralytics
 default of \texttt{optimizer="auto"}, which selects an optimiser and silently
 overrides the initial learning rate supplied by the user. A configuration that
 appears to specify a learning rate may therefore not use it.
+
+\subsection{A configuration that is uniform but not neutral}
+\label{sec:rtdetr-lr}
+
+Under the configuration described above, RT-DETR-l did not train. Its three loss
+terms -- GIoU, classification and L1 -- took finite values through epoch 6 and
+became NaN at epoch 7, after which they remained NaN for every subsequent epoch
+and validation mAP@50 was exactly zero. Early stopping halted the run at epoch 19,
+and the best checkpoint was therefore taken from epoch 4, before divergence. That
+checkpoint reaches 0.0039 mAP@50 on validation and 0.0057 on test.
+
+Reducing the initial learning rate from 0.01 to 0.0001 -- a factor of one hundred
+-- and changing nothing else produced a run that converged, reaching 0.938 mAP@50
+on validation and 0.9171 on test with the best checkpoint at epoch 58. Both runs
+are retained in the repository.
+
+The sensitivity is not itself surprising. Transformer-based detectors are commonly
+trained at learning rates one to two orders of magnitude below those used for
+convolutional detectors, and the value adopted here was drawn from studies that
+evaluated only YOLO variants. What matters is the methodological consequence. A
+single configuration applied uniformly to every model is often taken to be the
+fair basis for a comparison. Across architecture families it is not: the same
+value that trains five convolutional detectors to convergence prevents a
+transformer from training at all. Uniformity of configuration and fairness of
+comparison are distinct properties, and the first does not imply the second.
+
+The results reported for RT-DETR-l in Section~\ref{sec:results} therefore use
+lr0 = 0.0001. This is the single respect in which the ten runs differ, and it is
+recorded as such in Table~\ref{tab:training-config}.

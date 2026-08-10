@@ -1,8 +1,14 @@
 \section{Benchmark Setup}
 \label{sec:benchmark-setup}
 
-% TODO: 5.1, 5.2 and 5.3 are drafted below. Still to write:
-%   - the evaluation protocol.
+% TODO: 5.1 through 5.4 are drafted below. The subsection list is complete.
+%
+% 5.4 references sec:dataset-audit. That label EXISTS on the Section 3 stub, so
+% the reference resolves and prints "Section 3" -- but Section 3 has no content
+% yet. This is more dangerous than a ?? would be: a resolved reference to an
+% empty section looks correct in the PDF and cannot be found by grepping for
+% undefined references. It must be re-checked once Section 3 is written, to
+% confirm that section actually establishes what 5.4 claims it does.
 %
 % Fact-check findings for the drafted prose are in
 % notes/factcheck-05-benchmark-setup.md.
@@ -119,3 +125,41 @@ comparison are distinct properties, and the first does not imply the second.
 The results reported for RT-DETR-l in Section~\ref{sec:results} therefore use
 lr0 = 0.0001. This is the single respect in which the ten runs differ, and it is
 recorded as such in Table~\ref{tab:training-config}.
+
+\subsection{Evaluation protocol}
+\label{sec:eval-protocol}
+
+Each model was trained once on each split and evaluated on both the validation
+and the test partition of that split, giving ten training runs and twenty
+evaluations. Training used the training partition alone; the validation
+partition served for early stopping and best-checkpoint selection; the test
+partition was not consulted until training had completed.
+
+Four accuracy quantities are reported. mAP@50 is included because it is the only
+accuracy metric prior work on this dataset reports, and comparability requires
+it. mAP@50--95, the COCO standard, averages precision over ten
+intersection-over-union thresholds rather than one and is therefore sensitive to
+localisation quality as well as to detection; no published study on this dataset
+reports it. Precision and recall are reported for completeness, and per-class
+average precision is reported for all classes, which no published study on this
+dataset provides.
+
+A fifth quantity is reported that is not a performance measure: the number of
+classes on which the evaluation was actually computed. The framework reports
+this directly. Under the published split it is 45 on validation and 46 on test
+rather than 61, for the reasons established in Section~\ref{sec:dataset-audit}.
+The two figures differ by a single class, ESP32, which carries 190 training
+instances, two test instances and none in validation. Every mAP figure computed
+on the published split is therefore an average over a reduced set of classes,
+and reporting the count alongside the score is what makes results on the two
+splits comparable at all.
+
+The training configuration recorded an intersection-over-union threshold of 0.7
+for non-maximum suppression and a maximum of 300 detections per image, identical
+across all ten runs. The confidence threshold was left unset and is resolved by
+the framework at run time according to evaluation mode; its value is therefore
+fixed by the Ultralytics release stated in Section~\ref{sec:training-configuration}
+rather than specified here. We record this as an instance of the same reporting
+gap identified above: an evaluation configuration can be documented in full and
+still contain a threshold determined by a library version, which is precisely
+why that version must be reported.

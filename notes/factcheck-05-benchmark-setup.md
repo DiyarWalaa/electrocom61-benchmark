@@ -206,3 +206,78 @@ with no citation. Same category as the untraceable claims logged for 5.1/5.2.
 where 5.2 says "Apart from the architecture under test". Read alone, 5.3 is
 false -- the architecture differs too. Read after 5.2, the qualifier carries.
 Not an error; a dependency on reading order worth being aware of.
+
+---
+
+# Fact-check: subsection 5.4 (2026-08-10)
+
+`Evaluation protocol`, inserted verbatim. Prose not edited. Two substitutions:
+`Section 3` -> `Section~\ref{sec:dataset-audit}`, `Section 5.2` ->
+`Section~\ref{sec:training-configuration}`. Both resolve to the numbers the
+draft had typed (3 and 5.2), confirming the manual numbering was correct.
+
+Verification script: `scripts/verify_eval_protocol.py`, run directory
+`runs/20260810_verify_eval_protocol_02/`.
+
+## Verified
+
+| Claim | Verdict |
+|---|---|
+| ten training runs, twenty evaluations | PASS -- 10 rows, all 20 evaluations carry both mAP figures |
+| 45 classes on val, 46 on test, published split | PASS -- unanimous across all 5 published runs |
+| 61 on both, corrected split | PASS -- unanimous across all 5 corrected runs |
+| ESP32 is exactly the 45-vs-46 difference | PASS -- test-minus-val is `{ESP32}` alone in all 5 published runs, with nothing in val-minus-test |
+| ESP32: 190 training, 2 test, 0 validation instances | PASS -- `class_split_counts.csv` |
+| NMS IoU 0.7, max_det 300, identical across ten runs | PASS -- all 10 args.yaml |
+| confidence threshold left unset, resolved by framework at run time | PASS -- `conf: null` in all 10 |
+
+**The threshold paragraph is worded correctly.** It says "The training
+configuration recorded ...", which is exactly what the sources support: every
+args.yaml is `mode: train`, and no args.yaml exists for the evaluation passes.
+A version of this sentence claiming these were the *evaluation* thresholds
+would not have been supportable.
+
+## Flagged -- claims about the paper that the paper does not yet meet
+
+**"Precision and recall are reported for completeness."** Not currently true.
+Both exist in the per-run results JSONs, but neither appears in
+`data/master_results.csv` nor in any generated table -- `t4_main_results` has
+Val@50, Val@50--95, Test@50, Test@50--95, Cls val, Cls test and nothing else.
+Either the columns get added or the sentence needs softening.
+
+**"per-class average precision is reported for all classes."** Two problems.
+No table currently presents per-class AP at all. And "for all classes" is false
+under the published split, where per-class AP exists for the 45 and 46
+evaluated classes -- not all 61. That contradicts the very next paragraph,
+which is this subsection's central point. It is true under the corrected split.
+
+**"Four accuracy quantities are reported."** The paragraph names mAP@50,
+mAP@50--95, precision and recall (four), then adds per-class AP as a fifth
+item; the following paragraph then calls classes-evaluated "a fifth quantity".
+Either per-class AP is not an accuracy quantity, or classes-evaluated is the
+sixth. Internal counting inconsistency, not a factual error.
+
+## Not verifiable from committed sources
+
+Three claims about prior work, each needing the two prior-work PDFs rather than
+anything in this repository:
+
+- "mAP@50 ... is the only accuracy metric prior work on this dataset reports"
+- "no published study on this dataset reports [mAP@50--95]"
+- per-class AP, "which no published study on this dataset provides"
+
+Same category as the T3 classifications, which were checked against Section IV
+of each PDF.
+
+One procedural claim is supported but not provable from files: "the test
+partition was not consulted until training had completed". The artifact layout
+is consistent with it -- training used `split: val`, and the test evaluation is
+a separate pass -- but only the notebook can establish ordering.
+
+## Cross-reference hazard
+
+`\ref{sec:dataset-audit}` resolves, because the label sits on the Section 3
+stub. Section 3 has no content. A resolved reference to an empty section is
+worse than a broken one: it prints a plausible number, and no undefined-
+reference warning will ever flag it. Re-check when Section 3 is written that it
+actually establishes what 5.4 says it does.

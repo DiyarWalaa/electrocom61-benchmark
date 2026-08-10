@@ -3,12 +3,18 @@
 
 % TODO: 5.1 through 5.5 are drafted below.
 %
-% 5.5 states two percentages on DIFFERENT BASES. The 1.75% pair gap comes from
-% latency_by_arch.csv, which divides by the mean of the pair. The 23%
-% cross-session figure is only reproducible by dividing by the LARGER of the
-% pair; on the mean it is 26.4% and on the smaller 30.4%. Neither is wrong,
-% but the subsection should say which it uses. See
+% 5.5's percentages are now uniformly gap/mean, and the subsection says so.
+% Verified: the 1.75% pair gap is latency_by_arch.csv's own gap/mean column
+% (1.7544%), and the cross-session figure is 5.65/21.405 = 26.3957% -> 26%.
+% If any further spread is added to this subsection it must use the same
+% basis, or that sentence becomes false. See
 % runs/20260811_verify_efficiency_claims_02/.
+%
+% PENDING AUTHOR VERIFICATION: the claim that none of the three published
+% studies on this dataset states whether its parameter counts are fused or
+% unfused. It cannot be checked from anything in this repository -- it needs
+% the three PDFs. references.bib currently has TWO entries, so a third will
+% be needed before this sentence can carry a citation.
 %
 % 5.4 references sec:dataset-audit. That label EXISTS on the Section 3 stub, so
 % the reference resolves and prints "Section 3" -- but Section 3 has no content
@@ -125,7 +131,7 @@ convolutional detectors, and the value adopted here was drawn from studies that
 evaluated only YOLO variants. What matters is the methodological consequence. A
 single configuration applied uniformly to every model is often taken to be the
 fair basis for a comparison. Across architecture families it is not: the same
-value that trains five convolutional detectors to convergence prevents a
+value that trains four convolutional detectors to convergence prevents a
 transformer from training at all. Uniformity of configuration and fairness of
 comparison are distinct properties, and the first does not imply the second.
 
@@ -179,18 +185,22 @@ convolution, since that is the form in which a model is deployed. Both figures
 were measured. Fusion reduces YOLO26s from 9{,}995{,}078 parameters and 22.998
 GFLOPs to 9{,}488{,}787 and 20.892, and RT-DETR-l from 32{,}931{,}431 and
 110.159 to 32{,}109{,}095 and 105.6. The reduction ranges from 0.2\% to 5.1\% of
-parameters depending on architecture. Which of the two a study reports is rarely
-stated, and the difference is large enough to matter when parameter counts are
-compared across papers.
+parameters depending on architecture. None of the three published studies
+reporting results on this dataset states whether its parameter counts are fused
+or unfused, and the difference is large enough to matter when parameter counts
+are compared across papers.
 
 Latency was measured at batch size one, at 640 pixels, on the same Tesla P100
 used for training. Batch size one is the quantity of interest: it is the time to
 process a single image, which is what a conveyor-belt application experiences.
 Larger batches measure throughput, a different property.
 
-Three precautions were taken. Twenty inferences were run and discarded before
-timing began, because the first inferences after a model is loaded are several
-times slower while CUDA kernels compile and the device raises its clock.
+Four precautions were taken. Twenty inferences were run and discarded before
+each model was timed, because the first inferences after a model is loaded are
+several times slower while CUDA kernels compile and the device raises its clock.
+A further thirty images were run on one model before the loop began and
+discarded, absorbing one-time initialisation costs that would otherwise have
+fallen entirely on whichever model happened to be measured first.
 \texttt{torch.cuda.synchronize()} was called before stopping the clock on each
 image, because GPU execution is asynchronous and timing without it measures how
 quickly Python enqueues work rather than how quickly the device completes it.
@@ -200,9 +210,9 @@ near-worst case is more informative than the average.
 
 All ten checkpoints were measured consecutively within a single session. This was
 necessary rather than convenient: an earlier set of measurements taken across ten
-separate sessions varied by up to 23\% for the same architecture, a difference
-attributable to session conditions rather than to the models. Two further
-complete passes were required before the protocol was stable. In both, the first
+separate sessions differed by 5.65~ms for the same architecture (18.58 against
+24.23~ms for YOLOv9s), or 26\% of their mean. Two further complete passes were
+required before the protocol was stable. In both, the first
 model measured returned an end-to-end time approximately 4~ms above its identical
 counterpart while its inference time matched to within 0.4\%, placing the
 discrepancy outside the measured stages. The cause was the first read of each
@@ -212,8 +222,10 @@ timing eliminated it. The released protocol includes this step.
 Because latency is a property of the architecture rather than of the split a
 model was trained on, the two runs of each architecture constitute duplicate
 measurements. Across five architectures the largest difference between a pair was
-0.24~ms, or 1.75\%. This is reported as the resolution of the measurement, and
-differences of that order between models are not treated as meaningful.
+0.24~ms, or 1.75\% of their mean. This is reported as the resolution of the
+measurement, and differences of that order between models are not treated as
+meaningful. Every spread quoted in this subsection is expressed as a percentage
+of the mean of the two measurements it describes.
 
 Two distinct timing quantities are reported. The framework's own
 preprocess, inference and postprocess breakdown measures the stages it controls;

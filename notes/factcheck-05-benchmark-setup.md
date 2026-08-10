@@ -367,3 +367,74 @@ anything in the repository.
 
 The claim that fusion status "is rarely stated" in other papers is a claim
 about the literature and needs a citation or softening.
+
+---
+
+# Corrections applied 2026-08-11
+
+Five author-directed fixes to 5.3 and 5.5. All verified in the rendered PDF by
+text extraction: the seven new phrasings present, the three superseded ones
+absent.
+
+## 1. Session paragraph replaced (5.5)
+
+The 23% figure is gone. The paragraph now states the raw gap (5.65 ms, 18.58
+against 24.23 ms for YOLOv9s) before the percentage, which makes the basis
+recoverable by a reader even without the convention sentence.
+
+**Both percentages re-verified on the mean basis:**
+
+- pair gap: `latency_by_arch.csv` gives yolo11s gap 0.24 ms, mean 13.68,
+  gap_pct 1.7544. Recomputing 100*0.24/13.68 = 1.7544 -- the column IS
+  gap/mean, confirmed from its own values rather than assumed.
+- cross-session: 5.65 / ((18.58+24.23)/2) = 5.65/21.405 = 26.3957% -> **26%**.
+
+A sentence was added making the convention explicit: "Every spread quoted in
+this subsection is expressed as a percentage of the mean of the two
+measurements it describes." This is the only edit not dictated verbatim; it was
+authorised by the instruction to say so explicitly if it was not already clear.
+It was not clear -- the pair-gap sentence gave a bare "1.75%" -- so that
+sentence now reads "1.75% of their mean" as well.
+
+**Consequence to watch:** the convention sentence is a universal claim over the
+subsection. Any spread added to 5.5 later on a different basis makes it false.
+Recorded in the file header.
+
+## 2. Precautions: three -> four (5.5)
+
+The 30-image burn-in is now stated, distinguished from the 20-iteration warmup
+(which is per-model) and given its purpose. Order is now warmup, burn-in,
+synchronise, percentiles, matching the protocol block. The warmup sentence was
+adjusted from "before timing began" to "before each model was timed", since the
+per-model/once-per-loop distinction is the whole point of listing both.
+
+## 3. Five -> four convolutional detectors (5.3)
+
+The failure recorded in the 5.3 fact-check above is now fixed. `yolo11s`,
+`yolo12s`, `yolo26s`, `yolov9s` are the four; `rtdetr-l` is the fifth model and
+the transformer the sentence contrasts them against.
+
+## 4. Fusion-reporting claim rescoped (5.5)
+
+Was: "Which of the two a study reports is rarely stated" -- an unscoped claim
+about the literature.
+
+Now: "None of the three published studies reporting results on this dataset
+states whether its parameter counts are fused or unfused."
+
+**PENDING AUTHOR VERIFICATION.** This cannot be checked from anything in this
+repository; it needs the three PDFs. Two further notes:
+
+- `paper/references.bib` currently holds **two** entries, `yolov12paper` and
+  `yolov13paper`. A third is required before this sentence can carry a
+  citation, and the sentence names three studies.
+- The claim is now falsifiable by a single counter-example, which is the point,
+  but it also means one study stating "fused" breaks it outright. If the check
+  finds one, "none" becomes "two of the three" or similar.
+
+## 5. Earlier latency passes -- retrieval instructions issued
+
+The two prior passes are not in the repository; the committed
+`results_latency_unified.json` (sha256 23dd0d96..., 4691 bytes) is the third.
+Until the earlier two are ingested, the fourth paragraph of 5.5 remains
+asserted rather than traceable.

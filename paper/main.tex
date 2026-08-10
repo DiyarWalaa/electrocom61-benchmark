@@ -1,0 +1,68 @@
+% ---------------------------------------------------------------------------
+% ElectroCom61 benchmark study
+%
+% DOCUMENT CLASS IS PROVISIONAL. `article` is a placeholder so the draft
+% compiles anywhere; a venue template (IEEEtran, llncs, or whatever the target
+% requires) will replace it later.
+%
+% Nothing outside this file should need to change when it does. The section
+% files contain no preamble, no class-specific commands and no formatting
+% assumptions -- only \section, \subsection, prose, and \ref/\citep. Tables and
+% figures are pulled in from ../tables/ and ../figures/ by \input and
+% \includegraphics, so switching class means editing the preamble below and
+% nothing else.
+%
+% Two habits that keep that promise:
+%   - reference tables and figures by \ref{}, never by a typed number;
+%   - keep \graphicspath pointing at ../figures/ so figures are named by
+%     filename alone and the path lives in exactly one place.
+% ---------------------------------------------------------------------------
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=1in]{geometry}
+
+\usepackage{booktabs}     % \toprule, \midrule, \bottomrule -- all tables use these
+\usepackage{graphicx}
+\usepackage{natbib}
+\usepackage{hyperref}
+
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=black,
+  urlcolor=blue,
+}
+
+% Figures are referenced by filename alone; the directory lives only here.
+\graphicspath{{../figures/}}
+
+% Tables are generated into ../tables/ by scripts/make_tables.py and pulled in
+% with \input{../tables/<name>}. They are never pasted into a section file.
+
+\title{A Controlled Benchmark of Object Detectors on ElectroCom61}
+\author{Diyar Walaa}
+\date{\today}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+% TODO: abstract. Write last.
+\end{abstract}
+
+\input{sections/01-introduction}
+\input{sections/02-related-work}
+\input{sections/03-dataset-audit}
+\input{sections/04-corrected-split}
+\input{sections/05-benchmark-setup}
+\input{sections/06-results}
+\input{sections/07-discussion}
+\input{sections/08-limitations}
+\input{sections/09-conclusion}
+
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}

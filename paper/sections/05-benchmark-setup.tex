@@ -244,21 +244,27 @@ application using it would observe.
 \label{sec:artifacts}
 
 Every figure and table in this paper is produced by a script in the accompanying
-repository from a data file in the same repository; no value in either is entered
-by hand. Each generating run writes a directory recording its inputs, their
+repository from a data file in the same repository; no value in either is
+transcribed by hand into the paper. Each generating run writes a directory
+recording its inputs, their
 content hashes and the values derived from them, so that any reported figure can
 be traced to the measurement that produced it. Figures are associated with their
 generating run by script hash rather than by timestamp, because repeated renders
-can produce several directories within seconds of one another.
+can produce several directories within seconds of one another. The one exception
+is the provenance column of Table~\ref{tab:training-config}, which records
+whether each setting was stated by prior work and is therefore a reading of those
+papers rather than a measurement; it is stored as a data file and carries the
+citation supporting each entry.
 
 The corrected split is released as a manifest assigning each image to a
 partition, under the same licence as the source dataset. Applied to a copy of
 ElectroCom61 v2 it reproduces the split exactly: the seed is fixed and the
 allocation deterministic. No image is modified, added or removed.
 
-The ten trained checkpoints are retained, together with each run's configuration
-snapshot, per-class results and training curves. The run that failed to converge
-is retained alongside them and marked as such, since a configuration reported as
+The ten trained checkpoints are retained in the notebook outputs from which they
+were produced, and the repository carries each run's configuration snapshot,
+per-class results and training curves. The run that failed to converge is
+retained alongside them and marked as such, since a configuration reported as
 unusable should be inspectable. Library versions are stated in
 Section~\ref{sec:training-configuration} rather than in a supplementary file,
 because as established there the framework release determines the model

@@ -120,6 +120,33 @@ try {
         }
     }
 
+    # --- settle cross-references --------------------------------------------
+    # Three passes are the usual recipe, but they are not always enough. bibtex
+    # consumes one of them, and adding a labelled sectioning command shifts page
+    # breaks, so the labels can still be moving when pass 3 ends. LaTeX says so
+    # in the log -- "Rerun to get cross-references right" -- and a build that
+    # ignores it emits a PDF with stale \ref values and exits 0.
+    #
+    # So: keep running pdflatex while the log still asks. Capped, because a
+    # request that never clears is a real defect (commonly a \label inside a
+    # moving box) and looping forever would hide it.
+    $maxExtra = 2
+    $extra = 0
+    while (-not $fatal -and $extra -lt $maxExtra -and (Test-Path $logPath) -and
+           (Select-String -Path $logPath -Pattern 'Rerun to get' -Quiet)) {
+        $extra++
+        $null = & $pdflatex ($texArgs + "$jobName.tex")
+        $code = $LASTEXITCODE
+        if ($code -eq 0) {
+            Write-Host ("  {0,-16} ok  (cross-references had not settled)" -f
+                        "pdflatex (+$extra)")
+        } else {
+            Write-Host ("  {0,-16} exit {1}" -f "pdflatex (+$extra)", $code) `
+                       -ForegroundColor Yellow
+            $fatal = $true
+        }
+    }
+
     if (-not (Test-Path $logPath)) {
         Write-Host ''
         Write-Host 'No log file was produced; nothing to report.' -ForegroundColor Red
@@ -144,13 +171,25 @@ try {
 
     Write-Host ''
     Write-Host '=== result ===' -ForegroundColor Cyan
+    # An unsatisfied rerun request after the extra passes is a FAILURE, not a
+    # statistic. The PDF exists and looks fine, but its \ref values are stale --
+    # precisely the kind of silently-wrong output this project refuses to ship.
+    $unsettled = ($rerun -gt 0)
+
     $built = Test-Path $pdfPath
-    if ($built -and -not $fatal) {
+    if ($built -and -not $fatal -and -not $unsettled) {
         $size = [math]::Round((Get-Item $pdfPath).Length / 1KB, 1)
         $pages = ($log | Select-String -Pattern 'Output written on .+ \((\d+) page')
         $pageCount = ''
         if ($null -ne $pages) { $pageCount = ", $($pages.Matches[0].Groups[1].Value) pages" }
         Write-Host "  COMPILED  main.pdf ($size KB$pageCount)" -ForegroundColor Green
+    } elseif ($unsettled) {
+        # Interpolation, not -f: in ('a{0}' + 'b' -f $x) the format operator
+        # binds to the second string only, leaving {0} in the first unexpanded.
+        Write-Host "  FAILED    cross-references still unsettled after $maxExtra extra pass(es)" -ForegroundColor Red
+        Write-Host '            The PDF exists but its \ref values may be stale.'
+        Write-Host '            A \label inside a float or moving box can request'
+        Write-Host '            a rerun that never clears; check recent \label use.'
     } else {
         Write-Host '  FAILED    no usable PDF produced' -ForegroundColor Red
     }
@@ -208,7 +247,7 @@ try {
     Write-Host ''
     Write-Host "Boxes: $overfull overfull, $underfull underfull.  Rerun requests: $rerun."
 
-    if ($fatal -or -not $built) { exit 1 }
+    if ($fatal -or -not $built -or $unsettled) { exit 1 }
     exit 0
 }
 finally {

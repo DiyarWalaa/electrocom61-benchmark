@@ -94,9 +94,71 @@ def main():
             return 1
         tables[path] = load(path)
 
+    # ---- structural checks on the master table -----------------------------
+    # These run BEFORE the value expectations. A value can be correct in a
+    # table that is structurally wrong: a duplicated (model, split_set) pair
+    # still yields the right number for whichever row is read first, so
+    # checking values alone would pass a table no consumer can use safely.
+    structural = []
+    master_rows = tables[MASTER]
+
+    if not master_rows or "inclusion" not in master_rows[0]:
+        structural.append(("inclusion column present", "yes", "MISSING", False))
+    else:
+        n_bench = sum(1 for r in master_rows
+                      if r["inclusion"] == ec61.INCLUSION_BENCHMARK)
+        structural.append(("benchmark rows", ec61.N_BENCHMARK_ROWS, n_bench,
+                           n_bench == ec61.N_BENCHMARK_ROWS))
+
+        # Every declared diverged run must be present and labelled as such.
+        for slug in ec61.DIVERGED_RUNS:
+            got = [r for r in master_rows if r.get("run") == slug]
+            ok = len(got) == 1 and got[0]["inclusion"] == ec61.INCLUSION_DIVERGED
+            structural.append(("run %s labelled diverged" % slug, "yes",
+                               "yes" if ok else "no (%d row(s))" % len(got), ok))
+
+        # Duplicate (model, split_set) among BENCHMARK rows -- not across all
+        # rows. The diverged run legitimately shares its pair with
+        # rtdetr_l_pub_lr1e4, which is precisely why it must be excluded
+        # before anything indexes by that pair.
+        seen, dupes = {}, []
+        for r in master_rows:
+            if r.get("inclusion") != ec61.INCLUSION_BENCHMARK:
+                continue
+            key = (r.get("model"), r.get("split_set"))
+            if key in seen:
+                dupes.append("%s/%s: %s and %s" % (key[0], key[1], seen[key],
+                                                   r.get("run")))
+            seen[key] = r.get("run")
+        structural.append(("unique (model, split_set) among benchmark rows",
+                           "yes", "yes" if not dupes else "; ".join(dupes),
+                           not dupes))
+
+        # The guarded loader must accept the table. This is the check that
+        # matters most -- it is the code path every figure and table uses.
+        try:
+            ec61.load_benchmark_rows(MASTER)
+            structural.append(("ec61.load_benchmark_rows() accepts the table",
+                               "yes", "yes", True))
+        except Exception as exc:
+            structural.append(("ec61.load_benchmark_rows() accepts the table",
+                               "yes", "%s: %s" % (type(exc).__name__, exc),
+                               False))
+
+    # Value expectations are checked against BENCHMARK rows only. The diverged
+    # run shares (model, split_set) with rtdetr_l_pub_lr1e4, so an unfiltered
+    # lookup for "RT-DETR-l published test mAP@50" matches two rows and reports
+    # a disagreement that is not a defect -- the two runs are supposed to
+    # differ. Structural checks above still see every row.
+    value_tables = dict(tables)
+    try:
+        value_tables[MASTER] = ec61.load_benchmark_rows(MASTER)
+    except Exception:
+        pass  # already reported as a structural failure; leave rows unfiltered
+
     results = []
     for label, table, model, split, column, expected, tol in EXPECTATIONS:
-        rows = [r for r in tables[table]
+        rows = [r for r in value_tables[table]
                 if r.get("model") == model
                 and (split is None or r.get("split_set") == split)]
         if not rows:
@@ -128,12 +190,17 @@ def main():
                 float(actual) - float(expected))
         results.append((label, expected, actual, note, ok))
 
+    # Structural failures are counted alongside value failures so a broken
+    # table cannot exit 0 on the strength of its numbers being right.
+    results = [(label, expected, actual, "structural", ok)
+               for label, expected, actual, ok in structural] + results
+
     n_pass = sum(1 for r in results if r[4])
     n_fail = len(results) - n_pass
 
     width = max(len(r[0]) for r in results)
-    print("Cross-check of master_results.csv and latency_by_arch.csv "
-          "against %d known values" % len(EXPECTATIONS))
+    print("Structure of master_results.csv, then %d known values across "
+          "master_results.csv and latency_by_arch.csv" % len(EXPECTATIONS))
     print()
     for label, expected, actual, note, ok in results:
         print("  [%s] %-*s  expected %-12s  found %-12s %s"

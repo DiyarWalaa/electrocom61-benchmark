@@ -391,6 +391,87 @@ def write_csv(path, header, rows):
             w.writerow(row)
 
 
+# --------------------------------------------------------------------------
+# The master results table
+# --------------------------------------------------------------------------
+
+MASTER_CSV = os.path.join(DATA_DIR, "master_results.csv")
+
+# Runs that must never be aggregated with the benchmark. Membership is declared
+# here, by slug, and is NEVER inferred from the numbers -- a run is diverged
+# because we can say why, not because its mAP looked low enough to disown.
+#
+#   rtdetr_l_pub -- RT-DETR-l on the published split at lr0=0.01, the YOLO
+#   learning rate. All three training loss terms went NaN at epoch 7 and the
+#   run was stopped at 19. It is retained as the evidence for the learning-rate
+#   deviation described in the paper, not as a result.
+DIVERGED_RUNS = ("rtdetr_l_pub",)
+
+# The benchmark proper: five architectures times two splits.
+N_BENCHMARK_ROWS = 10
+
+INCLUSION_BENCHMARK = "benchmark"
+INCLUSION_DIVERGED = "diverged"
+
+
+def load_master_rows(path=MASTER_CSV):
+    """Every row of master_results.csv, diverged runs included."""
+    with open(path, "r", newline="", encoding="utf-8-sig") as fh:
+        return list(csv.DictReader(fh))
+
+
+def load_benchmark_rows(path=MASTER_CSV, expected=N_BENCHMARK_ROWS):
+    """The benchmark rows only -- the ONLY loader an aggregate may use.
+
+    Every figure, table and derived statistic in this study reads the master
+    table through here. Three things are enforced, and each is enforced because
+    the alternative fails silently:
+
+      1. Rows are filtered to inclusion == "benchmark". A diverged run averaged
+         into a mean does not announce itself; it just moves the number.
+
+      2. The surviving count must equal `expected`. Filtering alone is not
+         enough -- if a row is added later without an inclusion value, or the
+         column is dropped by an editing accident, the filter would quietly
+         return the wrong set. This turns that into a crash.
+
+      3. (model, split_set) must be unique. The diverged run shares BOTH with
+         rtdetr_l_pub_lr1e4, and consumers that index by that pair would
+         otherwise keep whichever row happened to be read last -- an outcome
+         that depends on file ordering rather than on intent.
+
+    A missing `inclusion` column is an error rather than a default, because
+    defaulting would make an out-of-date table look healthy.
+    """
+    rows = load_master_rows(path)
+    if not rows:
+        raise ValueError("%s has no rows" % path)
+    if "inclusion" not in rows[0]:
+        raise ValueError(
+            "%s has no `inclusion` column. Regenerate it with "
+            "scripts/collect_results.py -- an unlabelled table cannot be "
+            "filtered safely." % path)
+
+    kept = [r for r in rows if r["inclusion"] == INCLUSION_BENCHMARK]
+    if len(kept) != expected:
+        raise ValueError(
+            "%s: expected %d benchmark rows, found %d. Rows present: %s"
+            % (path, expected, len(kept),
+               ", ".join("%s=%s" % (r.get("run"), r.get("inclusion"))
+                         for r in rows)))
+
+    seen = {}
+    for r in kept:
+        key = (r["model"], r["split_set"])
+        if key in seen:
+            raise ValueError(
+                "%s: duplicate (model, split_set) among benchmark rows: %s "
+                "appears as both %s and %s. Indexing by that pair would keep "
+                "only one of them." % (path, key, seen[key], r["run"]))
+        seen[key] = r["run"]
+    return kept
+
+
 def counts_table(records, key_fn, splits=SPLITS):
     """Group records by key_fn and count per split.
 

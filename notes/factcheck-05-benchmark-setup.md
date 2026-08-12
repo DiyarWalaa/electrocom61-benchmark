@@ -438,3 +438,85 @@ The two prior passes are not in the repository; the committed
 `results_latency_unified.json` (sha256 23dd0d96..., 4691 bytes) is the third.
 Until the earlier two are ingested, the fourth paragraph of 5.5 remains
 asserted rather than traceable.
+
+---
+
+# 5.3 re-checked against the recovered run (2026-08-12)
+
+`rtdetr_l_pub` is now ingested. Every number 5.3 asserts about the diverged run
+is verifiable, and all of them pass. Verification:
+`scripts/verify_diverged_run.py`, run `runs/20260812_verify_diverged_run/`.
+
+## Now verified (was "not yet verifiable")
+
+| Claim | Verdict |
+|---|---|
+| stopped at epoch 19 | PASS |
+| 43.7 training minutes | PASS |
+| best checkpoint from epoch 4 | PASS -- derived, see below |
+| val mAP@50 0.0039 | PASS |
+| test mAP@50 0.0057 | PASS |
+| losses NaN from epoch 7, never finite again | PASS for the three TRAINING terms |
+| validation mAP@50 exactly zero from epoch 7 to 19 | PASS |
+| "Both runs are retained in the repository" | PASS -- now true |
+
+The JSON has no `best_epoch` field. Epoch 4 is derived as the argmax of
+Ultralytics fitness (0.1*mAP@50 + 0.9*mAP@50-95 = 0.001841) and corroborated
+independently: best 4 + patience 15 = 19, the epoch the run stopped at.
+
+## Flag 1 -- "its three loss terms" is ambiguous, and false on one reading
+
+The curve file has SIX loss columns, not three. Training and validation do not
+behave alike:
+
+| column | first NaN | finite after |
+|---|---|---|
+| `train/giou_loss` | 7 | none |
+| `train/cls_loss` | 7 | none |
+| `train/l1_loss` | 7 | none |
+| `val/giou_loss` | **2** | 4 |
+| `val/cls_loss` | **2** | 4 |
+| `val/l1_loss` | **2** | 4 |
+
+The three training terms behave exactly as 5.3 describes -- finite through 6,
+NaN at 7, never finite again, all three coinciding. The three validation terms
+were NaN as early as **epoch 2**, recovered at epoch 4, and went NaN again from
+5. So instability appears five epochs before the sentence says it does.
+
+"Its three loss terms -- GIoU, classification and L1 -- took finite values
+through epoch 6" is true of training and false of validation. Recommend naming
+the pass. The validation behaviour arguably strengthens the argument: the run
+was already unstable at epoch 2, and the checkpoint selected as "best" at epoch
+4 sits in a gap between two NaN stretches.
+
+## Flag 2 -- zero mAP is not exclusive to the post-divergence regime
+
+Validation mAP@50 is exactly zero at epochs 5, 7, 8, ..., 19. The claim as
+written -- zero from epoch 7 onward -- is true. But epoch **5** is also exactly
+zero, before the training losses diverged. Zero mAP therefore cannot by itself
+date the divergence, and a reader who takes "exactly zero" as the signature of
+the NaN regime would misread epoch 5.
+
+## Flag 3 -- mAP@50 reported without mAP@50-95, twice
+
+CLAUDE.md: "Report mAP@50 AND mAP@50-95. Never mAP@50 alone." 5.3 reports only
+mAP@50 in both places:
+
+- "That checkpoint reaches 0.0039 mAP@50 on validation and 0.0057 on test"
+  -- the 50-95 figures are 0.0016 and 0.0026, both verified.
+- "reaching 0.938 mAP@50 on validation and 0.9171 on test" for the converged
+  run -- the 50-95 figures are 0.6016 and 0.6045, both already in
+  master_results.csv.
+
+Not edited. Flagged because it is a project rule rather than a matter of taste.
+
+## Ingestion notes
+
+- The file arrived as `results_rtdetr_l_pub.json.txt` -- Windows appended `.txt`
+  with the extension hidden, exactly as anticipated. No BOM; CRLF endings,
+  normalised to LF to match the ten sibling JSONs. Parsed before and after
+  writing, and the parsed content compared for equality across the round trip.
+- `status: complete` in the JSON means the run finished without raising, NOT
+  that it succeeded. Which is why divergence is declared by slug in
+  `ec61.DIVERGED_RUNS` and never inferred from a status field or from the
+  numbers.

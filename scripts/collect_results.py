@@ -98,7 +98,8 @@ COMPLEXITY_COLUMNS = ["params_unfused", "gflops_unfused",
                       "params_fused", "gflops_fused", "layers_modules"]
 LATENCY_COLUMNS = ["e2e_ms_p50", "e2e_ms_p95", "fps_p50",
                    "pre_ms", "inf_ms", "post_ms"]
-COLUMNS = ACCURACY_COLUMNS + COMPLEXITY_COLUMNS + LATENCY_COLUMNS + ["latency_source"]
+COLUMNS = (ACCURACY_COLUMNS + COMPLEXITY_COLUMNS + LATENCY_COLUMNS
+           + ["latency_source", "inclusion"])
 
 # GFLOPs are reported to 3 decimals in the unified pass and 2 in the training
 # JSONs, so the cross-check allows rounding but nothing more.
@@ -159,14 +160,27 @@ def main():
     missing = []
     unjoined = []
     complexity_conflicts = []
+    # Runs whose training JSON was actually compared against the unified pass.
+    # Not every row qualifies: a run with no latency entry has nothing to
+    # compare to, so claiming the check covered it would be false.
+    crosschecked = []
 
     for p in paths:
         with open(p, "r", encoding="utf-8-sig") as fh:
             d = json.load(fh)
 
         run = d.get("run")
+        # Declared membership, from ec61.DIVERGED_RUNS. Never inferred from the
+        # numbers in this file.
+        diverged = run in ec61.DIVERGED_RUNS
+        inclusion = (ec61.INCLUSION_DIVERGED if diverged
+                     else ec61.INCLUSION_BENCHMARK)
+
         lat = lat_by_run.get(run)
-        if lat is None:
+        # A diverged run has no latency row because the unified timing pass
+        # covered the ten benchmark checkpoints and not this one. That is the
+        # correct state, not a gap to be reported as a defect.
+        if lat is None and not diverged:
             unjoined.append((os.path.basename(p), run))
 
         row = {
@@ -182,6 +196,7 @@ def main():
             "epochs_run": d.get("epochs_completed"),
             "train_time_min": d.get("train_minutes"),
             "latency_source": LATENCY_SOURCE if lat else "",
+            "inclusion": inclusion,
         }
         for c in COMPLEXITY_COLUMNS:
             row[c] = None
@@ -202,6 +217,7 @@ def main():
             # The training JSON's own complexity figures should equal the
             # unified pass's UNFUSED pair. Checked, not assumed -- a mismatch
             # would mean the two files describe different weights.
+            crosschecked.append(run)
             tp, tg = d.get("params"), d.get("gflops")
             if tp is not None and lat.get("params_unfused") is not None \
                     and tp != lat["params_unfused"]:
@@ -212,12 +228,18 @@ def main():
                 complexity_conflicts.append(
                     (run, "gflops", tg, lat["gflops_unfused"]))
 
+        # Latency and complexity are legitimately absent for a diverged run, so
+        # reporting them as missing would train the reader to ignore this list.
+        skip = set(COMPLEXITY_COLUMNS + LATENCY_COLUMNS) if diverged else set()
         for k, v in row.items():
-            if v is None:
+            if v is None and k not in skip:
                 missing.append((os.path.basename(p), k))
         rows.append(row)
 
-    rows.sort(key=lambda r: (str(r["model"]), str(r["split_set"])))
+    # `run` is part of the sort key, not decoration: the diverged run shares
+    # (model, split_set) with rtdetr_l_pub_lr1e4, so without it the order of
+    # those two rows would depend on the glob order of the input directory.
+    rows.sort(key=lambda r: (str(r["model"]), str(r["split_set"]), str(r["run"])))
 
     ec61.write_csv(OUT_CSV, COLUMNS,
                    [["" if r.get(c) is None else r.get(c) for c in COLUMNS]
@@ -289,7 +311,7 @@ def main():
             print("  %-20s %-7s train=%s  unified=%s" % (run, field, a, b))
     else:
         print("complexity cross-check: training JSONs agree with the unified "
-              "unfused figures on all %d runs" % len(rows))
+              "unfused figures on all %d runs that have one" % len(crosschecked))
     if missing:
         print("MISSING FIELDS:")
         for f, k in missing:
@@ -343,9 +365,9 @@ def main():
     else:
         lines.append("The training JSONs' `params` and `gflops` agree with the "
                      "unified pass's `params_unfused` and `gflops_unfused` on "
-                     "all %d runs (GFLOPs to within %.2f, the reporting "
-                     "precision). The two files describe the same weights."
-                     % (len(rows), GFLOPS_TOLERANCE))
+                     "all %d runs carrying both (GFLOPs to within %.2f, the "
+                     "reporting precision). The two files describe the same "
+                     "weights." % (len(crosschecked), GFLOPS_TOLERANCE))
     lines.append("")
     lines.append("## What could make this misleading")
     lines.append("")

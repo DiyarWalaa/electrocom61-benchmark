@@ -64,8 +64,10 @@ def main():
                          % MASTER)
         return 1
 
-    with open(MASTER, "r", newline="", encoding="utf-8-sig") as fh:
-        rows = list(csv.DictReader(fh))
+    # Benchmark rows only. A diverged run has no latency measurement at
+    # all, and pairing logic below expects exactly two rows per model --
+    # an unfiltered read would make rtdetr-l a group of three.
+    rows = ec61.load_benchmark_rows(MASTER)
 
     run_dir = ec61.make_run_dir("latency_by_arch")
 

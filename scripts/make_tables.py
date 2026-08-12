@@ -349,7 +349,7 @@ def t3():
 
 # ---------------------------------------------------------------- T4
 def t4():
-    rows = read_csv(S_MASTER)
+    rows = ec61.load_benchmark_rows(S_MASTER)
     rows.sort(key=lambda r: (r["model"], r["split_set"]))
 
     header = ["Model", "Split", "Val@50", "Val@50--95", "Test@50",
@@ -383,7 +383,7 @@ def t4():
 # ---------------------------------------------------------------- T5
 def t5():
     lat = {r["model"]: r for r in read_csv(S_LATENCY)}
-    master = read_csv(S_MASTER)
+    master = ec61.load_benchmark_rows(S_MASTER)
 
     comp = {}
     for r in master:

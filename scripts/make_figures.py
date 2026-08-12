@@ -755,8 +755,11 @@ def figure_2(rows_a, iphone_counts, unevaluable, rows_b):
 
 def load_f5_rows(path):
     """Per-model published and corrected accuracy, from the master table."""
-    with open(path, "r", newline="", encoding="utf-8-sig") as fh:
-        raw = list(csv.DictReader(fh))
+    # Benchmark rows only. The index below is keyed by (model, split_set)
+    # and assigns rather than accumulates, so a second rtdetr-l published
+    # row would silently replace the first -- and which one survived would
+    # depend on read order. load_benchmark_rows refuses that outright.
+    raw = ec61.load_benchmark_rows(path)
 
     by_model = {}
     for r in raw:
@@ -974,11 +977,10 @@ def load_f6_rows(latency_path, accuracy_path):
     """Join per-architecture latency to corrected-split accuracy and size."""
     with open(latency_path, "r", newline="", encoding="utf-8-sig") as fh:
         lat = {r["model"]: r for r in csv.DictReader(fh)}
-    with open(accuracy_path, "r", newline="", encoding="utf-8-sig") as fh:
-        acc = {}
-        for r in csv.DictReader(fh):
-            if r["split_set"] == "corrected":
-                acc[r["model"]] = r
+    acc = {}
+    for r in ec61.load_benchmark_rows(accuracy_path):
+        if r["split_set"] == "corrected":
+            acc[r["model"]] = r
 
     missing = sorted(set(lat) ^ set(acc))
     if missing:

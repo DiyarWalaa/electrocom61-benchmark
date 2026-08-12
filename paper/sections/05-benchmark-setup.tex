@@ -116,7 +116,8 @@ appears to specify a learning rate may therefore not use it.
 Under the configuration described above, RT-DETR-l did not train. Its three
 training loss terms -- GIoU, classification and L1 -- took finite values through
 epoch 6 and became NaN together at epoch 7, after which none returned to a finite
-value, and validation mAP@50 was exactly zero for every epoch from 7 to 19. The
+value, and both validation mAP@50 and mAP@50--95 were exactly zero for every
+epoch from 7 to 19. The
 run was unstable well before that point: the three validation loss terms were NaN
 at epochs 2, 3, 5 and 6, finite only at epochs 1 and 4, although detection metrics
 continued to be computed at those epochs. Early stopping halted the run at epoch

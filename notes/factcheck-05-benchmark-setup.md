@@ -520,3 +520,65 @@ Not edited. Flagged because it is a project rule rather than a matter of taste.
   that it succeeded. Which is why divergence is declared by slug in
   `ec61.DIVERGED_RUNS` and never inferred from a status field or from the
   numbers.
+
+---
+
+# 5.3 first paragraph rewritten (2026-08-12)
+
+Applied as confirmed. Every claim in the new paragraph verified against
+`rtdetr_l_pub_training_curves.csv`:
+
+| Claim | Verdict |
+|---|---|
+| training terms finite through epoch 6 | PASS -- finite at exactly 1..6 |
+| training terms NaN together at 7, none recovering | PASS |
+| validation terms NaN at epochs 2, 3, 5 and 6 | PASS |
+| validation terms finite only at epochs 1 and 4 | PASS -- across the whole run, not just 1-6 |
+| epoch 4 is the last finite-validation-loss epoch | PASS |
+| validation mAP@50 exactly zero for every epoch 7 to 19 | PASS -- 13 of 13 |
+| "detection metrics continued to be computed at those epochs" | PASS, with a caveat below |
+| 0.0039 / 0.0016 validation, 0.0057 / 0.0026 test | PASS |
+
+## Caveat on "continued to be computed"
+
+At the four NaN-validation epochs the metrics were computed as:
+
+    epoch 2   mAP@50 0.00036   mAP@50-95 0.0002
+    epoch 3   mAP@50 0.00293   mAP@50-95 0.00119
+    epoch 5   mAP@50 0         mAP@50-95 0
+    epoch 6   mAP@50 0.00098   mAP@50-95 0.00046
+
+The sentence is accurate -- all four were computed. But at epoch 5 the computed
+value was exactly zero, so a reader taking "continued to be computed" to mean
+"remained nonzero" would be wrong about one of the four. Not a defect in the
+sentence; a place where a careless reading is available.
+
+## Second paragraph: mAP@50-only violation fixed
+
+Now "0.938 mAP@50 and 0.6016 mAP@50--95 on validation, and 0.9171 and 0.6045 on
+test". All four verified against `master_results.csv` via
+`ec61.load_benchmark_rows()`, row `rtdetr_l_pub_lr1e4`.
+
+## Sweep of section 5 for unpaired mAP@50
+
+One bare occurrence remains, in the newly applied first paragraph:
+
+> "...and validation mAP@50 was exactly zero for every epoch from 7 to 19."
+
+Reported, not edited. Two observations:
+
+- mAP@50-95 is **also exactly zero across all 13 of those epochs** (verified),
+  so pairing it costs nothing factually.
+- Whether this counts as a violation is a judgement call. The rule exists to
+  stop a favourable mAP@50 standing in for a weaker mAP@50-95. At zero there is
+  no such asymmetry. But the rule as written in CLAUDE.md is unconditional.
+
+Three other occurrences in section 5 are correctly paired within their own
+sentence:
+
+- the re-evaluated diverged checkpoint (5.3)
+- the converged run (5.3, just fixed)
+- the metric-selection discussion in 5.4, where mAP@50 and mAP@50--95 are each
+  discussed as metrics rather than quoted as results
+
+No other section contains a mAP figure; sections 1-4 and 6-9 are still stubs.

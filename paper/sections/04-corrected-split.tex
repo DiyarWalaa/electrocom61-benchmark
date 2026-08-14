@@ -12,30 +12,30 @@
 %   4.5  runs/20260803_corrected_split_02/summary.md (image-level allocator);
 %        runs/20260804_burst_aware_split_03 via the sweep row at tau=30;
 %        runs/20260814_figure_near_duplicate/per_box_centre_shift.csv
-%   4.6  runs/20260804_build_corrected_dataset_02/summary.md
+%   4.6  runs/20260804_build_corrected_dataset_02/summary.md;
+%        runs/20260814_split_adjacency_check/summary.md;
+%        runs/20260805_figure_verification_sheet_02/summary.md
 %   4.7  runs/20260804_duplicate_contamination/summary.md;
 %        runs/20260805_consecutive_counter_pairs/
 %   4.8  README.md licence section; data/kaggle/latency_history/pass2.json
 %
-% UNSUPPORTED BULLET, LEFT AS A TODO RATHER THAN WRITTEN. See 4.6 below: the
-% drafted bullet claimed 364 same-camera cross-split pairs within 15 s in both
-% the published and the corrected split. No committed run reports that figure.
-% The nearest committed measurements are different quantities and must not be
-% substituted for it:
-%   - runs/20260803_corrected_split_02/ reports cross-split adjacent pairs
-%     537 before / 600 after, but for the SUPERSEDED image-level allocator, not
-%     the released one, and over all gaps rather than a 15 s window.
-%   - runs/20260804_burst_aware_split_04/ reports 177 groups already straddling
-%     the boundary before any move, which counts groups, not pairs.
-% Producing the claimed figure needs a script and a run directory of its own.
+% RESOLVED 2026-08-14 -- the adjacency check in 4.6. scripts/split_adjacency_check.py
+% now produces it: runs/20260814_split_adjacency_check/. Counted over
+% CONSECUTIVE captures, 364 same-camera pairs within 15 s straddle a boundary
+% under both assignments, and the pair SETS are identical -- 0 created, 0
+% removed -- under both device keyings. The all-pairs definition gives 556
+% (csv_device) and 555 (family_only), also identical between the two splits.
+% Both definitions are reported in the run because "pairs within 15 seconds" is
+% ambiguous between them; the prose quotes the consecutive figure and names the
+% definition it used.
 %
-% F3 LEGIBILITY -- MEASURED, NOT ESTIMATED. near_duplicate_pair is rendered at
-% 11.0 x 7.4 in and its smallest text (the per-box shift table) is 6.9 pt at
-% that size. Included at \figcol (3.5 in) that text renders at 2.2 pt; at
-% \textwidth (6.5 in) at 4.1 pt. Both are below the 8 pt floor every other
-% figure in this paper is built to. It is included below at \textwidth because
-% that is the least bad option available, and it needs a re-render at target
-% width before submission. Scaling cannot fix it.
+% RESOLVED 2026-08-14 -- F3 legibility. Re-rendered at 7.0 x 6.45 in with the
+% per-box shift table at 8.0 pt, replacing the 11.0 x 7.4 in / 6.9 pt version
+% that scaled to 2.2 pt in a column and 3.9 pt at text width. The text blocks
+% were re-laid out for the new width, not merely re-pointed: the subtitle is
+% wrapped to three lines, the panel header to three, and the shift table given
+% a narrower column format, because at 8 pt the old strings overflowed their
+% cells and drew over one another.
 
 The audit of Section~\ref{sec:dataset-audit} establishes a defect that is
 repairable without collecting data: fifteen classes are unevaluable because the
@@ -68,14 +68,28 @@ by another image returned to training.
 \subsection{The grouping rule}
 \label{sec:grouping-rule}
 
-Whole capture bursts move as a unit; individual images never move alone.
-Section~\ref{sec:duplicate-contamination} established that burst structure
-exists in this dataset, and a burst is precisely a set of frames showing the
-same scene seconds apart. Moving one frame out of a burst therefore places a
-near-duplicate of a training image into an evaluation partition, which is the
-contamination the fourth constraint forbids. Making the burst the atomic unit
-of movement rules that out by construction rather than by detection: a group
-that cannot be split cannot straddle the boundary.
+Whole groups of images move as a unit; individual images never move alone. What
+motivates this is not that bursts can be detected in the data ---
+Section~\ref{sec:duplicate-contamination} shows they cannot, because the
+distribution of gaps between consecutive captures is unimodal and offers no
+valley at which one photographic session ends and the next begins. It is that
+consecutive captures are separated by seconds rather than minutes, and that
+frames a few seconds apart can show the same scene: the pair in
+Figure~\ref{fig:near-duplicate-pair} was captured one second apart and its five
+annotation boxes differ by at most 9.01 pixels of 640. Moving one such frame
+into an evaluation partition while its neighbour stays in training is precisely
+the contamination the fourth constraint forbids.
+
+A group is therefore \emph{defined} by a threshold rather than detected in the
+data, and that distinction governs how the rest of this section reads. Grouping
+by a gap of $\tau$ seconds is a decision about what to treat as inseparable, not
+a measurement of what the photographer did. It cannot be justified by pointing
+at a mode in the gap distribution, because there is only one mode. It can only
+be justified by the properties of the splits it produces, which is what the
+sweep in Section~\ref{sec:tau-choice} does and why that sweep is the argument
+for $\tau$ rather than a convenience. What the rule does buy unconditionally is
+structural: a group that cannot be split cannot straddle the boundary, so the
+contamination is ruled out by construction rather than caught by detection.
 
 Bursts are formed at a 15-second gap threshold and, critically, per camera
 rather than globally. Sorting every image in the dataset by timestamp and
@@ -89,11 +103,20 @@ carry one. Three families encode a timestamp and can be clustered in time; a
 fourth cannot. Nine images carry an additional \texttt{\_NN} sub-index
 appended to their timestamp, which resolves frames sharing a capture second.
 The 189 untimestamped images admit no temporal clustering at all, so for those
-the grouping falls back to scene content --- matching class inventory and box
-geometry --- which groups by appearance rather than by time. That substitution
-is weaker than a burst and is recorded as such: it is an inference about which
-photographs show the same arrangement, not a measurement of when they were
-taken.
+the grouping falls back to scene content: two images are joined when their class
+inventories match and their box centres agree to within $\epsilon = 0.05$ in
+normalised coordinates, and each connected component of the resulting graph
+becomes one group. That substitution is weaker than a burst and is recorded as
+such --- it is an inference about which photographs show the same arrangement,
+not a measurement of when they were taken.
+
+The same $\epsilon$ appears twice in this section and the two roles should not
+be confused. Here it \emph{constructs} groups among the untimestamped images;
+in Section~\ref{sec:correction-limits} it is one of three thresholds at which
+contamination is \emph{measured}. At $\epsilon = 0.05$ the two coincide, so the
+contamination figure at that threshold is not fully independent of the grouping
+that produced the split. The figures at $\epsilon = 0.02$ and $\epsilon = 0.01$
+carry no such dependence, and they are zero for test--train under both scorings.
 
 \subsection{The allocation}
 \label{sec:allocation}
@@ -210,9 +233,14 @@ superseded. A run whose conclusion was overturned is still the only record of
 what was actually computed at the time, and editing it would destroy the
 evidence that the sequence above took place.
 
-% F3 at \textwidth, not \figcol: see the legibility note in this file's header.
-% This is a wide two-panel exhibit; even \textwidth leaves its shift table at
-% 4.1 pt. It needs a re-render at target width before submission.
+% F3 is a wide two-panel exhibit, not a column figure, so it takes \textwidth
+% rather than \figcol. It is now RENDERED at 7.0 in with its shift table at
+% 8.0 pt, chosen to match the ~7.16 in text width of a two-column IEEE page, so
+% under that template it prints at roughly 1:1 and the point sizes above are the
+% sizes the reader sees. UNDER A TWO-COLUMN TEMPLATE THIS BECOMES figure*: a
+% plain figure there would be trapped in one 3.5 in column and halve the text
+% again. This class is single-column, so figure and figure* are identical here
+% and the change costs nothing until the venue template lands.
 \begin{figure}[tp]
   \centering
   \includegraphics[width=\textwidth]{near_duplicate_pair.pdf}
@@ -246,14 +274,32 @@ the pixels a detector trains on. Comparing content hashes across all 2{,}121
 images and their 2{,}121 label files is the only check in the set that would
 catch it.
 
-% TODO -- UNSUPPORTED, DO NOT WRITE UNTIL A RUN EXISTS. The drafted bullet here
-% reported an independent check on the allocator: same-camera cross-split pairs
-% within 15 s numbering 364 in the published split and 364 in the corrected one,
-% showing the allocator neither created nor removed any. No committed run
-% reports that figure, and the nearest committed numbers measure different
-% things (see this file's header). The claim is worth making -- it is a check on
-% temporal adjacency independent of the label-geometry contamination measure --
-% but it needs a script and its own run directory first.
+The contamination result is verifiable by eye as well as by count.
+Appendix~\ref{sec:appendix-verification-sheet} reproduces the verification
+sheet: the twelve most similar cross-split pairs across all relationships beside
+the twelve closest test--train pairs, scored with no epsilon cutoff so that
+non-qualifying pairs appear rather than being filtered away. A count of zero is
+only as trustworthy as the scorer that produced it, and the sheet is what lets a
+reader judge the scorer instead of the count.
+
+A further check comes from outside the allocator, and measures a different
+property from the eight above. Two images captured by the same camera within 15
+seconds of each other form a temporally adjacent pair; the released split should
+not separate any pair that the published split did not already separate. Counted
+over consecutive captures, 364 such pairs straddle a partition boundary under the
+published assignment and 364 under the corrected one, and they are the same 364
+pairs --- none created, none removed. The identity is not an artefact of how a
+pair is counted or how a camera is identified: it holds under the wider
+definition that counts every pair within the window rather than only
+time-adjacent ones, where the totals are 556 and 555 depending on whether the
+camera is taken from the metadata or from the filename, and it holds under both
+of those camera attributions. This matters because it is independent of the
+contamination measure: adjacency is
+read from timestamps and cannot be defeated by an occluded component, whereas the
+label-geometry measure compares annotations and never sees a pair whose class
+inventories differ. The two fail in opposite directions, so their agreement is
+worth more than either alone. The 189 untimestamped images carry no capture time
+and are outside this check entirely.
 
 \input{../tables/t2_split_properties}
 
@@ -285,6 +331,18 @@ extra being an Arduino-Uno, and the two shared single-instance components sit
 109.6 and 86.3 pixels apart on the 640-pixel canvas. Inspected visually, the
 scene is rearranged rather than re-photographed. That pair was never scored, and
 never scored is not the same as scored and cleared.
+
+Two further quantities behind the negative result are worth stating rather than
+leaving in a run directory, and both are visible in
+Appendix~\ref{sec:appendix-verification-sheet}. The closest test--train pair
+scores 0.0515 against a loosest threshold of 0.05, clearing it by 3\%: the
+result is real but the margin is thin, and a threshold chosen slightly more
+conservatively would have returned a non-zero count. And 95 cross-split pairs
+carrying two annotated boxes or fewer are excluded from the ranking, 23 of them
+test--train, because a match between box centres is cheap to achieve by chance
+when there are few boxes to match. Excluding them is the conservative direction
+for a ranking and the permissive one for a zero, which is why the count is
+stated here rather than folded silently into the totals.
 
 Partial overlap between images is pervasive and no split removes it. Every image
 in a capture session shares a background and draws from the same pool of

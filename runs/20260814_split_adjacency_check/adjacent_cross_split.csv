@@ -1,0 +1,9 @@
+keying,definition,state,total_pairs,cross_split,pairs_test_train,pairs_train_valid,pairs_test_valid
+csv_device,all-pairs,published,1969,556,159,312,85
+csv_device,all-pairs,corrected,1969,556,159,312,85
+csv_device,consecutive,published,1306,364,103,205,56
+csv_device,consecutive,corrected,1306,364,103,205,56
+family_only,all-pairs,published,1963,555,159,311,85
+family_only,all-pairs,corrected,1963,555,159,311,85
+family_only,consecutive,published,1302,364,103,205,56
+family_only,consecutive,corrected,1302,364,103,205,56

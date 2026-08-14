@@ -1,0 +1,45 @@
+\section{Split verification sheet}
+\label{sec:appendix-verification-sheet}
+
+% Source: runs/20260805_figure_verification_sheet_02/. The figure is a
+% photographic contact sheet and is PNG by decision, not by omission: it embeds
+% 48 real thumbnails, and vector output would carry the same rasters at a larger
+% file size. See figures/README.md.
+%
+% It is rendered at 13.5 x 17.45 in and included below at text width, so it is
+% reduced to roughly half size on the page. That is acceptable for what it is --
+% the reader compares thumbnails and zooms in the PDF for detail -- but it is
+% the reason the numbers behind it are restated in the caption rather than left
+% to be read off the image.
+
+Figure~\ref{fig:verification-sheet} is the visual counterpart to the
+contamination figures quoted in Sections~\ref{sec:duplicate-contamination}
+and~\ref{sec:correction-limits}. Those sections report that no test--train pair
+qualifies as a near-duplicate at any threshold tested, and that the closest such
+pair clears the loosest threshold by 3\%. A reader has no way to judge from a
+count alone whether a scoring function that returns zero is measuring the right
+thing, so the sheet shows the pairs the scorer ranked highest and lets the claim
+be checked by eye rather than taken on trust.
+
+Two properties of the sheet make it evidence rather than illustration. It scores
+every cross-split pair with \emph{no} epsilon cutoff, so the right-hand block
+shows the twelve closest test--train pairs even though none of them qualifies as
+a duplicate --- non-qualifying pairs are the point, not an omission. And the
+per-pair distances are printed beside each thumbnail, so the 0.0515 margin
+behind the negative result is visible as a number and as two photographs at the
+same time.
+
+\begin{figure*}[p]
+  \centering
+  \includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{split_verification_sheet.png}
+  \caption{Split verification sheet. Left: the twelve most similar cross-split
+  pairs across all three relationships. Right: the twelve closest test--train
+  pairs, none of which qualifies as a near-duplicate at any threshold tested.
+  Every cross-split pair is scored with no epsilon cutoff, so the right-hand
+  block exists precisely because its pairs do not qualify. Of the 4{,}860
+  test--train pairs sharing a class inventory, 4{,}837 carry more than two
+  annotated boxes and are ranked; 23 low-information pairs are excluded from
+  that ranking, of the 95 excluded across all relationships. The closest
+  test--train pair scores 0.0515 against a loosest threshold of 0.05.}
+  \label{fig:verification-sheet}
+\end{figure*}

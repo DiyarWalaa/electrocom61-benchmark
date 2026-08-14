@@ -88,14 +88,29 @@ OUT_PDF = os.path.join(OUT_DIR, "near_duplicate_pair.pdf")
 
 DPI = 300
 
-# Rendered size. NOTE this is a WIDE figure -- two 640 px panels side by side
-# plus a shift table -- and its smallest text is 6.9 pt AT THIS SIZE. Included
-# at a 3.5 in column that text renders at 2.2 pt, and at a 6.5 in text block at
-# 4.1 pt; both are below the 8 pt floor the other figures are built to. Making
-# it legible needs a re-render at target width, not a different \includegraphics
-# width. See notes/writing-plan.md.
-FIG_W_IN = 11.0
-FIG_H_IN = 7.4
+# Rendered size. This is a WIDE figure -- two 640 px panels side by side plus a
+# shift table -- so it is a full-text-width exhibit, not a column figure. 7.0 in
+# is chosen to match the text width of a two-column IEEE page (about 7.16 in),
+# so the figure is included at roughly 1:1 there and its point sizes below are
+# the sizes the reader actually sees.
+#
+# It was previously rendered at 11.0 x 7.4 in with a 6.9 pt shift table, which
+# scaled to 2.2 pt in a 3.5 in column and 3.9 pt at this class's text width --
+# illegible either way. That could not be fixed by changing the
+# \includegraphics width, only by re-rendering, which is what this is.
+FIG_W_IN = 7.0
+FIG_H_IN = 6.45
+
+# Every point size below is chosen FOR FIG_W_IN, not scaled from a previous
+# render. The smallest text in the figure is the per-box shift table; it is the
+# one that decides whether the figure survives being placed on a page, so it
+# sets the floor and everything else is sized around it.
+FS_TITLE     = 10.5   # suptitle
+FS_SUBTITLE  = 8.0    # the two explanatory lines under the title
+FS_HEADER    = 8.2    # per-panel filename / capture time / split
+FS_TABLE     = 8.0    # per-box shift table -- THE FLOOR, do not go below 8
+FS_FOOTNOTE  = 8.0    # the two closing lines
+FS_BOXLABEL  = 8.0    # class names drawn on the photographs
 
 # Categorical slots 1-5 of the reference palette, in fixed order. Not cycled,
 # not reordered, not invented.
@@ -148,6 +163,18 @@ def _overlap(a, b):
     return not (a[2] <= b[0] or b[2] <= a[0] or a[3] <= b[1] or b[3] <= a[1])
 
 
+def panel_width_pt():
+    """Printed width of one image panel, in points.
+
+    Derived from the gridspec below: the axes area spans left=0.035 to
+    right=0.965 of the figure, split into two columns with wspace=0.05 of the
+    column width between them. Kept as a function so the layout constants have
+    one home rather than two.
+    """
+    usable = (0.965 - 0.035) * FIG_W_IN
+    return (usable / (2.0 + 0.05)) * 72.27
+
+
 def draw_panel(ax, img_path, boxes, names, colors, size):
     """Draw one image with its boxes and class labels.
 
@@ -169,10 +196,13 @@ def draw_panel(ax, img_path, boxes, names, colors, size):
         spine.set_edgecolor(INK_SECONDARY)
         spine.set_linewidth(0.8)
 
-    # Approximate text metrics in DATA units (image pixels). Each panel spans
-    # `size` data units across roughly 4.8 in => 346 pt, so 1 pt ~ 1.85 px.
-    fs = 7.2
-    pt_to_data = size / 346.0
+    # Approximate text metrics in DATA units (image pixels). A panel spans
+    # `size` data units across its own printed width, so the conversion has to
+    # be DERIVED from the figure width -- hardcoding it (it was 346 pt, for an
+    # 11 in figure) silently breaks the collision avoidance the moment the
+    # figure is resized, which is exactly what a resize is for.
+    fs = FS_BOXLABEL
+    pt_to_data = size / panel_width_pt()
     char_w = fs * 0.60 * pt_to_data
     line_h = fs * 1.45 * pt_to_data
     pad = 3.0 * pt_to_data
@@ -283,21 +313,31 @@ def main():
 
     # ---- compose -------------------------------------------------------
     fig = plt.figure(figsize=(FIG_W_IN, FIG_H_IN), dpi=DPI, facecolor=SURFACE)
-    gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.30],
-                          hspace=0.04, wspace=0.05,
-                          left=0.035, right=0.965, top=0.862, bottom=0.085)
+    # height_ratios gives the caption block a larger share than it had at 11 in:
+    # at 8 pt the header and the shift table need more vertical room than they
+    # did at 6.9, and a text block that overflows its cell does not shrink, it
+    # draws over its neighbour.
+    gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.46],
+                          hspace=0.05, wspace=0.05,
+                          left=0.035, right=0.965, top=0.866, bottom=0.100)
 
     fig.suptitle("The near-duplicate pair the released split keeps together",
-                 fontsize=13, color=INK, y=0.977, fontweight="bold")
-    fig.text(0.5, 0.928,
-             "Shot one second apart, five identical components. Under the "
-             "published split both sit in train.",
-             ha="center", fontsize=8.5, color=INK_SECONDARY)
-    fig.text(0.5, 0.899,
-             "An image-level allocator moved the left panel to test, creating a "
-             "test↔train near-duplicate. The released burst-aware split (τ=15 s) "
-             "moves whole bursts, so both stay in train.",
-             ha="center", fontsize=8.5, color=INK_SECONDARY)
+                 fontsize=FS_TITLE, color=INK, y=0.982, fontweight="bold")
+    # Wrapped explicitly, and every line below was measured against FIG_W_IN.
+    # matplotlib does not wrap figure text: an over-long line runs off both
+    # edges rather than folding, so the break points are chosen here.
+    fig.text(0.5, 0.936,
+             "Shot one second apart, five identical components. "
+             "Under the published split both sit in train.",
+             ha="center", fontsize=FS_SUBTITLE, color=INK_SECONDARY)
+    fig.text(0.5, 0.915,
+             "An image-level allocator moved the left panel to test, "
+             "creating a test↔train near-duplicate.",
+             ha="center", fontsize=FS_SUBTITLE, color=INK_SECONDARY)
+    fig.text(0.5, 0.894,
+             "The released burst-aware split (τ=15 s) moves whole bursts, "
+             "so both stay in train.",
+             ha="center", fontsize=FS_SUBTITLE, color=INK_SECONDARY)
 
     def shift_lines(sign):
         """Per-box shift text FROM this panel TO the other one.
@@ -306,9 +346,11 @@ def main():
         Printing the same signs under both panels would state that each image
         is displaced in the same direction from the other, which is impossible.
         """
-        return "\n".join(
-            "    %-30s Δx %+6.1f   Δy %+6.1f   |Δ| %5.1f px"
-            % (n, sign * dx, sign * dy, d) for (_c, n, dx, dy, d) in shifts)
+        head = "  %-15s %6s %6s %8s" % ("", "dx", "dy", "|shift|")
+        body = "\n".join(
+            "  %-15s %+6.1f %+6.1f %6.1f px" % (n[:15], sign * dx, sign * dy, d)
+            for (_c, n, dx, dy, d) in shifts)
+        return head + "\n" + body
 
     for col, (stem, img_path, boxes, split, sign, other) in enumerate([
             (STEM_A, img_a, boxes_a, split_a, +1.0, STEM_B),
@@ -318,30 +360,28 @@ def main():
 
         cap = fig.add_subplot(gs[1, col])
         cap.axis("off")
-        header = ("%s.jpg\ncaptured %s   |   split: %s   |   %d×%d px"
+        header = ("%s.jpg\ncaptured %s\nsplit: %s   |   %d×%d px"
                   % (stem, capture_time(stem), split.upper(), size, size))
-        cap.text(0.0, 1.0, header, va="top", ha="left", fontsize=8.2,
+        cap.text(0.0, 1.0, header, va="top", ha="left", fontsize=FS_HEADER,
                  color=INK, family="monospace", linespacing=1.5)
-        cap.text(0.0, 0.52,
+        cap.text(0.0, 0.62,
                  "per-box centre shift, this panel → %s:\n%s"
                  % (other[-6:], shift_lines(sign)),
-                 va="top", ha="left", fontsize=6.9, color=INK_SECONDARY,
+                 va="top", ha="left", fontsize=FS_TABLE, color=INK_SECONDARY,
                  family="monospace", linespacing=1.45)
 
     # Two lines, not one: at this figure width a single line of this text
     # runs off both edges. Wrapped explicitly rather than relying on a
     # bounding box, so the break point is chosen rather than arbitrary.
     max_shift = max(d for (_c, _n, _dx, _dy, d) in shifts)
-    fig.text(0.5, 0.050,
-             "Both panels contain the same five classes — one instance each of "
-             "Diode, Fuse, Fuse-Base, Heat-Sink and RFID-Scanner.",
-             ha="center", fontsize=7.4, color=INK_SECONDARY)
-    fig.text(0.5, 0.022,
-             "Largest per-box centre shift: %.1f px of %d (%.1f%%). Boxes are "
-             "the dataset's own YOLO annotations, unmodified. The released "
-             "split carries zero test↔train near-duplicate pairs at every epsilon."
+    fig.text(0.5, 0.044,
+             "Same five classes in both panels, one instance each. Boxes are "
+             "the dataset's own YOLO annotations, unmodified.",
+             ha="center", fontsize=FS_FOOTNOTE, color=INK_SECONDARY)
+    fig.text(0.5, 0.016,
+             "Largest per-box centre shift: %.1f px of %d (%.1f%%)."
              % (max_shift, size, 100.0 * max_shift / size),
-             ha="center", fontsize=7.4, color=INK_SECONDARY)
+             ha="center", fontsize=FS_FOOTNOTE, color=INK_SECONDARY)
 
     if not os.path.isdir(OUT_DIR):
         os.makedirs(OUT_DIR)

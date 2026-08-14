@@ -1,0 +1,6 @@
+class_id,class_name,dx_px,dy_px,distance_px
+16,Diode,4.50,-2.00,4.92
+21,Fuse,4.00,-4.50,6.02
+22,Fuse-Base,1.00,-2.50,2.69
+25,Heat-Sink,5.00,-7.50,9.01
+47,RFID-Scanner,-2.00,-5.00,5.39

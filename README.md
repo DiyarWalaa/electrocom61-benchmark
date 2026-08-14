@@ -8,13 +8,25 @@ repository is to produce a benchmark where every reported number is traceable
 to a split, a seed, a set of weights and a machine — and where the dataset
 itself has been audited before any model is trained on it.
 
-**Current stage: dataset audit complete; a corrected split released.** No
-detector has been trained yet. Everything in `runs/` so far concerns the
+**Current stage: dataset audit complete, corrected split released, benchmark
+trained and measured, paper partly drafted.** Ten benchmark runs — five
+detectors (YOLOv9s, YOLO11s, YOLOv12s, YOLO26s, RT-DETR-l), each trained once on
+the published split and once on the corrected one — are recorded in
+`data/master_results.csv`. An eleventh row holds the RT-DETR-l run that diverged
+at the YOLO learning rate; it is marked `diverged` in the `inclusion` column and
+retained rather than discarded, because a configuration reported as unusable
+should be inspectable. Per-run configuration snapshots, training curves and
+per-class average precision are under `data/kaggle/`. Seven figures
+(`figures/`) and six tables (`tables/`) are generated from those files by
+scripts in `scripts/`; the paper is in `paper/`, where Section 5 is drafted and
+the remaining sections are stubs.
+
+The audit came first and still underwrites everything above. It concerns the
 *integrity of the data*: whether the train/valid/test split is clean, whether
 the shipped metadata describes the shipped images, and whether near-duplicate
-photo bursts straddle the split boundary. Those questions have to be answered
-first, because a leaked split inflates test scores no matter which model is
-trained on it.
+photo bursts straddle the split boundary. Those questions had to be answered
+before any model was trained, because a leaked split inflates test scores no
+matter which model is trained on it.
 
 ---
 

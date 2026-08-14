@@ -108,3 +108,14 @@ __pycache__/
 Thumbs.db
 desktop.ini
 .DS_Store
+
+# ---------------------------------------------------------------------------
+# Split fragments from an in-place rebuild of references.bib. These are working
+# files, not artifacts: the assistant wrote them to reassemble the bibliography
+# and cannot delete them, because file deletion is denied by
+# scripts/deny_guard.py. Ignored so they never reach a commit. Safe to delete
+# by hand.
+# ---------------------------------------------------------------------------
+paper/references.bib.head
+paper/references.bib.mid
+paper/references.bib.tail

@@ -58,30 +58,26 @@
 }
 
 % ===========================================================================
-% MODEL AND METRIC CITATIONS. Added 2026-08-14.
+% MODEL AND METRIC CITATIONS. Added 2026-08-14, REPLACED FROM AUTHORITATIVE
+% RECORDS 2026-08-15.
 %
-% NONE of these has been verified against its source from within this
-% repository, and no script here can verify one: reference/ holds a single
-% archived notebook, and the prior papers' PDFs are not committed. Section 8
-% states this limitation for every claim the paper makes about prior work; it
-% applies to these entries too.
+% Every field below now comes from arXiv (abstract pages, by identifier) or
+% from the Crossref REST API, not from model knowledge and not from another
+% paper's reference list. The earlier versions of these entries had titles and
+% author lists filled in from memory; those are gone.
 %
-% The two groups below differ in HOW they are unverified, which matters when
-% deciding what to re-check first.
+% WHAT IS STILL NOT SOURCED is stated per entry. Two things in particular:
+%   - Venues for the four YOLO papers. arXiv gives no journal reference for
+%     any of them, so where a proceedings venue is claimed it came from the
+%     author or from a prior paper's bibliography, NOT from a record.
+%   - The Ultralytics software entry, which has no arXiv or Crossref record at
+%     all. See its own comment at the end of this block.
 % ===========================================================================
 
-% ---------------------------------------------------------------------------
-% GROUP 1 -- authors, venue and arXiv identifier taken from the BIBLIOGRAPHIES
-% OF THE TWO PRIOR PAPERS, supplied by the author 2026-08-14.
-%
-% This provenance is SECONDHAND: a citation copied out of another paper's
-% reference list inherits any error in that list, and the lists themselves are
-% not in this repository. TITLES ARE NOT FROM THAT SOURCE -- the author supplied
-% surnames, venue and arXiv number only, so each title below was filled in here
-% and must be checked against the arXiv record rather than assumed.
-% ---------------------------------------------------------------------------
-
-% VERIFY: title, author list, venue.
+% Title and authors from arXiv:2402.13616 (v2, 2024-02-29). EXACT.
+% VENUE UNSOURCED: "ECCV 2024" was supplied by the author from a prior paper's
+% bibliography; arXiv shows no journal reference and no Crossref proceedings
+% entry was looked up. Confirm or drop the booktitle before submission.
 @inproceedings{yolov9,
   author    = {Wang, Chien-Yao and Yeh, I-Hau and Liao, Hong-Yuan Mark},
   title     = {{YOLOv9}: Learning What You Want to Learn Using Programmable
@@ -90,111 +86,130 @@
   year      = {2024},
   eprint    = {2402.13616},
   archivePrefix = {arXiv},
-  note      = {Citation taken from a prior paper's bibliography; title filled
-               in here and not yet checked against the arXiv record},
+  doi       = {10.48550/arXiv.2402.13616},
+  note      = {VERIFY the venue only: title and authors are from the arXiv
+               record, the ECCV attribution is not},
 }
 
-% VERIFY: title, author list. Preprint only -- no venue was supplied.
-@article{yolo11,
-  author  = {Khanam, Rahima and Hussain, Muhammad},
-  title   = {{YOLOv11}: An Overview of the Key Architectural Enhancements},
-  journal = {arXiv preprint},
-  year    = {2024},
-  eprint  = {2410.17725},
+% Title and authors from arXiv:2410.17725 (2024-10-23). EXACT.
+% Preprint only -- arXiv shows no journal reference, and none was supplied.
+@misc{yolo11,
+  author       = {Khanam, Rahima and Hussain, Muhammad},
+  title        = {{YOLOv11}: An Overview of the Key Architectural Enhancements},
+  year         = {2024},
+  eprint       = {2410.17725},
   archivePrefix = {arXiv},
-  note    = {Citation taken from a prior paper's bibliography; title filled in
-             here and not yet checked against the arXiv record},
+  doi          = {10.48550/arXiv.2410.17725},
+  howpublished = {arXiv:2410.17725},
 }
 
-% VERIFY: title, author list. Preprint only -- no venue was supplied.
-@article{yolov12,
-  author  = {Tian, Yunjie and Ye, Qixiang and Doermann, David},
-  title   = {{YOLOv12}: Attention-Centric Real-Time Object Detectors},
-  journal = {arXiv preprint},
-  year    = {2025},
-  eprint  = {2502.12524},
+% Title and authors from arXiv:2502.12524 (2025-02-18). EXACT.
+% Preprint only -- arXiv shows no journal reference, and none was supplied.
+@misc{yolov12,
+  author       = {Tian, Yunjie and Ye, Qixiang and Doermann, David},
+  title        = {{YOLOv12}: Attention-Centric Real-Time Object Detectors},
+  year         = {2025},
+  eprint       = {2502.12524},
   archivePrefix = {arXiv},
-  note    = {Citation taken from a prior paper's bibliography; title filled in
-             here and not yet checked against the arXiv record},
+  doi          = {10.48550/arXiv.2502.12524},
+  howpublished = {arXiv:2502.12524},
 }
 
-% VERIFY -- TITLE IS THE LEAST CERTAIN OF THIS GROUP. The author supplied
-% "Lei et al." and the arXiv number only; the title below was filled in here
-% with lower confidence than the three above. Check this one first.
+% Title and FULL author list from arXiv:2506.17733 (v1 2025-06-21, v2
+% 2025-09-05). The earlier entry read "Lei, Mengqi and others"; the record
+% gives ten authors, now listed in full.
 % NOTE this is the YOLOv13 ARCHITECTURE paper, distinct from yolov13paper
 % above, which is the e-waste study that uses it on this dataset.
-@article{yolov13,
-  author  = {Lei, Mengqi and others},
-  title   = {{YOLOv13}: Real-Time Object Detection with Hypergraph-Enhanced
-             Adaptive Visual Perception},
-  journal = {arXiv preprint},
-  year    = {2025},
-  eprint  = {2506.17733},
+@misc{yolov13,
+  author       = {Lei, Mengqi and Li, Siqi and Wu, Yihong and Hu, Han and
+                  Zhou, You and Zheng, Xinhu and Ding, Guiguang and
+                  Du, Shaoyi and Wu, Zongze and Gao, Yue},
+  title        = {{YOLOv13}: Real-Time Object Detection with
+                  Hypergraph-Enhanced Adaptive Visual Perception},
+  year         = {2025},
+  eprint       = {2506.17733},
   archivePrefix = {arXiv},
-  note    = {Citation taken from a prior paper's bibliography; title filled in
-             here with low confidence and not yet checked},
+  doi          = {10.48550/arXiv.2506.17733},
+  howpublished = {arXiv:2506.17733},
 }
 
-% ---------------------------------------------------------------------------
-% GROUP 2 -- supplied by the author 2026-08-14, to be verified against the
-% papers themselves. Titles here ARE the author's, unlike group 1.
-% ---------------------------------------------------------------------------
+% Title and authors from arXiv:2606.03748 (2026-06-02).
+% THE AUTHOR LIST HERE REPLACES A PLACEHOLDER. The previous entry carried a
+% corporate author, {Ultralytics}, added only so BibTeX could sort it, because
+% this paper postdates the assistant's training data and nothing was known
+% about it. The six names below are from the arXiv record.
+@misc{yolo26,
+  author       = {Jocher, Glenn and Qiu, Jing and Liu, Mengyu and Lyu, Shuai and
+                  Akyon, Fatih Cagatay and Kalfaoglu, Muhammet Esat},
+  title        = {Ultralytics {YOLO26}: Unified Real-Time End-to-End Vision
+                  Models},
+  year         = {2026},
+  eprint       = {2606.03748},
+  archivePrefix = {arXiv},
+  doi          = {10.48550/arXiv.2606.03748},
+  howpublished = {arXiv:2606.03748},
+}
 
-% VERIFY against the paper.
+% Title and FULL author list from arXiv:2304.08069 (v1 2023-04-17, v3
+% 2024-04-03); venue, pages and DOI from Crossref. The earlier entry read
+% "Zhao, Yian and others" and carried no page range.
 @inproceedings{rtdetr,
-  author    = {Zhao, Yian and others},
+  author    = {Zhao, Yian and Lv, Wenyu and Xu, Shangliang and Wei, Jinman and
+               Wang, Guanzhong and Dang, Qingqing and Liu, Yi and Chen, Jie},
   title     = {{DETRs} Beat {YOLOs} on Real-time Object Detection},
-  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition
-               (CVPR)},
+  booktitle = {2024 IEEE/CVF Conference on Computer Vision and Pattern
+               Recognition (CVPR)},
+  pages     = {16965--16974},
   year      = {2024},
+  doi       = {10.1109/CVPR52733.2024.01605},
   eprint    = {2304.08069},
   archivePrefix = {arXiv},
-  note      = {VERIFY: full author list, page range},
 }
 
-% VERIFY against the paper.
+% Authors confirmed against arXiv:2005.12872 (2020-05-26); venue, pages and DOI
+% from Crossref. The author list filled in earlier from memory was correct.
 @inproceedings{detr,
   author    = {Carion, Nicolas and Massa, Francisco and Synnaeve, Gabriel and
                Usunier, Nicolas and Kirillov, Alexander and Zagoruyko, Sergey},
   title     = {End-to-End Object Detection with Transformers},
-  booktitle = {European Conference on Computer Vision (ECCV)},
+  booktitle = {Computer Vision -- ECCV 2020},
+  series    = {Lecture Notes in Computer Science},
+  pages     = {213--229},
   year      = {2020},
+  doi       = {10.1007/978-3-030-58452-8_13},
   eprint    = {2005.12872},
   archivePrefix = {arXiv},
-  note      = {VERIFY: author list beyond the first was filled in here, not
-               supplied},
 }
 
-% VERIFY against the paper. No arXiv identifier was supplied.
+% Authors, venue, pages and DOI from Crossref. The author list filled in
+% earlier from memory was correct; the DOI and page range are new.
 @inproceedings{coco,
   author    = {Lin, Tsung-Yi and Maire, Michael and Belongie, Serge and
                Hays, James and Perona, Pietro and Ramanan, Deva and
                Doll{\'a}r, Piotr and Zitnick, C. Lawrence},
   title     = {Microsoft {COCO}: Common Objects in Context},
-  booktitle = {European Conference on Computer Vision (ECCV)},
+  booktitle = {Computer Vision -- ECCV 2014},
+  series    = {Lecture Notes in Computer Science},
+  pages     = {740--755},
   year      = {2014},
-  note      = {VERIFY: author list beyond the first was filled in here, not
-               supplied; pages not recorded},
+  doi       = {10.1007/978-3-319-10602-1_48},
 }
 
-% VERIFY -- AND NOTE THIS ONE CANNOT BE CHECKED FROM MODEL KNOWLEDGE AT ALL.
-% arXiv 2606 is June 2026, after the assistant's training cutoff, so every
-% field below is the author's and nothing here corroborates any of it.
-@article{yolo26,
-  author  = {{Ultralytics}},
-  title   = {Ultralytics {YOLO26}: Unified Real-Time End-to-End Vision Models},
-  journal = {arXiv preprint},
-  year    = {2026},
-  eprint  = {2606.03748},
-  archivePrefix = {arXiv},
-  note    = {VERIFY: no author list was supplied. The corporate author here is
-             a PLACEHOLDER added only because BibTeX cannot sort or label an
-             entry without one -- replace it with the real list},
-}
-
-% VERIFY: the canonical Ultralytics software citation and its author list.
-% The VERSION is not in doubt -- 8.4.115 is recorded in all eleven results
-% JSONs under data/kaggle/ -- but the citation form is unchecked.
+% THE ONE ENTRY IN THIS BLOCK WITH NO AUTHORITATIVE RECORD.
+%
+% There is no arXiv identifier and no Crossref DOI for the Ultralytics package
+% itself, so nothing here was replaced -- the author list below is still the
+% one filled in from model knowledge. Partial corroboration only: Glenn Jocher
+% and Jing Qiu both appear on the YOLO26 arXiv paper above, which supports two
+% of the three names but is not a citation for the software.
+%
+% The canonical form would come from the repository's own CITATION file or a
+% Zenodo record, neither of which is reachable under the fetch domains allowed
+% here. STILL UNSOURCED.
+%
+% The VERSION is not in doubt: 8.4.115 is recorded in all eleven results JSONs
+% under data/kaggle/.
+%
 % Entry type is misc, not software: plainnat defines no software type and warns,
 % dropping the version field. NOTE -- do not write an "at" sign in a comment in
 % this file: BibTeX starts a new entry at every "at" sign regardless of the
@@ -204,9 +219,8 @@
   title        = {Ultralytics {YOLO}, version 8.4.115},
   year         = {2026},
   howpublished = {\url{https://github.com/ultralytics/ultralytics}},
-  note         = {VERIFY: canonical citation form and author list. The VERSION
-                  is not in doubt -- 8.4.115 is recorded in all eleven results
-                  JSONs under data/kaggle/},
+  note         = {VERIFY: author list and canonical citation form are UNSOURCED
+                  -- no arXiv or Crossref record exists for the package},
 }
 
 % ===========================================================================

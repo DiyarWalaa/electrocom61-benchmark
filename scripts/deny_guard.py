@@ -46,9 +46,14 @@ SEPARATORS = re.compile(r"&&|\|\||[;\n|]")
 # against a stripped segment, case-insensitively, because PowerShell cmdlets
 # are case-insensitive and `RM` is as destructive as `rm`.
 RULES = [
-    (r"^(rm|rmdir|rd|del|erase|mv)\b",
+    # A command token must be followed by WHITESPACE or the end of the segment,
+    # not merely a word boundary. \b also matches before "=" and "(", so a
+    # Python snippet containing `rd=open(...)` was read as the rmdir alias and
+    # blocked. Short aliases -- rd, ri, mv, del -- are the ones that collide
+    # with ordinary identifiers, so the constraint matters most for this rule.
+    (r"^(rm|rmdir|rd|del|erase|mv)(?=\s|$)",
      "file deletion or move"),
-    (r"^(remove-item|move-item|rename-item|clear-content|ri|ren)\b",
+    (r"^(remove-item|move-item|rename-item|clear-content|ri|ren)(?=\s|$)",
      "file deletion, move or truncation"),
     (r"^git\s+(rm|clean)\b",
      "git deletion"),
@@ -68,13 +73,13 @@ RULES = [
      "force push"),
     (r"^git\s+clone\b",
      "network clone"),
-    (r"^(pip|pip3|conda|npm|npx|winget|choco|mpm|miktex)\b",
+    (r"^(pip|pip3|conda|npm|npx|winget|choco|mpm|miktex)(?=\s|$)",
      "package installation"),
-    (r"^python\s+-m\s+pip\b",
+    (r"^python\s+-m\s+pip(?=\s|$)",
      "package installation"),
-    (r"^(install-module|install-package)\b",
+    (r"^(install-module|install-package)(?=\s|$)",
      "package installation"),
-    (r"^(curl|wget|invoke-webrequest|invoke-restmethod|iwr|irm|start-bitstransfer)\b",
+    (r"^(curl|wget|invoke-webrequest|invoke-restmethod|iwr|irm|start-bitstransfer)(?=\s|$)",
      "network download"),
     # Not anchored: the script is reached through `powershell -File ...`, so the
     # flag is what matters, wherever the invocation starts.

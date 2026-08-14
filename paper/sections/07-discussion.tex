@@ -1,5 +1,173 @@
 \section{Discussion}
 \label{sec:discussion}
 
-% TODO: Interpretation. Includes the framework-version argument and the
-% two prior-work findings recorded in notes/writing-corrections.md.
+% Sources, by subsection:
+%   7.1  reference/electrocom61-yolov9.ipynb (archived, cells 29 and 41);
+%        README.md "Reference material"; data/config_provenance.csv;
+%        Sections 3.1, 5.1, 5.5
+%   7.2  Sections 3.1, 3.3, 5.4
+%   7.3  Sections 3.2, 6.1
+%   7.4  Sections 6.2, 6.4, 5.5; data/latency_by_arch.csv
+%
+% PENDING AUTHOR VERIFICATION AGAINST THE PRIOR-WORK PDFs. Three claims in 7.1
+% rest on readings of papers that are NOT in this repository. Nothing in the
+% tooling has checked them. Each is written narrowly, and each needs a page
+% reference before submission:
+%
+%   1. THE FORK. That YOLOv13 is distributed as a fork outside Ultralytics, and
+%      therefore that the corresponding row in a prior comparison table was
+%      produced on a different codebase from the rows beside it. Section 5.1
+%      already asserts the first half; the second half is the new claim here.
+%
+%   2. THE CROSS-VALIDATION PROTOCOL. notes/writing-corrections.md records that
+%      the YOLOv13 paper evaluates its proposed model by 3-fold cross-validation
+%      over the entire dataset while the comparison rows in the same table are
+%      single-split figures. This is the strongest item in 7.1 and the least
+%      verifiable from here.
+%
+%   3. THE PUBLISHED COMPLEXITY FIGURES -- and this one is WEAKER than the
+%      drafted bullet claimed. The bullet proposed that "for the three
+%      architectures whose parameter counts can be checked independently, the
+%      published values differ substantially from the measured ones (Section 6.4
+%      and Table 5)". THE REPOSITORY HOLDS NO PUBLISHED PARAMETER COUNTS. Table 5
+%      carries this study's measured values only, and no run, note or data file
+%      records what the prior papers report, so the difference cannot be stated
+%      or sized here. What IS established -- author-verified against all three
+%      PDFs, see 5.5 -- is that the two studies reporting parameter counts do not
+%      say whether those counts are fused or unfused. The paragraph below makes
+%      that narrower point. Restore the stronger one only with the published
+%      numbers recorded in a committed file.
+
+The benchmark in Sections~\ref{sec:benchmark-setup} and~\ref{sec:results} was
+built to settle a disagreement in the published record. What it establishes is
+narrower and more useful than a winner: that the disagreement was never about
+the models.
+
+\subsection{Why published results on this dataset disagree}
+\label{sec:disagreement}
+
+At least four properties differ between the published comparisons on
+ElectroCom61, and none of the comparisons states which value it used for any of
+them. Each is enough on its own to move a reported figure by more than the
+differences the comparisons are drawing conclusions from.
+
+The first is the version of the dataset. The archived notebook that produces the
+dataset paper's headline figure downloads Roboflow export version 5, while the
+archive published at the Mendeley DOI is version 9 \citep{electrocom61}; the two
+differ in image count and in the preprocessing applied before export, as
+Section~\ref{sec:metadata-provenance} documents for the metadata that travels
+with them. Neither benchmark study states which version it used
+\citep{yolov12paper,yolov13paper}.
+
+The second is the evaluation partition. In the archived notebook the evaluation
+command is run without a test-split argument, so the reported figure is a
+validation-set score; the test directory is never passed to an evaluation
+command anywhere in it. Neither benchmark study states which partition its
+figures come from. A validation score and a test score are different quantities
+even when the split is sound, and the notebook selects its best checkpoint on
+the same partition it then reports.
+
+The third is how many classes the figure averages over. Under the published
+split any mAP averages 45 classes on validation and 46 on test rather than 61,
+for the reasons established in Section~\ref{sec:class-coverage}. A figure
+produced under a protocol that reaches all 61 classes is not the same quantity
+as one produced under a protocol that reaches 46, and the fifteen classes that
+differ between them are not a random sample --- they are among the most heavily
+annotated in the dataset.
+
+The fourth is the framework. Neither study states an Ultralytics version, which
+is what fixes the layer composition, detection head, loss function and default
+augmentation of every model distributed under a given name, so two studies can
+report results for the same architecture while training different networks. One
+architecture appearing in a prior comparison table is distributed as a fork
+outside the Ultralytics package (Section~\ref{sec:models-evaluated}), which
+places that row on a different codebase from the rows beside it. A related gap
+affects the complexity columns: of the studies reporting parameter counts,
+neither states whether the counts are fused or unfused, and
+Section~\ref{sec:efficiency-measurement} measures that difference at up to 5.1\%
+of parameters.
+
+None of this establishes that any published figure is wrong. Each of the four is
+a property that a reader needs in order to know what a number refers to, and
+that the published record does not supply. The claim is that the figures are not
+comparable with one another --- which is a question about reporting, and is
+answerable by reporting.
+
+\subsection{What would have caught it}
+\label{sec:what-would-have-caught-it}
+
+The coverage defect was invisible at the level at which splits are normally
+checked. Aggregated over all 2121 images the published split reads 69.7 / 20.7 /
+9.7, which is a textbook 70/20/10, and it reaches that figure through deviations
+that cancel (Section~\ref{sec:allocation-uniformity}). A reader verifying the
+split ratio would have found nothing.
+
+Three checks would have found it, none of which requires training a model and
+each of which costs minutes. Count the classes with no instances in the
+evaluation partitions. Compute the allocation of each capture session
+separately, rather than the aggregate. Read the number of classes the evaluation
+framework actually scored.
+
+The third is the cheapest and the most telling, because it requires no extra
+work at all. Ultralytics reports that count on every evaluation it runs. It was
+printed on every evaluation any of these studies performed, and it read 45 or 46
+against a dataset described throughout as having 61 classes. Reporting it beside
+the score --- as Section~\ref{sec:eval-protocol} does here --- would have made
+the defect self-evident without anyone looking for it.
+
+\subsection{What generalises beyond this dataset}
+\label{sec:generalisation}
+
+Nothing about the defect is specific to electronic components. It arises
+whenever data is collected in sessions and split by image: any class
+photographed only within sessions that happen to fall entirely in training
+becomes unevaluable, and a randomly drawn image-level split does not prevent
+this, because randomness over images is not randomness over sessions. Medical
+images grouped by patient, agricultural images by field, industrial images by
+production run all have the same structure.
+
+The audit that found it needed no pixels and no model. Filenames, label files
+and the metadata shipped with the archive were sufficient to establish the
+coverage gap, its mechanism and its extent. That matters for whether such a
+check is worth running: it is not a research contribution, it is a few minutes
+of arithmetic over files that any user of a dataset already has.
+
+The transferable lesson is the direction of the error. A split defect is assumed
+to inflate scores, because the familiar defect is leakage --- a test image also
+seen in training is easy for the wrong reason. Here the defect was exclusion
+rather than leakage, and what it excluded was disproportionately easy, so it
+\emph{deflated} the scores (Section~\ref{sec:accuracy}). ``A broken split means
+inflated results'' is a useful heuristic and not a rule. A defect that
+understates is the harder one to notice, because nobody audits a result for
+being too low.
+
+\subsection{Reporting speed changes the answer}
+\label{sec:speed-changes-the-answer}
+
+On accuracy alone, these five architectures are close enough that the choice
+between the three occupying the middle of the field is not resolvable at a
+single seed: they are separated by 0.0023 mAP@50--95 on the corrected split
+(Section~\ref{sec:metric-choice}). Adding latency resolves it immediately, and
+not by a small margin --- the same three span 33.53~ms, roughly 140 times the
+measurement's own spread.
+
+The complexity proxy most often reported in its place would have misled. Ordered
+by parameter count, these architectures fall in an order almost unrelated to
+their measured speed: the one with the fewest parameters is the second slowest
+of the five (Section~\ref{sec:efficiency}). A study offering parameter counts as
+a stand-in for deployment cost would have handed a reader the wrong ordering,
+and nothing in such a study would reveal that.
+
+A speed ranking is also uninterpretable without a repeatability figure beside
+it. The 0.96~ms separating the two fastest architectures here means something
+only because the same architecture measured twice varies by 0.24~ms
+(Section~\ref{sec:efficiency-measurement}); with the first number alone a reader
+cannot tell a real ordering from measurement noise, and the two smallest
+differences in Table~\ref{tab:efficiency} are of the same order as the noise.
+
+The application that motivates this dataset is a conveyor belt that does not
+stop for the detector. Whether a model keeps up is the question that decides
+deployment, and it is not expressible in any accuracy metric. No prior study of
+this dataset measured inference speed, so none of them could answer it --- not
+because their measurements were poor, but because they measured a different
+thing.

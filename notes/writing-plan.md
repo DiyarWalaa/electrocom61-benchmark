@@ -17,14 +17,14 @@ their claims are settled.
 | 2 | **4 — A Corrected Split** | **complete** (4.1–4.8 drafted, fact-checked) |
 | 3 | **5 — Benchmark Setup** | **complete** (5.1–5.6 drafted, fact-checked) |
 | 4 | **6 — Results** | **complete** (6.1–6.5 drafted, fact-checked) |
-| 5 | 7 — Discussion | stub |
+| 5 | **7 — Discussion** | **complete** (7.1–7.4 drafted, fact-checked) |
 | 6 | 8 — Limitations | stub |
 | 7 | 2 — Related Work | stub |
 | 8 | 9 — Conclusion | stub |
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-Sections 3, 4, 5 and 6 are finished and are the model for the rest: every
+Sections 3, 4, 5, 6 and 7 are finished and are the model for the rest: every
 number in them traces to a committed file, and anything that does not is marked
 in the section file's own header comment rather than left silent.
 
@@ -149,11 +149,14 @@ Rule 5 bites hardest here. The accuracy spread between the top models is small;
 every ordering claim needs its margin stated, and the latency resolution
 (0.24 ms / 1.75%) governs which latency orderings are reportable at all.
 
-### Section 7 — Discussion
+### Section 7 — Discussion — DRAFTED
 
-Claims: _to be supplied._
+Four subsections, deliberately shorter than 3, 4 and 6 per the Length note
+above. Three claims in 7.1 rest on readings of the prior-work PDFs and are
+flagged in the section header as pending verification: the fork, the
+cross-validation protocol, and the published complexity figures.
 
-Evidence available:
+Evidence used:
 - The framework-version argument, already set up in 5.2
 - The uniform-but-not-neutral argument from 5.3, referenced forward as
   `sec:discussion`

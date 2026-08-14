@@ -347,8 +347,10 @@ the data:
   redistributed here — `data/` is git-ignored and you download it yourself from
   the Mendeley DOIs above. Cite the DOI if you use it.
 - **`runs/`** holds measurements derived from that dataset (filenames, counts,
-  cluster memberships). Reuse them freely, but the CC BY attribution to the
-  dataset authors travels with anything derived from their data — so credit
+  cluster memberships, and the split manifests). That derived content is
+  offered under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) —
+  the same licence as the dataset it comes from. The CC BY attribution to the
+  dataset authors travels with anything derived from their data, so credit
   both this repository and the ElectroCom61 DOI.
 - **`reference/`** is **third-party material, not covered by the MIT grant
   above.** `electrocom61-yolov9.ipynb` is the ElectroCom61 first author's work,

@@ -309,7 +309,7 @@ def t3():
     default = [r for r in rows if r["source"].strip().lower() == "default"]
     shown = [r for r in rows if r["source"].strip().lower() != "default"]
 
-    header = ["Setting", "Value", "Source", "Citation"]
+    header = ["Setting", "Value", "Provenance", "Citation"]
     body = [[tex(r["setting"]), tex(r["value"]), tex(r["source"]),
              tex(r["citation"])] for r in shown]
 

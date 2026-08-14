@@ -263,8 +263,8 @@ allocation deterministic. No image is modified, added or removed.
 
 The ten trained checkpoints are retained in the notebook outputs from which they
 were produced, and the repository carries each run's configuration snapshot,
-per-class results and training curves. The run that failed to converge is
-retained alongside them and marked as such, since a configuration reported as
+training curves and per-class average precision. The run that failed to converge
+is retained alongside them and marked as such, since a configuration reported as
 unusable should be inspectable. Library versions are stated in
 Section~\ref{sec:training-configuration} rather than in a supplementary file,
 because as established there the framework release determines the model

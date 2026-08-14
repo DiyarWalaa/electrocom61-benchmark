@@ -19,14 +19,19 @@ their claims are settled.
 | 4 | **6 — Results** | **complete** (6.1–6.5 drafted, fact-checked) |
 | 5 | **7 — Discussion** | **complete** (7.1–7.4 drafted, fact-checked) |
 | 6 | **8 — Limitations** | **complete** (drafted, fact-checked) |
-| 7 | 2 — Related Work | stub |
+| 7 | 2 — Related Work | stub — **blocked**, see below |
 | 8 | 9 — Conclusion | stub |
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-Sections 3 through 8 are finished and are the model for the rest: every
-number in them traces to a committed file, and anything that does not is marked
-in the section file's own header comment rather than left silent.
+**Sections 3 through 8 are complete and fact-checked.** They are the model for
+the rest: every number in them traces to a committed file, and anything that does
+not is marked in the section file's own header comment rather than left silent.
+
+**Remaining: 2, 9, 1 and the abstract.** Section 2 is blocked on a literature
+search that has not started (see its entry below). Sections 9, 1 and the abstract
+are not blocked --- they are written last by design, from the settled claims of
+3 through 8, and those claims are now settled.
 
 ## Writing rules
 
@@ -180,11 +185,21 @@ confound; the scope limit on the contamination figures; RT-DETR-l evaluated at
 
 Claims: _to be supplied._
 
-Unblocked 2026-08-14: `references.bib` now holds **three** entries —
-`yolov12paper`, `yolov13paper` and `electrocom61`, the dataset paper. Both
-`yolov12paper` and `yolov13paper` still carry `TODO` notes on unverified fields,
-visible in the rendered bibliography, and must be checked against their PDFs
-before submission.
+**BLOCKED on a literature search that has not started.** `references.bib` holds
+three entries — `yolov12paper`, `yolov13paper` and `electrocom61` — and all three
+are already cited elsewhere in the paper. A Related Work section needs more than
+the three papers this study argues with: the detector families evaluated, prior
+work on electronic-component and e-waste detection generally, and whatever else
+the search turns up. None of that has been gathered.
+
+Two search items are outstanding and both belong to this section's work:
+
+- **`yolov13paper`'s venue, pages and DOI.** Not indexed in IEEE Xplore as of
+  August 2026 and not returned by general search; the entry is cited as in press
+  with its ISBN. See the note above the entry in `references.bib`.
+- **Whether YOLOv13 is distributed outside the Ultralytics package.** The claim
+  was removed from 5.1 and 7.1 rather than left unsourced. Its source would be
+  the iMoonLab repository or the YOLOv13 arXiv paper, neither consulted.
 
 ### Section 9 — Conclusion, Section 1 — Introduction, Abstract
 

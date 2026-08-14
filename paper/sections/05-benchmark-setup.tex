@@ -36,14 +36,23 @@
 % Fact-check findings for the drafted prose are in
 % notes/factcheck-05-benchmark-setup.md.
 %
-% UNSOURCED CLAIM, 5.1: that YOLOv13 "is distributed as a fork of the
-% Ultralytics package rather than within it". This appears in NEITHER prior
-% paper, so there is no page to cite. Its source would have to be the iMoonLab
-% repository or the YOLOv13 arXiv paper, neither of which is in this repository
-% and neither of which has been consulted. It is a search item, not a
-% verification item. The same claim is made in 7.1 and carries the same gap.
-% The sentence below is load-bearing -- it is the stated reason YOLOv13 was not
-% evaluated -- so it needs a source before submission.
+% THE FORK CLAIM IS REMOVED FROM 5.1, 2026-08-14. The paragraph previously said
+% YOLOv13 "is distributed as a fork of the Ultralytics package rather than
+% within it". That appears in NEITHER prior paper, so there was no page to cite,
+% and its source would have to be the iMoonLab repository or the YOLOv13 arXiv
+% paper -- neither in this repository, neither consulted. It is a SEARCH ITEM,
+% still open. The same sentence is gone from 7.1.
+%
+% What the paragraph now rests on is narrower: YOLOv13 is not among the
+% architectures the Ultralytics release used here provides. NOTE THE
+% VERIFICATION STATUS HONESTLY -- this is checkable in principle from a machine
+% with ultralytics 8.4.115 installed, but NOT from this analysis environment,
+% where ultralytics is not installed (every analysis script here is standard
+% library only, and installing it is denied). What IS verified from committed
+% files: all eleven results JSONs record ultralytics 8.4.115, and the five
+% architectures actually trained are yolov9s, yolo11s, yolo12s, yolo26s and
+% rtdetr-l. That establishes what was used, not what was available. Confirm the
+% availability claim against 8.4.115 before submission.
 %
 % CLOSED 2026-08-14 -- both of 5.3's known defects.
 %   - "five convolutional detectors" now reads FOUR in the prose below.
@@ -79,12 +88,13 @@ reported alongside its accuracy in Section~\ref{sec:results} rather than treated
 as a confound.
 
 YOLOv13 was not evaluated, despite appearing in one prior study of this dataset
-\citep{yolov13paper}. It is distributed as a fork of the Ultralytics package
-rather than within it, and installing that fork would change the framework
-version under which every other model was trained. Holding the framework
-constant was judged more important than covering one additional architecture.
-This constraint is itself relevant to the comparability of published results on
-this dataset and is returned to in Section~\ref{sec:discussion}.
+\citep{yolov13paper}. It is not among the architectures provided by the
+Ultralytics release used here, so evaluating it would have required installing
+software that no other run in this benchmark used, changing the framework under
+which every other model was trained. Holding one release constant across all ten
+runs was judged more important than covering one additional architecture. This
+constraint is itself relevant to the comparability of published results on this
+dataset and is returned to in Section~\ref{sec:discussion}.
 
 \subsection{Training configuration}
 \label{sec:training-configuration}

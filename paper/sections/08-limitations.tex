@@ -75,6 +75,26 @@ library version is what makes it recoverable, which is the reason
 Section~\ref{sec:training-configuration} treats that version as part of the
 specification, but it is a mitigation and not a fix.
 
+Latency was measured on a single Tesla P100, chosen because prior work on this
+dataset reports the same device and holding it constant keeps the comparison
+against those studies intact. It is not the hardware the deployment argument in
+Section~\ref{sec:deployment} concerns: a recycling facility would install an
+embedded accelerator or an industrial edge device, where memory bandwidth,
+kernel support and operator coverage all differ from a datacentre GPU. Relative
+orderings between architectures need not transfer, and the architectures most
+likely to move are the ones whose advantage here is in postprocessing rather
+than convolution. Nothing in this paper measures that.
+
+Every statement this paper makes about prior work is read from published PDFs,
+which are not part of the accompanying repository. The scripts that verify every
+other number in this paper cannot check any of them, and that includes the
+transcribed parameter counts underlying the complexity comparison in
+Section~\ref{sec:disagreement} --- the one strong claim here whose input is a
+hand transcription rather than a measurement. Those values are recorded in a
+committed file with the table each came from, so they can be re-checked against
+their sources, but re-checking them is a manual step that this study's tooling
+does not perform.
+
 Every YOLO run consumed its full hundred-epoch budget without triggering early
 stopping, so none of them had plateaued when training ended. The accuracy
 figures reported for them are therefore a lower bound at this budget rather than

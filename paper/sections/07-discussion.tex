@@ -14,14 +14,15 @@
 % tooling has checked them. Each is written narrowly, and each needs a page
 % reference before submission:
 %
-%   1. THE FORK -- **UNSOURCED**, not merely unverified. That YOLOv13 is
-%      distributed as a fork outside Ultralytics appears in NEITHER prior paper,
-%      so there is no page to point at. Its source would have to be the
-%      iMoonLab repository or the YOLOv13 arXiv paper, neither of which is in
-%      this repository and neither of which has been consulted. This is a
-%      search item. Section 5.1 asserts the same thing and carries the same
-%      gap. Until a source exists, the sentence in 7.1 and the one in 5.1 are
-%      the weakest claims in the paper -- treat them as such.
+%   1. THE FORK -- **REMOVED** from both 7.1 and 5.1 on 2026-08-14, rather than
+%      left in place unsourced. That YOLOv13 is distributed as a fork outside
+%      Ultralytics appears in NEITHER prior paper; its source would have to be
+%      the iMoonLab repository or the YOLOv13 arXiv paper, neither in this
+%      repository and neither consulted. It remains an OPEN SEARCH ITEM. 5.1 now
+%      rests on the narrower claim that YOLOv13 is not among the architectures
+%      the Ultralytics release used here provides, which is sufficient to
+%      justify the exclusion; see 05's header for that claim's own verification
+%      status, which is not perfect either.
 %
 %   2. THE CROSS-VALIDATION PROTOCOL -- pending verification, source located.
 %      The YOLOv13 paper states 3-fold cross-validation over the entire dataset
@@ -30,16 +31,25 @@
 %      notes/writing-corrections.md records the reading. Confirm both locations
 %      against the PDF before submission.
 %
-%   3. THE PUBLISHED COMPLEXITY FIGURES -- input now committed, prose NOT yet
-%      updated. data/published_complexity.csv records what the two papers report
-%      (both Table I, YOLOv12 paper Sec. IV and YOLOv13 paper Sec. IV), typed by
-%      hand from the PDFs and re-checkable row by row via its table_location
-%      column. scripts/compare_published_complexity.py sets it against the
-%      measured values: runs/20260814_compare_published_complexity/. THE
-%      DIFFERENCES ARE LARGE AND RUN IN BOTH DIRECTIONS, and fusion explains
-%      none of them. The paragraph below still makes only the narrower
-%      fused/unfused point; it is awaiting the author's review of the computed
-%      differences before it is strengthened.
+%   3. THE PUBLISHED COMPLEXITY FIGURES -- written firmly, on PARAMETERS ONLY.
+%      Source: data/published_complexity.csv (both papers' Table I; YOLOv12
+%      paper Sec. IV, YOLOv13 paper Sec. IV), set against measured values by
+%      scripts/compare_published_complexity.py in
+%      runs/20260814_compare_published_complexity/.
+%
+%      THE INPUT IS TYPED BY HAND FROM THE PDFs AND NOTHING IN THE TOOLING CAN
+%      CHECK IT. A mis-keyed digit would propagate straight into a claim about
+%      someone else's work. Every row carries a table_location column so each
+%      value is re-checkable against its source in one step; do that before
+%      submission. This is the only claim in the paper whose input is
+%      unverifiable from within the repository AND whose conclusion is strong.
+%
+%      THE LAYER COLUMN IS DELIBERATELY NOT USED. It stays in the CSV, but no
+%      conclusion is drawn from it: this study's own two layer conventions are
+%      not interchangeable -- layers_modules counts nn.Module objects and is not
+%      the figure Ultralytics prints, as collect_results.py states in terms and
+%      warns against comparing to a published count. Two conventions that
+%      disagree with each other cannot be used to convict a third.
 
 The benchmark in Sections~\ref{sec:benchmark-setup} and~\ref{sec:results} was
 built to settle a disagreement in the published record. What it establishes is
@@ -81,14 +91,30 @@ annotated in the dataset.
 The fourth is the framework. Neither study states an Ultralytics version, which
 is what fixes the layer composition, detection head, loss function and default
 augmentation of every model distributed under a given name, so two studies can
-report results for the same architecture while training different networks. One
-architecture appearing in a prior comparison table is distributed as a fork
-outside the Ultralytics package (Section~\ref{sec:models-evaluated}), which
-places that row on a different codebase from the rows beside it. A related gap
-affects the complexity columns: of the studies reporting parameter counts,
-neither states whether the counts are fused or unfused, and
-Section~\ref{sec:efficiency-measurement} measures that difference at up to 5.1\%
-of parameters.
+report results for the same architecture while training different networks.
+
+The complexity columns are separable from the accuracy ones, because both
+studies do state parameter counts, and those can be set beside measured values
+directly. For the three architectures common to their tables and to this study,
+the published counts are 0.26, 2.13 and 8.46 times the values measured here:
+2.5~M against 9.44~M for YOLO11s, 19.7~M against 9.25~M for YOLOv12s, and
+60.8~M against 7.19~M for YOLOv9s. The discrepancies run in both directions, so
+no single systematic offset accounts for them. Fusing batch normalisation into
+the preceding convolution --- the one convention difference these papers leave
+unstated, and the obvious candidate --- moves a parameter count by at most 5.1\%
+in this study's own measurements, and every published value here falls outside
+the interval between the fused and unfused figures. Fusion therefore explains
+none of them.
+
+The two papers report the same seven rows with identical values, and the second
+adds one row for its own architecture. Whatever the source of those seven
+figures, they were not independently re-derived by the second study, so the
+published record contains one measurement of them rather than two agreeing
+ones. That bears on how much evidence stands behind the numbers, and it is
+stated here as a property of the record. What produced the discrepancy is not
+established: a different variant, input resolution, class count or framework
+release would each be sufficient, and none of the papers states which of those
+it held fixed.
 
 None of this establishes that any published figure is wrong. Each of the four is
 a property that a reader needs in order to know what a number refers to, and

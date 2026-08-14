@@ -10,6 +10,16 @@
 % basis, or that sentence becomes false. See
 % runs/20260811_verify_efficiency_claims_02/.
 %
+% The three spreads in the session paragraph are on that same gap/mean basis
+% and were checked against the two committed latency files -- pass 2 is
+% data/kaggle/latency_history/pass2.json, the released pass is
+% data/kaggle/results_latency_unified.json:
+%   4.29 ms = 8.7293% (51.29 vs 47.00, rtdetr_l_corr vs rtdetr_l_pub_lr1e4)
+%   0.18 ms = 0.4313% (41.82 vs 41.64, same pair, inference only)
+%   0.12 ms = 0.2542% (47.15 vs 47.27, same pair in the released pass)
+% The two files' protocol blocks differ in exactly one key, file_cache, which
+% is what licenses "identical to the released one except".
+%
 % PENDING AUTHOR VERIFICATION: the claim that none of the three published
 % studies on this dataset states whether its parameter counts are fused or
 % unfused. It cannot be checked from anything in this repository -- it needs
@@ -217,13 +227,16 @@ near-worst case is more informative than the average.
 All ten checkpoints were measured consecutively within a single session. This was
 necessary rather than convenient: an earlier set of measurements taken across ten
 separate sessions differed by 5.65~ms for the same architecture (18.58 against
-24.23~ms for YOLOv9s), or 26\% of their mean. Two further complete passes were
-required before the protocol was stable. In both, the first
-model measured returned an end-to-end time approximately 4~ms above its identical
-counterpart while its inference time matched to within 0.4\%, placing the
-discrepancy outside the measured stages. The cause was the first read of each
-image file from network-mounted storage; reading all 205 images once before
-timing eliminated it. The released protocol includes this step.
+24.23~ms for YOLOv9s), or 26\% of their mean. A further precaution was
+established by an intermediate pass over the same ten checkpoints, identical to
+the released one except that the image files were not read before timing. In that
+pass the first model measured returned an end-to-end median of 51.29~ms against
+47.00~ms for the identical model measured later in the same pass, a difference of
+4.29~ms or 8.7\% of their mean, while their inference times differed by 0.18~ms,
+or 0.43\%. The discrepancy therefore lay outside the measured stages, and was
+traced to the first read of each image file from network-mounted storage. Reading
+all 205 images once before timing eliminated it: in the released pass the same two
+runs differ by 0.12~ms, or 0.25\%. Both passes are retained in the repository.
 
 Because latency is a property of the architecture rather than of the split a
 model was trained on, the two runs of each architecture constitute duplicate

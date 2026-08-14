@@ -287,12 +287,25 @@ def t2():
     body = [[tex(a) if "$" not in a and "\\" not in a else a, b, c]
             for a, b, c in spec]
 
+    # The epsilon caveat is not decoration. eps=0.05 is BOTH the threshold these
+    # counts are measured at AND the threshold at which the allocator grouped
+    # the untimestamped images, so the corrected column's figure at that value
+    # is not independent of the grouping that produced it. The 0.02 and 0.01
+    # figures are, and they are also zero for test<->train -- which is the
+    # sentence that keeps the headline honest.
     caption = ("Properties of the published split and of the corrected split "
                "released here. Near-duplicate pair counts are at $\\epsilon = "
                "%s$ with low-information pairs excluded, reported separately "
-               "for raw and aligned scoring. The corrected split holds the "
-               "image counts of the published one exactly, so no accuracy "
-               "difference can be attributed to training-set size." % EPS)
+               "for raw and aligned scoring. That threshold is also the one at "
+               "which the allocator grouped the untimestamped images, so the "
+               "corrected column's count at $\\epsilon = %s$ is not independent "
+               "of the grouping that produced the split; the counts at "
+               "$\\epsilon = 0.02$ and $\\epsilon = 0.01$ carry no such "
+               "dependence and are likewise zero for "
+               "test$\\leftrightarrow$train under both scorings. The corrected "
+               "split holds the image counts of the published one exactly, so "
+               "no accuracy difference can be attributed to training-set size."
+               % (EPS, EPS))
     latex = booktabs("tab:split-properties", caption, "lrr", header, body)
 
     plain = [[a.replace("$\\geq$", ">=").replace("$\\leftrightarrow$", "<->")

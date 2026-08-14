@@ -8,12 +8,12 @@ lets a reader judge whether the scorer's verdict matches what they see.
 
 TWO COLUMNS, TWO QUESTIONS
 
-  A  The 12 most similar cross-split pairs, ALL relationships pooled
+  A  The 6 most similar cross-split pairs, ALL relationships pooled
      (test<->train, valid<->train, valid<->test), smallest distance first.
      This is "what is the closest thing to a duplicate anywhere across the
      boundary".
 
-  B  The 12 closest TEST<->TRAIN pairs specifically, shown even though none of
+  B  The 6 closest TEST<->TRAIN pairs specifically, shown even though none of
      them qualifies as a duplicate at any epsilon. Test contamination is the
      one that biases the headline metric, so a reader should be able to see the
      worst case rather than be told it is zero.
@@ -37,7 +37,7 @@ method under-detects by construction. It is not proof that no duplicate exists.
 
 INTERPOLATION
 
-Thumbnails DOWNSCALE 640px sources to about 210px, so they are drawn with
+Thumbnails DOWNSCALE 640px sources to about 180px, so they are drawn with
 antialiasing. This is the opposite choice from figure_near_duplicate.py, which
 draws at native size and uses nearest-neighbour: smoothing on the way down
 avoids aliasing artefacts, whereas smoothing on the way up would invent detail.
@@ -68,16 +68,27 @@ DATASET = os.path.join(ec61.DATA_DIR, "ElectroCom-61_corrected")
 OUT_DIR = os.path.join(ec61.REPO_ROOT, "figures")
 OUT_PNG = os.path.join(OUT_DIR, "split_verification_sheet.png")
 
-N_ROWS = 12
-DPI = 200
-FIG_W = 13.5
-HEADER_H = 2.55
-ROW_H = 1.18
-FOOTER_H = 0.74
+# SIZED FOR THE PAGE, not for the screen. This was previously 12 rows at
+# 13.5 in wide, which reduced to about 46% at text width and put its smallest
+# text near 3.7 pt -- unreadable in print. Fewer rows alone would not have
+# fixed that: the reduction is driven by WIDTH, so the figure is now rendered
+# at 7.0 in, matching the ~7.16 in text width of a two-column IEEE page, and
+# every point size below is the size the reader actually sees there.
+#
+# Six pairs per column rather than twelve. The claim the sheet supports is that
+# the worst case can be inspected; six closest pairs demonstrate that as well as
+# twelve, and halving the rows is what buys the vertical room the larger text
+# needs while keeping the aspect ratio printable on one page.
+N_ROWS = 6
+DPI = 300                # raised with the size cut so thumbnails keep detail
+FIG_W = 7.0
+HEADER_H = 2.14
+ROW_H = 0.80
+FOOTER_H = 0.58
 
-THUMB_IN = 1.02          # thumbnail edge, inches
-GAP_IN = 0.06
-COL_X = (0.34, 7.02)     # left edge of each column, inches
+THUMB_IN = 0.60          # thumbnail edge, inches
+GAP_IN = 0.05
+COL_X = (0.22, 3.61)     # left edge of each column, inches
 TEXT_W = 3.75
 
 # Single accent for boxes. Colour carries no identity here -- the boxes mark
@@ -242,41 +253,55 @@ def main():
     with Image.open(tree[col_a[0]["a"]]["img"]) as im:
         size = im.size[0]
 
-    fig.text(0.5, 1 - 0.30 / fig_h,
+    fig.text(0.5, 1 - 0.26 / fig_h,
              "Split verification sheet — closest cross-split image pairs",
-             ha="center", va="top", fontsize=15, fontweight="bold", color=INK)
-    fig.text(0.5, 1 - 0.62 / fig_h,
-             "Released split: burst-aware, τ = 15 s, seed 20260804.  "
-             "Ranked by label-geometry distance, smallest first.  "
-             "Boxes are the dataset's own YOLO annotations.",
-             ha="center", va="top", fontsize=8.6, color=INK_SECONDARY)
+             ha="center", va="top", fontsize=11.0, fontweight="bold", color=INK)
+    fig.text(0.5, 1 - 0.50 / fig_h,
+             "Released split: burst-aware, τ = 15 s, seed 20260804. "
+             "Ranked by label-geometry distance, smallest first.",
+             ha="center", va="top", fontsize=8.0, color=INK_SECONDARY)
 
-    verdict = ("test↔train carries ZERO near-duplicate pairs at every epsilon "
-               "(loosest ε = %.2f). The closest test↔train pair scores %.4f — "
-               "above the threshold, but only by %.0f%%."
-               % (eps_max, closest_tt, 100.0 * (closest_tt - eps_max) / eps_max)
-               ) if (tt_qualifying == 0 and closest_tt is not None) else (
-              "test↔train carries %d qualifying near-duplicate pairs." % tt_qualifying)
-    fig.text(0.5, 1 - 0.92 / fig_h, verdict, ha="center", va="top",
-             fontsize=9.4, color=INK, fontweight="bold")
+    # Two lines, not one. As a single string this ran off both edges at 7 in,
+    # and it is the headline of the sheet, so it is the last thing that should
+    # be clipped.
+    if tt_qualifying == 0 and closest_tt is not None:
+        verdict = ["test↔train carries ZERO near-duplicate pairs at every "
+                   "epsilon (loosest ε = %.2f)." % eps_max,
+                   "The closest test↔train pair scores %.4f — above the "
+                   "threshold, but only by %.0f%%."
+                   % (closest_tt, 100.0 * (closest_tt - eps_max) / eps_max)]
+    else:
+        verdict = ["test↔train carries %d qualifying near-duplicate pairs."
+                   % tt_qualifying, ""]
+    for i, line in enumerate(verdict):
+        if not line:
+            continue
+        fig.text(0.5, 1 - (0.70 + 0.17 * i) / fig_h, line, ha="center",
+                 va="top", fontsize=8.4, color=INK, fontweight="bold")
 
-    fig.text(0.5, 1 - 1.22 / fig_h,
+    # Every line below is wrapped for FIG_W. matplotlib does not wrap figure
+    # text, so an over-long string runs off both edges instead of folding.
+    fig.text(0.5, 1 - 1.14 / fig_h,
              "Column B shows the closest test↔train pairs anyway, none of which "
-             "qualify as duplicates — so the worst case can be inspected rather "
-             "than taken on trust.",
-             ha="center", va="top", fontsize=8.4, color=INK_SECONDARY)
-    fig.text(0.5, 1 - 1.47 / fig_h,
-             "%d low-information pairs (≤ %d boxes, where a centre match is cheap "
-             "by chance) are excluded from both rankings; %d of them scored below "
-             "column A's last row. Full list in the run's CSV."
+             "qualify —",
+             ha="center", va="top", fontsize=8.0, color=INK_SECONDARY)
+    fig.text(0.5, 1 - 1.31 / fig_h,
+             "so the worst case can be inspected rather than taken on trust.",
+             ha="center", va="top", fontsize=8.0, color=INK_SECONDARY)
+    fig.text(0.5, 1 - 1.53 / fig_h,
+             "%d low-information pairs (≤ %d boxes) are excluded from both "
+             "rankings; %d scored"
              % (len(low_only), scene_signature.LOW_INFO_BOX_COUNT, n_low_above_cutoff),
-             ha="center", va="top", fontsize=8.4, color=INK_SECONDARY)
+             ha="center", va="top", fontsize=8.0, color=INK_SECONDARY)
+    fig.text(0.5, 1 - 1.70 / fig_h,
+             "below column A's last row. Full list in the run's CSV.",
+             ha="center", va="top", fontsize=8.0, color=INK_SECONDARY)
 
     for col, (x0, title) in enumerate([
-            (COL_X[0], "A.  12 most similar cross-split pairs — all relationships"),
-            (COL_X[1], "B.  12 closest test↔train pairs — none qualify as duplicates")]):
-        fig.text(x0 / FIG_W, 1 - (HEADER_H - 0.30) / fig_h, title,
-                 ha="left", va="top", fontsize=10.2, fontweight="bold", color=INK)
+            (COL_X[0], "A.  %d most similar, all relationships" % N_ROWS),
+            (COL_X[1], "B.  %d closest test↔train — none qualify" % N_ROWS)]):
+        fig.text(x0 / FIG_W, 1 - (HEADER_H - 0.22) / fig_h, title,
+                 ha="left", va="top", fontsize=8.6, fontweight="bold", color=INK)
 
     for col, rows in enumerate([col_a, col_b]):
         x0 = COL_X[col]
@@ -288,38 +313,46 @@ def main():
             draw_thumb(fig, (x0 + THUMB_IN + GAP_IN, y, THUMB_IN, THUMB_IN),
                        FIG_W, fig_h, tree[p["b"]], size)
 
-            tx = (x0 + 2 * THUMB_IN + 2 * GAP_IN + 0.10) / FIG_W
+            # Text column is narrow at this width, so each line is built to fit
+            # rather than truncated by the figure edge. The stem is shortened to
+            # its capture time -- the date is already implied by the timestamp
+            # line beneath and the full name is in the run's CSV.
+            tx = (x0 + 2 * THUMB_IN + 2 * GAP_IN + 0.06) / FIG_W
             ty = y_top / fig_h
-            fig.text(tx, ty - 0.10 / fig_h,
-                     "#%-2d  distance %.4f   %s" % (r + 1, p["score"], p["rel"]),
-                     ha="left", va="top", fontsize=7.6, color=INK,
+            fig.text(tx, ty - 0.06 / fig_h,
+                     "#%d  %.4f" % (r + 1, p["score"]),
+                     ha="left", va="top", fontsize=8.0, color=INK,
                      family="monospace", fontweight="bold")
-            fig.text(tx, ty - 0.32 / fig_h,
-                     "A  %-22s %s  %s" % (tree[p["a"]]["stem"][:22],
-                                          capture_time(tree[p["a"]]["stem"]),
-                                          p["sa"].upper()),
-                     ha="left", va="top", fontsize=6.9, color=INK_SECONDARY,
+            fig.text(tx, ty - 0.21 / fig_h,
+                     p["rel"],
+                     ha="left", va="top", fontsize=8.0, color=INK,
+                     family="monospace")
+            fig.text(tx, ty - 0.36 / fig_h,
+                     "A %s %s" % (capture_time(tree[p["a"]]["stem"]),
+                                  p["sa"].upper()[:5]),
+                     ha="left", va="top", fontsize=8.0, color=INK_SECONDARY,
                      family="monospace")
             fig.text(tx, ty - 0.50 / fig_h,
-                     "B  %-22s %s  %s" % (tree[p["b"]]["stem"][:22],
-                                          capture_time(tree[p["b"]]["stem"]),
-                                          p["sb"].upper()),
-                     ha="left", va="top", fontsize=6.9, color=INK_SECONDARY,
+                     "B %s %s" % (capture_time(tree[p["b"]]["stem"]),
+                                  p["sb"].upper()[:5]),
+                     ha="left", va="top", fontsize=8.0, color=INK_SECONDARY,
                      family="monospace")
-            fig.text(tx, ty - 0.68 / fig_h,
-                     "raw %.4f   aligned %.4f   %d boxes"
-                     % (p["raw"], p["aligned"], p["n_boxes"]),
-                     ha="left", va="top", fontsize=6.6, color=INK_MUTED,
+            fig.text(tx, ty - 0.64 / fig_h,
+                     "%d boxes" % p["n_boxes"],
+                     ha="left", va="top", fontsize=8.0, color=INK_MUTED,
                      family="monospace")
 
-    # Two lines: at this width the caption runs off both edges as one.
-    fig.text(0.5, 0.40 / fig_h,
-             "Pairs are compared only when their class multisets match exactly, so a duplicate with one "
-             "occluded component is never scored and cannot appear here at any rank.",
-             ha="center", va="center", fontsize=7.8, color=INK_SECONDARY)
-    fig.text(0.5, 0.20 / fig_h,
-             "This sheet is evidence about what the method can see; the method under-detects by construction.",
-             ha="center", va="center", fontsize=7.8, color=INK_SECONDARY)
+    # Three lines at this width: the caption ran off both edges as two.
+    fig.text(0.5, 0.44 / fig_h,
+             "Pairs are compared only when their class multisets match exactly,",
+             ha="center", va="center", fontsize=8.0, color=INK_SECONDARY)
+    fig.text(0.5, 0.28 / fig_h,
+             "so a duplicate with one occluded component is never scored and "
+             "cannot appear here at any rank.",
+             ha="center", va="center", fontsize=8.0, color=INK_SECONDARY)
+    fig.text(0.5, 0.12 / fig_h,
+             "The method under-detects by construction.",
+             ha="center", va="center", fontsize=8.0, color=INK_SECONDARY)
 
     if not os.path.isdir(OUT_DIR):
         os.makedirs(OUT_DIR)

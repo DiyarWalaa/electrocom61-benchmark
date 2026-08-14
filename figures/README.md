@@ -15,8 +15,8 @@ from.
 | `f5_published_vs_corrected` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
 | `f6_accuracy_vs_latency` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
 | `f4_tau_sweep` | `scripts/make_figures.py` | `runs/20260809_make_figures_11/` | PDF + PNG 300 dpi |
-| `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260804_figure_near_duplicate_04/` | PNG 300 dpi |
-| `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260805_figure_verification_sheet_02/` | PNG 200 dpi |
+| `near_duplicate_pair` | `scripts/figure_near_duplicate.py` | `runs/20260814_figure_near_duplicate_05/` | PDF + PNG 300 dpi |
+| `split_verification_sheet` | `scripts/figure_verification_sheet.py` | `runs/20260814_figure_verification_sheet_02/` | PNG 300 dpi |
 
 ## F1 — per-class instance counts
 
@@ -379,37 +379,48 @@ nothing but risk disturbing images already reviewed.
 
 ### `near_duplicate_pair.png`
 
-`scripts/figure_near_duplicate.py` → `runs/20260804_figure_near_duplicate_04/`
+`scripts/figure_near_duplicate.py` → `runs/20260814_figure_near_duplicate_05/`
 
 `IMG_20240220_115315` and `IMG_20240220_115316` side by side with their YOLO
 boxes drawn — shot one second apart, five identical components. Shows the
 near-duplicate pair that the released burst-aware split keeps together and that
 an earlier image-level allocator had split across train and test.
 
-3300 × 2220 px at 300 dpi, i.e. **11.0 × 7.4 in**. Runs `_01` through `_03`
-are superseded and carry a `NOTE.md` saying why; `_04` produced the reviewed
-image and `runs/20260814_figure_near_duplicate/` added the PDF without changing
-the drawing.
+2100 × 1935 px at 300 dpi, i.e. **7.0 × 6.45 in**, PDF and PNG.
 
-**Legibility — measured, and it is a problem.** The smallest text in the figure
-is the per-box shift table at **6.9 pt at 11 in wide**. Included at a 3.5 in
-column it renders at **2.2 pt**; at a 6.5 in text block, at **4.1 pt**. Both
-are below the 8 pt floor every `make_figures.py` figure is built to. Section 4
-includes it at full text width because that is the widest slot available, but
-scaling cannot fix this: the figure needs re-rendering at its target width with
-font sizes chosen for that width, exactly as F1 and F2 were.
+**Re-rendered for the page, 2026-08-14.** It was 11.0 × 7.4 in with a 6.9 pt
+per-box shift table, which scaled to 2.2 pt in a 3.5 in column and 3.9 pt at
+this class's text width — below the 8 pt floor every `make_figures.py` figure is
+built to, and not fixable by changing the `\includegraphics` width. It is now
+drawn at 7.0 in with **all text at 8.0 pt or above**, sized for the ~7.16 in
+text width of a two-column IEEE page, so it prints at roughly 1:1 there.
+
+The text blocks were re-laid out, not merely re-pointed: at 8 pt the old strings
+overflowed their cells and drew over one another, so the subtitle is wrapped to
+three lines, the panel header to three, and the shift table given a narrower
+column format. `panel_width_pt()` now derives the label-collision metric from
+`FIG_W_IN` instead of hardcoding it, so a future resize does not silently break
+the collision avoidance.
 
 ### `split_verification_sheet.png`
 
-`scripts/figure_verification_sheet.py` → `runs/20260805_figure_verification_sheet_02/`
+`scripts/figure_verification_sheet.py` → `runs/20260814_figure_verification_sheet_02/`
 
-Twenty-four thumbnail pairs: the twelve most similar cross-split pairs across
-all relationships beside the twelve closest test↔train pairs, none of which
-qualify as duplicates. Lets the "zero test↔train contamination" claim be
-checked by eye instead of taken on trust.
+Twelve thumbnail pairs: the six most similar cross-split pairs across all
+relationships beside the six closest test↔train pairs, none of which qualify as
+duplicates. Lets the "zero test↔train contamination" claim be checked by eye
+instead of taken on trust. Printed as Appendix A.
 
-2700 × 3490 px at 200 dpi. Run `_01` used the pre-fix script (sha `bcd2c442`);
-`_02` matches the current script (`3c749f89`) and produced the committed image.
+2100 × 2256 px at 300 dpi, i.e. **7.0 × 7.52 in**.
+
+**Re-rendered for the page, 2026-08-14.** It was 12 rows at 13.5 in wide, which
+reduced to about 46% at text width and put its smallest text near 3.7 pt. Fewer
+rows alone would not have fixed that — the reduction is driven by width — so it
+is now 6 rows at 7.0 in with **all text at 8.0 pt**, on the same reasoning as
+`near_duplicate_pair` above. Six closest pairs support "the worst case can be
+inspected" as well as twelve do, and halving the rows is what buys the vertical
+room the larger text needs while keeping the aspect ratio printable on one page.
+DPI was raised from 200 to 300 so the smaller thumbnails keep their detail.
 
 ## Open layout note — page budget for Section 3
 
@@ -439,16 +450,15 @@ committed sources, and the numbers do not move.
 
 **No action on either of these now.**
 
-- **`near_duplicate_pair` → PDF: DONE 2026-08-14**, now that Section 4 exists
-  and cites it. `figure_near_duplicate.py` writes both formats from the same
-  figure object with `pdf.fonttype 42`; the drawing is unchanged and the PNG is
-  byte-comparable in content. What the PDF does **not** fix is the font size —
-  see the legibility note above, which is the outstanding item.
+- **`near_duplicate_pair` → PDF and page-sized re-render: DONE 2026-08-14.**
+  Both items closed together; see its section above.
 
-- **`split_verification_sheet` stays PNG.** It is a photographic contact sheet
-  and appendix material: 48 thumbnails of real images, where vector output
-  would embed the same rasters at a larger file size and buy nothing. Not a
-  deferred task — a decision.
+- **`split_verification_sheet` page-sized re-render: DONE 2026-08-14.** Six rows
+  at 7.0 in, printed as Appendix A. See its section above.
+
+- **`split_verification_sheet` stays PNG.** It is a photographic contact sheet:
+  24 thumbnails of real images, where vector output would embed the same rasters
+  at a larger file size and buy nothing. Not a deferred task — a decision.
 
 - **`device_by_split.csv` becomes a table, not a figure.** Five rows plus a
   total; a bar chart of five values costs a full column to say what a table

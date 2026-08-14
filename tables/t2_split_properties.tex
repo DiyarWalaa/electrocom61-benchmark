@@ -1,6 +1,6 @@
 \begin{table}[t]
   \centering
-  \caption{Properties of the published split and of the corrected split released here. Near-duplicate pair counts are at $\epsilon = 0.05$ with low-information pairs excluded, reported separately for raw and aligned scoring. The corrected split holds the image counts of the published one exactly, so no accuracy difference can be attributed to training-set size.}
+  \caption{Properties of the published split and of the corrected split released here. Near-duplicate pair counts are at $\epsilon = 0.05$ with low-information pairs excluded, reported separately for raw and aligned scoring. That threshold is also the one at which the allocator grouped the untimestamped images, so the corrected column's count at $\epsilon = 0.05$ is not independent of the grouping that produced the split; the counts at $\epsilon = 0.02$ and $\epsilon = 0.01$ carry no such dependence and are likewise zero for test$\leftrightarrow$train under both scorings. The corrected split holds the image counts of the published one exactly, so no accuracy difference can be attributed to training-set size.}
   \label{tab:split-properties}
   \begin{tabular}{lrr}
     \toprule

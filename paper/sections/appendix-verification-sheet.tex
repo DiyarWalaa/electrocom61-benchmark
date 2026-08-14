@@ -1,16 +1,18 @@
 \section{Split verification sheet}
 \label{sec:appendix-verification-sheet}
 
-% Source: runs/20260805_figure_verification_sheet_02/. The figure is a
+% Source: runs/20260814_figure_verification_sheet_02/. The figure is a
 % photographic contact sheet and is PNG by decision, not by omission: it embeds
-% 48 real thumbnails, and vector output would carry the same rasters at a larger
+% 24 real thumbnails, and vector output would carry the same rasters at a larger
 % file size. See figures/README.md.
 %
-% It is rendered at 13.5 x 17.45 in and included below at text width, so it is
-% reduced to roughly half size on the page. That is acceptable for what it is --
-% the reader compares thumbnails and zooms in the PDF for detail -- but it is
-% the reason the numbers behind it are restated in the caption rather than left
-% to be read off the image.
+% RE-RENDERED 2026-08-14 for the page. It was 12 rows at 13.5 in wide, which
+% reduced to about 46% at text width and put its smallest text near 3.7 pt.
+% It is now 6 rows at 7.0 in with all text at 8.0 pt, sized for the ~7.16 in
+% text width of a two-column IEEE page. Under THIS class the page gives 6.27 in,
+% so the text lands at about 7.2 pt; under the venue template it is roughly 1:1.
+% Becomes figure* there -- it already is one here, which costs nothing in a
+% single-column class.
 
 Figure~\ref{fig:verification-sheet} is the visual counterpart to the
 contamination figures quoted in Sections~\ref{sec:duplicate-contamination}
@@ -23,8 +25,8 @@ be checked by eye rather than taken on trust.
 
 Two properties of the sheet make it evidence rather than illustration. It scores
 every cross-split pair with \emph{no} epsilon cutoff, so the right-hand block
-shows the twelve closest test--train pairs even though none of them qualifies as
-a duplicate --- non-qualifying pairs are the point, not an omission. And the
+shows the six closest test--train pairs even though none of them qualifies as a
+duplicate --- non-qualifying pairs are the point, not an omission. And the
 per-pair distances are printed beside each thumbnail, so the 0.0515 margin
 behind the negative result is visible as a number and as two photographs at the
 same time.
@@ -32,8 +34,8 @@ same time.
 \begin{figure*}[p]
   \centering
   \includegraphics[width=\textwidth,height=0.86\textheight,keepaspectratio]{split_verification_sheet.png}
-  \caption{Split verification sheet. Left: the twelve most similar cross-split
-  pairs across all three relationships. Right: the twelve closest test--train
+  \caption{Split verification sheet. Left: the six most similar cross-split
+  pairs across all three relationships. Right: the six closest test--train
   pairs, none of which qualifies as a near-duplicate at any threshold tested.
   Every cross-split pair is scored with no epsilon cutoff, so the right-hand
   block exists precisely because its pairs do not qualify. Of the 4{,}860

@@ -1,6 +1,254 @@
 \section{Results}
 \label{sec:results}
 
-% TODO: Accuracy and efficiency. Tables t4_main_results, t5_efficiency,
-% t6_latency_breakdown. Figures f5_published_vs_corrected,
-% f6_accuracy_vs_latency.
+% Every number in this section traces to a committed file. Sources:
+%   6.1  data/master_results.csv (via ec61.load_benchmark_rows);
+%        data/kaggle/artifacts/*_corr/*_per_class.csv;
+%        runs/20260804_build_corrected_dataset_02/class_counts_built.csv
+%   6.2  data/master_results.csv
+%   6.3  data/master_results.csv; data/config_provenance.csv (citation column)
+%   6.4  data/latency_by_arch.csv; data/master_results.csv;
+%        runs/20260811_verify_efficiency_claims_02/
+%   6.5  data/latency_by_arch.csv; data/master_results.csv
+%
+% THE DIVERGED RUN IS ABSENT FROM EVERY TABLE AND EVERY NUMBER HERE. All five
+% tables and both figures read master_results.csv through
+% ec61.load_benchmark_rows(), which filters to inclusion == "benchmark",
+% asserts the surviving row count and rejects duplicate (model, split_set)
+% pairs. rtdetr_l_pub is marked "diverged" and never reaches an aggregate. Its
+% behaviour is discussed in Section 5.3 and is not restated here.
+%
+% ONE DRAFTED BULLET COULD NOT BE SUPPORTED AND WAS NOT WRITTEN. 6.1's third
+% bullet proposed that the rescued classes "score near 0.995" -- an AP@50
+% figure. PER-CLASS AP@50 IS NOT COMMITTED ANYWHERE. The per-class CSVs under
+% data/kaggle/artifacts/ carry a single column, AP50_95; a search across
+% data/ and runs/ finds no per-class AP@50 table. What IS committed supports
+% the same argument on the strict metric and is used instead: on test, the 15
+% rescued classes average 0.685 to 0.698 AP@50-95 depending on the model,
+% against 0.571 to 0.610 for the other 46. Restore the 0.995 figure only if a
+% per-class AP@50 table is committed.
+%
+% COVERAGE GAP, worth knowing before quoting per-class results: nine of the
+% eleven Kaggle runs carry a *_per_class.csv. The two YOLOv9s runs do not --
+% that model was trained from the YOLOv9 repository rather than Ultralytics and
+% its artifacts are results.csv plus args.yaml. Per-class statements here
+% therefore rest on four of the five architectures, and this is stated in the
+% prose rather than hidden. It also qualifies 5.4's claim that per-class average
+% precision is reported "for all classes" -- true of the classes, not of every
+% model.
+
+Two questions are asked of the ten runs. What does the corrected split change
+about the measured accuracy of these detectors, and which detector should a
+conveyor-belt application actually deploy? The two have different answers, and
+the second is not derivable from the first.
+
+\subsection{Accuracy on both splits}
+\label{sec:accuracy}
+
+Every model scores higher on the corrected split than on the published one, on
+both accuracy metrics and on both evaluation partitions. On test, mAP@50 rises
+by between 2.73 and 4.27 points and mAP@50--95 by between 1.03 and 1.88, with no
+model excepted; Table~\ref{tab:main-results} gives the figures and
+Figure~\ref{fig:published-vs-corrected} shows them as two panels. The uniformity
+matters as much as the size: a change that raised some models and lowered others
+would indicate the two splits differ in difficulty in some model-specific way,
+whereas a shift in one direction for all five indicates a property of the data.
+
+This inverts the usual expectation, and the inversion is the finding. A split
+with a defect normally inflates the scores measured on it, because the usual
+defect is leakage: a test image that also appears in training is easy for the
+wrong reason, so repairing the split lowers the numbers. Here repairing it
+raises them. The reason is that the published split's defect was not leakage but
+exclusion, and what it excluded was disproportionately easy. The fifteen classes
+returned to the evaluation partitions by Section~\ref{sec:corrected-split} are
+measurably easier than the classes that were already there: across the four
+architectures for which per-class results are available, those fifteen average
+between 0.685 and 0.698 AP@50--95 on test, while the other 46 average between
+0.571 and 0.610. Adding easy classes to an average raises it.
+
+The gains on the strict metric are roughly half those on the lenient one, and
+that ratio is informative rather than incidental. A class can be easy to find
+and hard to localise precisely: mAP@50 accepts any prediction overlapping the
+ground truth by half, while mAP@50--95 averages over ten thresholds up to 0.95
+and so charges for the last few pixels of box placement. The rescued classes
+clear the first bar comfortably and the second less so. Detecting them accounts
+for most of the gain; localising them precisely does not.
+
+The consequence for the literature is a plain one. Reported performance on
+ElectroCom61 has been understated rather than overstated. Every published mAP on
+this dataset was computed over roughly 46 of the 61 classes
+(Section~\ref{sec:class-coverage}), and the fifteen missing from that average
+are the ones these models handle best. This is the opposite of the correction
+one expects to have to make to a benchmark with a split defect, and it is worth
+stating explicitly because the reflex on hearing ``the split was broken'' is to
+assume the published numbers were too high.
+
+% Generated by scripts/make_tables.py; carries its own \caption and \label.
+\input{../tables/t4_main_results}
+
+\begin{figure}[tp]
+  \centering
+  \includegraphics[width=\figcol,height=\figmaxh,keepaspectratio]{f5_published_vs_corrected.pdf}
+  \caption{Test accuracy under the published and the corrected split, one line
+  per model. (a) mAP@50: every model rises, by 2.73 to 4.27 points, and the
+  ranking changes --- 2 of 5 models occupy a different position.
+  (b) mAP@50--95: every model rises again, by 1.03 to 1.88 points, but the
+  ranking is unchanged. The contrast is the point: a metric that reorders under
+  a change of split is reporting the split as much as the model.}
+  \label{fig:published-vs-corrected}
+\end{figure}
+
+\subsection{What the choice of metric changes}
+\label{sec:metric-choice}
+
+The two accuracy metrics disagree about whether the ranking of these models is
+stable. Under mAP@50--95 the same architecture finishes first on both splits and
+the same architecture finishes last on both: YOLO26s leads at 0.6317 corrected
+and 0.6129 published, and YOLOv12s trails at 0.6017 and 0.5842. Under mAP@50 the
+top three reorder between splits --- RT-DETR-l leads on both, but YOLO26s and
+YOLOv9s exchange second and third place. A ranking that changes when the split
+changes, while the models and the training configuration do not, is reporting a
+property of the evaluation partition as much as a property of the model.
+
+That stability should not be overclaimed, and the table makes the reason
+visible. Between the first-placed and last-placed architectures sit three
+models --- YOLO11s, YOLOv9s and RT-DETR-l --- separated on mAP@50--95 by a total
+of 0.0023 on the corrected split and 0.0039 on the published one. Two of them,
+YOLO11s and YOLOv9s, differ by 0.0001. These are single-seed measurements with
+no variance estimate (Section~\ref{sec:limitations}), and differences of that
+size cannot be attributed to the architectures. They are reported here as a
+group occupying the middle of the field, not as an ordering, and any use of
+these results should treat them the same way.
+
+The implication concerns method rather than models. mAP@50 is the only accuracy
+metric prior work on this dataset reports, and it is the less reliable of the
+two for choosing between models: it is the metric whose ranking moved. The
+weakness is not visible from mAP@50 alone --- a single number gives no signal
+that it is unstable --- and becomes visible only when mAP@50--95 is reported
+beside it and the two disagree. That is the argument for reporting both, and it
+is why this study treats a bare mAP@50 as incomplete rather than merely
+old-fashioned.
+
+\subsection{A published ordering not reproduced}
+\label{sec:ordering}
+
+YOLOv12s finishes last of the five architectures on both accuracy metrics, on
+both evaluation partitions, and on both splits. It is last on validation and on
+test, at mAP@50 and at mAP@50--95, in all eight combinations that
+Table~\ref{tab:main-results} reports.
+
+One prior study of this dataset reports YOLOv12s as its most balanced performer,
+at 89.1\% mAP@50 \citep{yolov12paper}. That figure is close to what this study
+measures for the same architecture: it sits within 0.3 points of the 0.894
+mAP@50 measured here on the published split's validation partition, and further
+from the 0.877 measured on that split's test partition. The magnitude is
+therefore reproduced; what is not reproduced is the position.
+
+The disagreement is reported as a measurement, and its scope is narrow. Under
+one framework version, one set of hyperparameters, one seed and one machine, all
+held constant across five architectures and stated in
+Section~\ref{sec:training-configuration}, YOLOv12s ranks last rather than first.
+The published comparison does not state which version of the dataset it used,
+which split it evaluated on, or what random seed it drew --- as
+Section~\ref{sec:training-configuration} records, the dataset exists in at least
+two Roboflow versions and this repository's audit found the shipped metadata
+describing the earlier one. Any of those could account for the difference, and
+nothing here identifies which does. The claim made is only that the ordering does
+not reproduce under a controlled configuration, which is a statement about what
+can currently be established rather than about the prior result.
+
+\subsection{Efficiency}
+\label{sec:efficiency}
+
+The two fastest architectures are separated by more than the measurement can
+resolve, but not by much. YOLO11s runs at 13.68~ms and YOLO26s at 14.64~ms
+median end-to-end, 0.96~ms apart, against the 0.24~ms noise floor established in
+Section~\ref{sec:efficiency-measurement} from the largest disagreement between
+the two timed runs of any one architecture. The gap is four times the floor, so
+the ordering is real; four times a floor is also a thin margin on which to
+choose a model, and the two should be treated as comparable in latency and
+separated on other grounds. Table~\ref{tab:efficiency} gives the per-architecture
+figures.
+
+Neither complexity measure predicts speed reliably, and the more familiar one
+fails worse. Parameter count orders the five architectures in an order almost
+unrelated to their latency: YOLOv9s holds the fewest parameters at 7{,}190{,}695
+fused and is the second slowest of the five. GFLOPs does substantially better,
+reproducing the latency order exactly apart from the leading pair, which it
+transposes --- and that pair is the 0.96~ms one, four times the noise floor.
+Reporting parameter counts as a proxy for deployment cost, as is common, would
+give a reader the wrong ordering here; reporting GFLOPs would give very nearly
+the right one.
+
+The two architectures without non-maximum suppression carry the lowest
+postprocessing cost, and the size of that advantage should be stated carefully.
+YOLO26s spends 0.38~ms in postprocessing and RT-DETR-l 0.57~ms, against 1.06 to
+1.08~ms for the three architectures that run NMS --- a ratio of 2.8 between the
+extremes, and an absolute saving of about 0.68~ms for YOLO26s against YOLO11s.
+Table~\ref{tab:latency-breakdown} gives the stage breakdown. At batch size one
+that saving is modest: it is 2.6\% of YOLO26s's end-to-end time against 7.7\% of
+YOLO11s's. NMS cost grows with the number of predictions processed, so the
+advantage would be expected to widen with batch size, but every measurement
+reported here is at batch size one and none of them establishes by how much.
+That is a limit of the protocol chosen in
+Section~\ref{sec:efficiency-measurement}, not a finding about the architectures.
+
+\input{../tables/t5_efficiency}
+
+\input{../tables/t6_latency_breakdown}
+
+\subsection{Accuracy is not the deployment criterion}
+\label{sec:deployment}
+
+Taking accuracy and latency together, two of the five architectures are not
+dominated by any other. YOLO11s records the lowest latency of the five, and
+YOLO26s the highest mAP@50--95 on both splits.
+Figure~\ref{fig:accuracy-vs-latency} plots
+the trade-off, with marker area carrying fused GFLOPs so that all three
+quantities are visible at once.
+
+The front is narrower than it looks, and the reason should be disclosed rather
+than smoothed over. YOLOv9s is excluded from it by 0.0001 mAP@50--95 --- 0.6186
+against YOLO11s's 0.6187 --- which is below the precision at which these figures
+are reported and far below anything a single seed could establish. It is
+excluded on latency, not on accuracy: it runs 7.37~ms slower than YOLO11s, which
+is thirty times the noise floor and the one difference in this comparison that is
+beyond argument. Presenting a clean two-point front without that qualification
+would misrepresent how the third point missed it.
+
+RT-DETR-l occupies a different position under each metric. It records the
+highest mAP@50 on both splits, 0.9444 corrected and 0.9171 published, and does
+not lead on mAP@50--95, where it places fourth of five on both. It buys that
+mAP@50 lead at roughly three times the latency of the fastest architecture and
+five times the fused GFLOPs of the lightest. It also required a learning rate a
+hundredfold lower than the value that trains the four convolutional detectors,
+for the reasons set out in Section~\ref{sec:rtdetr-lr}; the configuration under
+which it is reported here is not the configuration applied to the others.
+
+The recommendation for the application that motivates this study is YOLO26s. It
+records the highest mAP@50--95 on both splits, the lowest fused GFLOPs of the
+five at 20.892, and the lowest postprocessing cost at 0.38~ms, while running
+within a millisecond of the fastest architecture measured. It is not the fastest
+and it does not lead on mAP@50; it is the architecture that gives up least on
+any of the three axes that a conveyor-belt deployment cares about.
+
+No prior study of this dataset could have reached that conclusion, for a reason
+that has nothing to do with the models. None of them measured inference speed.
+A comparison conducted on accuracy alone cannot distinguish between two
+architectures that differ by 0.0001 mAP and 7.37~ms, and it has no way to
+express that the difference which matters for deployment is the second one.
+
+\begin{figure}[tp]
+  \centering
+  \includegraphics[width=\figcol,height=\figmaxh,keepaspectratio]{f6_accuracy_vs_latency.pdf}
+  \caption{Accuracy against latency on the corrected split. Marker area is
+  fused GFLOPs; the shaded band behind each point spans 0.24~ms, the largest
+  difference between the two timed runs of any one architecture (YOLO11s) and
+  so this rig's noise floor. The Pareto front is YOLO11s and YOLO26s. They are
+  the closest pair in latency at 0.96~ms apart, 4.0 times the noise floor ---
+  separable, but not by much. YOLOv9s misses the front by 0.0001 mAP, which is
+  below the precision the accuracy figures are reported at. Latency is on a log
+  axis, so the four convolutional detectors are not compressed against
+  RT-DETR-l.}
+  \label{fig:accuracy-vs-latency}
+\end{figure}

@@ -68,8 +68,9 @@
 \subsection{Models evaluated}
 \label{sec:models-evaluated}
 
-Five detectors were evaluated: YOLOv9s, YOLO11s, YOLOv12s, YOLO26s and
-RT-DETR-l. The selection serves two purposes. The first three appear in the
+Five detectors were evaluated: YOLOv9s \citep{yolov9}, YOLO11s \citep{yolo11},
+YOLOv12s \citep{yolov12}, YOLO26s \citep{yolo26} and RT-DETR-l
+\citep{rtdetr}. The selection serves two purposes. The first three appear in the
 comparison tables of both prior studies of ElectroCom61
 \citep{yolov12paper,yolov13paper}, and are included so that the present
 benchmark can be placed alongside theirs. The remaining two have not previously
@@ -87,9 +88,9 @@ RT-DETR-l, was used. Its higher parameter count and computational cost are
 reported alongside its accuracy in Section~\ref{sec:results} rather than treated
 as a confound.
 
-YOLOv13 was not evaluated, despite appearing in one prior study of this dataset
-\citep{yolov13paper}. It is not among the architectures provided by the
-Ultralytics release used here, so evaluating it would have required installing
+YOLOv13 \citep{yolov13} was not evaluated, despite appearing in one prior study
+of this dataset \citep{yolov13paper}. It is not among the architectures provided
+by the Ultralytics release used here, so evaluating it would have required installing
 software that no other run in this benchmark used, changing the framework under
 which every other model was trained. Holding one release constant across all ten
 runs was judged more important than covering one additional architecture. This
@@ -131,9 +132,10 @@ both describe the dataset as distributed at $640 \times 640$.
 One setting differs from prior work rather than matching it. Both studies report
 PyTorch 2.0.0, whereas the present work uses 2.5.1+cu121. Neither states an
 Ultralytics version, which is the more consequential omission: the Ultralytics
-release determines the layer composition, detection head, loss function and
-augmentation defaults of every model it provides, so two studies may both report
-results for ``YOLOv9s'' while training architectures that differ.
+release \citep{ultralytics} determines the layer composition, detection head,
+loss function and augmentation defaults of every model it provides, so two
+studies may both report results for ``YOLOv9s'' while training architectures
+that differ.
 
 The optimiser was specified explicitly rather than left at the Ultralytics
 default of \texttt{optimizer="auto"}, which selects an optimiser and silently
@@ -161,10 +163,10 @@ Reducing the initial learning rate from 0.01 to 0.0001 -- a factor of one hundre
 and 0.6016 mAP@50--95 on validation, and 0.9171 and 0.6045 on test, with the best
 checkpoint at epoch 58. Both runs are retained in the repository.
 
-The sensitivity is not itself surprising. Transformer-based detectors are commonly
-trained at learning rates one to two orders of magnitude below those used for
-convolutional detectors, and the value adopted here was drawn from studies that
-evaluated only YOLO variants. What matters is the methodological consequence. A
+The sensitivity is not itself surprising. Transformer-based detectors, since
+DETR \citep{detr}, are commonly trained at learning rates one to two orders of
+magnitude below those used for convolutional detectors, and the value adopted
+here was drawn from studies that evaluated only YOLO variants. What matters is the methodological consequence. A
 single configuration applied uniformly to every model is often taken to be the
 fair basis for a comparison. Across architecture families it is not: the same
 value that trains four convolutional detectors to convergence prevents a
@@ -186,7 +188,7 @@ partition was not consulted until training had completed.
 
 Four accuracy quantities are reported. mAP@50 is included because it is the only
 accuracy metric prior work on this dataset reports, and comparability requires
-it. mAP@50--95, the COCO standard, averages precision over ten
+it. mAP@50--95, the COCO standard \citep{coco}, averages precision over ten
 intersection-over-union thresholds rather than one and is therefore sensitive to
 localisation quality as well as to detection; no published study on this dataset
 reports it. Precision and recall are reported for completeness, and per-class

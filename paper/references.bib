@@ -56,3 +56,155 @@
   year    = {2025},
   doi     = {10.1016/j.dib.2025.111331}
 }
+
+% ===========================================================================
+% MODEL AND METRIC CITATIONS. Added 2026-08-14.
+%
+% NONE of these has been verified against its source from within this
+% repository, and no script here can verify one: reference/ holds a single
+% archived notebook, and the prior papers' PDFs are not committed. Section 8
+% states this limitation for every claim the paper makes about prior work; it
+% applies to these entries too.
+%
+% The two groups below differ in HOW they are unverified, which matters when
+% deciding what to re-check first.
+% ===========================================================================
+
+% ---------------------------------------------------------------------------
+% GROUP 1 -- authors, venue and arXiv identifier taken from the BIBLIOGRAPHIES
+% OF THE TWO PRIOR PAPERS, supplied by the author 2026-08-14.
+%
+% This provenance is SECONDHAND: a citation copied out of another paper's
+% reference list inherits any error in that list, and the lists themselves are
+% not in this repository. TITLES ARE NOT FROM THAT SOURCE -- the author supplied
+% surnames, venue and arXiv number only, so each title below was filled in here
+% and must be checked against the arXiv record rather than assumed.
+% ---------------------------------------------------------------------------
+
+% VERIFY: title, author list, venue.
+@inproceedings{yolov9,
+  author    = {Wang, Chien-Yao and Yeh, I-Hau and Liao, Hong-Yuan Mark},
+  title     = {{YOLOv9}: Learning What You Want to Learn Using Programmable
+               Gradient Information},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2024},
+  eprint    = {2402.13616},
+  archivePrefix = {arXiv},
+  note      = {Citation taken from a prior paper's bibliography; title filled
+               in here and not yet checked against the arXiv record},
+}
+
+% VERIFY: title, author list. Preprint only -- no venue was supplied.
+@article{yolo11,
+  author  = {Khanam, Rahima and Hussain, Muhammad},
+  title   = {{YOLOv11}: An Overview of the Key Architectural Enhancements},
+  journal = {arXiv preprint},
+  year    = {2024},
+  eprint  = {2410.17725},
+  archivePrefix = {arXiv},
+  note    = {Citation taken from a prior paper's bibliography; title filled in
+             here and not yet checked against the arXiv record},
+}
+
+% VERIFY: title, author list. Preprint only -- no venue was supplied.
+@article{yolov12,
+  author  = {Tian, Yunjie and Ye, Qixiang and Doermann, David},
+  title   = {{YOLOv12}: Attention-Centric Real-Time Object Detectors},
+  journal = {arXiv preprint},
+  year    = {2025},
+  eprint  = {2502.12524},
+  archivePrefix = {arXiv},
+  note    = {Citation taken from a prior paper's bibliography; title filled in
+             here and not yet checked against the arXiv record},
+}
+
+% VERIFY -- TITLE IS THE LEAST CERTAIN OF THIS GROUP. The author supplied
+% "Lei et al." and the arXiv number only; the title below was filled in here
+% with lower confidence than the three above. Check this one first.
+% NOTE this is the YOLOv13 ARCHITECTURE paper, distinct from yolov13paper
+% above, which is the e-waste study that uses it on this dataset.
+@article{yolov13,
+  author  = {Lei, Mengqi and others},
+  title   = {{YOLOv13}: Real-Time Object Detection with Hypergraph-Enhanced
+             Adaptive Visual Perception},
+  journal = {arXiv preprint},
+  year    = {2025},
+  eprint  = {2506.17733},
+  archivePrefix = {arXiv},
+  note    = {Citation taken from a prior paper's bibliography; title filled in
+             here with low confidence and not yet checked},
+}
+
+% ---------------------------------------------------------------------------
+% GROUP 2 -- supplied by the author 2026-08-14, to be verified against the
+% papers themselves. Titles here ARE the author's, unlike group 1.
+% ---------------------------------------------------------------------------
+
+% VERIFY against the paper.
+@inproceedings{rtdetr,
+  author    = {Zhao, Yian and others},
+  title     = {{DETRs} Beat {YOLOs} on Real-time Object Detection},
+  booktitle = {IEEE/CVF Conference on Computer Vision and Pattern Recognition
+               (CVPR)},
+  year      = {2024},
+  eprint    = {2304.08069},
+  archivePrefix = {arXiv},
+  note      = {VERIFY: full author list, page range},
+}
+
+% VERIFY against the paper.
+@inproceedings{detr,
+  author    = {Carion, Nicolas and Massa, Francisco and Synnaeve, Gabriel and
+               Usunier, Nicolas and Kirillov, Alexander and Zagoruyko, Sergey},
+  title     = {End-to-End Object Detection with Transformers},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2020},
+  eprint    = {2005.12872},
+  archivePrefix = {arXiv},
+  note      = {VERIFY: author list beyond the first was filled in here, not
+               supplied},
+}
+
+% VERIFY against the paper. No arXiv identifier was supplied.
+@inproceedings{coco,
+  author    = {Lin, Tsung-Yi and Maire, Michael and Belongie, Serge and
+               Hays, James and Perona, Pietro and Ramanan, Deva and
+               Doll{\'a}r, Piotr and Zitnick, C. Lawrence},
+  title     = {Microsoft {COCO}: Common Objects in Context},
+  booktitle = {European Conference on Computer Vision (ECCV)},
+  year      = {2014},
+  note      = {VERIFY: author list beyond the first was filled in here, not
+               supplied; pages not recorded},
+}
+
+% VERIFY -- AND NOTE THIS ONE CANNOT BE CHECKED FROM MODEL KNOWLEDGE AT ALL.
+% arXiv 2606 is June 2026, after the assistant's training cutoff, so every
+% field below is the author's and nothing here corroborates any of it.
+@article{yolo26,
+  author  = {{Ultralytics}},
+  title   = {Ultralytics {YOLO26}: Unified Real-Time End-to-End Vision Models},
+  journal = {arXiv preprint},
+  year    = {2026},
+  eprint  = {2606.03748},
+  archivePrefix = {arXiv},
+  note    = {VERIFY: no author list was supplied. The corporate author here is
+             a PLACEHOLDER added only because BibTeX cannot sort or label an
+             entry without one -- replace it with the real list},
+}
+
+% VERIFY: the canonical Ultralytics software citation and its author list.
+% The VERSION is not in doubt -- 8.4.115 is recorded in all eleven results
+% JSONs under data/kaggle/ -- but the citation form is unchecked.
+% Entry type is misc, not software: plainnat defines no software type and warns,
+% dropping the version field. NOTE -- do not write an "at" sign in a comment in
+% this file: BibTeX starts a new entry at every "at" sign regardless of the
+% leading %, which is what broke this build once already.
+@misc{ultralytics,
+  author       = {Jocher, Glenn and Qiu, Jing and Chaurasia, Ayush},
+  title        = {Ultralytics {YOLO}, version 8.4.115},
+  year         = {2026},
+  howpublished = {\url{https://github.com/ultralytics/ultralytics}},
+  note         = {VERIFY: canonical citation form and author list. The VERSION
+                  is not in doubt -- 8.4.115 is recorded in all eleven results
+                  JSONs under data/kaggle/},
+}

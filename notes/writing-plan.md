@@ -14,9 +14,9 @@ their claims are settled.
 | Order | Section | Status |
 |---|---|---|
 | 1 | **3 — Dataset Audit** | **complete** (3.1–3.7 drafted, fact-checked) |
-| 2 | 4 — A Corrected Split | stub — next |
+| 2 | **4 — A Corrected Split** | **complete** (4.1–4.8 drafted, fact-checked) |
 | 3 | **5 — Benchmark Setup** | **complete** (5.1–5.6 drafted, fact-checked) |
-| 4 | 6 — Results | stub |
+| 4 | **6 — Results** | **complete** (6.1–6.5 drafted, fact-checked) |
 | 5 | 7 — Discussion | stub |
 | 6 | 8 — Limitations | stub |
 | 7 | 2 — Related Work | stub |
@@ -24,9 +24,9 @@ their claims are settled.
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-Sections 3 and 5 are finished and are the model for the rest: every number in
-them traces to a committed file, and anything that does not is marked in the
-section file's own header comment rather than left silent.
+Sections 3, 4, 5 and 6 are finished and are the model for the rest: every
+number in them traces to a committed file, and anything that does not is marked
+in the section file's own header comment rather than left silent.
 
 ## Writing rules
 
@@ -66,6 +66,19 @@ defect we then had to find and fix.
    which.** 5.5 uses gap/mean throughout and states so. Mixing bases inside a
    subsection makes two numbers look comparable when they are not.
 
+## Length
+
+**As of 2026-08-14 the paper is 24 pages with Sections 1, 2, 7, 8 and 9 still
+unwritten.** Sections 3 and 4 are more detailed than most venues will
+accommodate, and some of that material is expected to move to supplementary
+material at submission.
+
+The instruction for now is **stop adding, do not cut**. Nothing is removed until
+a venue and its page limit are known — cutting early would discard material that
+may simply relocate, and the run directories the prose cites are not going
+anywhere. From here, new sections are drafted tighter rather than to the density
+of 3 and 4.
+
 ## Section skeletons
 
 Claim-plus-evidence bullets are supplied per section before drafting. Recorded
@@ -98,11 +111,12 @@ Carried from the stub: open with the top-10 result in
 `notes/writing-corrections.md` — the unevaluable classes are the **biggest**
 classes, not the smallest, which forecloses the class-imbalance reading.
 
-### Section 4 — A Corrected Split
+### Section 4 — A Corrected Split — DRAFTED
 
-Claims: _to be supplied._
+Eight subsections. 41 assertions re-derived from source. `scripts/split_adjacency_check.py`
+was written for 4.6's adjacency claim rather than quoting an unsourced figure.
 
-Evidence available:
+Evidence used:
 - `runs/20260804_burst_aware_split_04/` — the released split, τ=15 s, seed
   20260804; 68 images moved; sizes 1478/438/205 held
 - `runs/20260804_burst_aware_tau_sweep/` — why τ=15 and not 20/25/30/35/45/60
@@ -119,11 +133,13 @@ Scope limit that must travel with every contamination number: the figures cover
 pairs sharing an **identical class inventory** only. Partial overlap is
 pervasive and no split of this dataset eliminates it.
 
-### Section 6 — Results
+### Section 6 — Results — DRAFTED
 
-Claims: _to be supplied._
+Five subsections. 24 assertions re-derived from source. One drafted bullet (the
+rescued classes scoring "near 0.995") was NOT written: per-class AP@50 is
+committed nowhere, only AP@50-95, so the argument is made on the strict metric.
 
-Evidence available:
+Evidence used:
 - `data/master_results.csv` — 11 rows, 10 `inclusion=benchmark`, read only
   through `ec61.load_benchmark_rows`
 - `data/latency_by_arch.csv` — per-architecture means and pair gaps

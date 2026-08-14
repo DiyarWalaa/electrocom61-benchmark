@@ -28,14 +28,26 @@
 % against 0.571 to 0.610 for the other 46. Restore the 0.995 figure only if a
 % per-class AP@50 table is committed.
 %
-% COVERAGE GAP, worth knowing before quoting per-class results: nine of the
-% eleven Kaggle runs carry a *_per_class.csv. The two YOLOv9s runs do not --
-% that model was trained from the YOLOv9 repository rather than Ultralytics and
-% its artifacts are results.csv plus args.yaml. Per-class statements here
-% therefore rest on four of the five architectures, and this is stated in the
-% prose rather than hidden. It also qualifies 5.4's claim that per-class average
-% precision is reported "for all classes" -- true of the classes, not of every
-% model.
+% RETRACTED 2026-08-14. An earlier draft of this header claimed the two YOLOv9s
+% runs lacked per-class results because that model "was trained from the YOLOv9
+% repository rather than Ultralytics". BOTH HALVES WERE WRONG, and the cause was
+% inferred from a missing file rather than read from a source. What the sources
+% show:
+%   - All ELEVEN results_*.json record ultralytics 8.4.115, torch 2.5.1+cu121,
+%     Tesla P100-PCIE-16GB. No run used a different framework.
+%   - yolov9s_corr/runs/yolov9s_corr/args.yaml is an Ultralytics args.yaml, with
+%     the same keys as every other run's (task/mode/model/time/save_period/
+%     cls_remap/patience/optimizer/seed/deterministic).
+%   - Per-class AP50-95 IS PRESENT for all eleven runs, inside the results JSON
+%     at /val/per_class_AP50_95 and /test/per_class_AP50_95 -- 61 classes on the
+%     corrected split, 45 val / 46 test on the published one.
+% What actually differs is only the ARTIFACT EXPORT LAYOUT: nine runs were
+% flattened into <name>_per_class.csv and <name>_training_curves.csv, while the
+% two YOLOv9s runs preserved the raw Kaggle runs/ tree (runs/<name>/results.csv
+% plus runs/detect/val*/). The convenience CSV is a derived view -- checked
+% entry by entry against yolo26s_corr's JSON, 122 of 122 values identical.
+% Section 5.2's single-framework claim therefore stands, and 5.4 needs no
+% qualification: per-class AP is available for all five architectures.
 
 Two questions are asked of the ten runs. What does the corrected split change
 about the measured accuracy of these detectors, and which detector should a
@@ -61,10 +73,10 @@ wrong reason, so repairing the split lowers the numbers. Here repairing it
 raises them. The reason is that the published split's defect was not leakage but
 exclusion, and what it excluded was disproportionately easy. The fifteen classes
 returned to the evaluation partitions by Section~\ref{sec:corrected-split} are
-measurably easier than the classes that were already there: across the four
-architectures for which per-class results are available, those fifteen average
-between 0.685 and 0.698 AP@50--95 on test, while the other 46 average between
-0.571 and 0.610. Adding easy classes to an average raises it.
+measurably easier than the classes that were already there: across all five
+architectures, those fifteen average between 0.681 and 0.698 AP@50--95 on test,
+while the other 46 average between 0.571 and 0.610. The ordering holds for every
+model without exception. Adding easy classes to an average raises it.
 
 The gains on the strict metric are roughly half those on the lenient one, and
 that ratio is informative rather than incidental. A class can be easy to find
@@ -149,10 +161,10 @@ one framework version, one set of hyperparameters, one seed and one machine, all
 held constant across five architectures and stated in
 Section~\ref{sec:training-configuration}, YOLOv12s ranks last rather than first.
 The published comparison does not state which version of the dataset it used,
-which split it evaluated on, or what random seed it drew --- as
-Section~\ref{sec:training-configuration} records, the dataset exists in at least
-two Roboflow versions and this repository's audit found the shipped metadata
-describing the earlier one. Any of those could account for the difference, and
+which split it evaluated on, or what random seed it drew --- and as
+Section~\ref{sec:metadata-provenance} establishes, the dataset exists in at
+least two versions and the metadata shipped with the later one describes the
+earlier. Any of those could account for the difference, and
 nothing here identifies which does. The claim made is only that the ordering does
 not reproduce under a controlled configuration, which is a statement about what
 can currently be established rather than about the prior result.

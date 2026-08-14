@@ -1064,7 +1064,13 @@ def figure_6(rows):
     caption += " Latency is on a log axis, so the four CNNs are not compressed against RT-DETR-l."
 
     # ---- layout ------------------------------------------------------------
-    h_title = 0.20
+    # h_title was 0.20, reserving a strip for an internal "F6 accuracy vs
+    # latency" heading. That heading is gone: a figure carrying a LaTeX caption
+    # should not also title itself, and "F6" is this repository's working label,
+    # not a name that belongs in the paper. F6 is single-panel, so unlike F2, F4
+    # and F5 it has no (a)/(b) markers to keep -- the strip is reclaimed rather
+    # than left blank.
+    h_title = 0.02
     h_plot = 2.35
     h_xlabel = 0.34
     h_sizekey = 0.52
@@ -1150,8 +1156,6 @@ def figure_6(rows):
     ax.get_xaxis().set_major_formatter(matplotlib.ticker.ScalarFormatter())
     ax.get_xaxis().set_minor_formatter(matplotlib.ticker.NullFormatter())
 
-    fig.text(0.012, (fig_h - 0.02) / fig_h, "F6  accuracy vs latency",
-             fontsize=8.5, fontweight="bold", va="top", ha="left", color=INK)
 
     # ---- size key, as its own strip below the plot -------------------------
     key = fig.add_axes([0.175, h_bottom / fig_h, 0.80,

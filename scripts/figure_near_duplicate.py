@@ -60,6 +60,10 @@ import ec61  # noqa: E402
 
 import matplotlib  # noqa: E402
 matplotlib.use("Agg")  # no display on this machine; write straight to file
+# Embed TrueType rather than Type 3 in the PDF. IEEE rejects Type 3, and
+# make_figures.py sets the same two keys for every other figure in the paper.
+matplotlib.rcParams["pdf.fonttype"] = 42
+matplotlib.rcParams["ps.fonttype"] = 42
 import matplotlib.pyplot as plt  # noqa: E402
 from matplotlib.patches import Rectangle  # noqa: E402
 from matplotlib.patheffects import withStroke  # noqa: E402
@@ -76,8 +80,22 @@ DATASET = os.path.join(ec61.DATA_DIR, "ElectroCom-61_corrected")
 
 OUT_DIR = os.path.join(ec61.REPO_ROOT, "figures")
 OUT_PNG = os.path.join(OUT_DIR, "near_duplicate_pair.png")
+# PDF alongside the PNG, for the same reason every other figure has one: the
+# paper includes vector art so the figure does not resample when the venue
+# template changes its column width. pdf.fonttype 42 embeds TrueType rather
+# than Type 3, which IEEE requires.
+OUT_PDF = os.path.join(OUT_DIR, "near_duplicate_pair.pdf")
 
 DPI = 300
+
+# Rendered size. NOTE this is a WIDE figure -- two 640 px panels side by side
+# plus a shift table -- and its smallest text is 6.9 pt AT THIS SIZE. Included
+# at a 3.5 in column that text renders at 2.2 pt, and at a 6.5 in text block at
+# 4.1 pt; both are below the 8 pt floor the other figures are built to. Making
+# it legible needs a re-render at target width, not a different \includegraphics
+# width. See notes/writing-plan.md.
+FIG_W_IN = 11.0
+FIG_H_IN = 7.4
 
 # Categorical slots 1-5 of the reference palette, in fixed order. Not cycled,
 # not reordered, not invented.
@@ -233,7 +251,7 @@ def main():
         params={"stems": [STEM_A, STEM_B], "dpi": DPI, "palette": PALETTE,
                 "image_size_px": size, "dataset": DATASET,
                 "interpolation": "nearest (source already stretch-resized once)"},
-        extra={"output": OUT_PNG,
+        extra={"output": OUT_PNG, "output_pdf": OUT_PDF,
                "pair_identified_by": "runs/20260804_duplicate_contamination"},
     )
 
@@ -264,7 +282,7 @@ def main():
     colors = [PALETTE[i % len(PALETTE)] for i in range(len(boxes_a))]
 
     # ---- compose -------------------------------------------------------
-    fig = plt.figure(figsize=(11.0, 7.4), dpi=DPI, facecolor=SURFACE)
+    fig = plt.figure(figsize=(FIG_W_IN, FIG_H_IN), dpi=DPI, facecolor=SURFACE)
     gs = fig.add_gridspec(2, 2, height_ratios=[1.0, 0.30],
                           hspace=0.04, wspace=0.05,
                           left=0.035, right=0.965, top=0.862, bottom=0.085)
@@ -328,10 +346,12 @@ def main():
     if not os.path.isdir(OUT_DIR):
         os.makedirs(OUT_DIR)
     fig.savefig(OUT_PNG, dpi=DPI, facecolor=SURFACE)
+    fig.savefig(OUT_PDF, facecolor=SURFACE)   # vector, no dpi needed
     plt.close(fig)
 
-    out_px = (int(11.0 * DPI), int(7.4 * DPI))
+    out_px = (int(FIG_W_IN * DPI), int(FIG_H_IN * DPI))
     print("wrote %s" % OUT_PNG)
+    print("wrote %s (%.1f KB)" % (OUT_PDF, os.path.getsize(OUT_PDF) / 1024.0))
     print("  %d x %d px at %d dpi, %.1f KB"
           % (out_px[0], out_px[1], DPI, os.path.getsize(OUT_PNG) / 1024.0))
     print("  panels: %s (%s) | %s (%s)" % (STEM_A, split_a, STEM_B, split_b))

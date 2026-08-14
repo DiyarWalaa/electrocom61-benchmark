@@ -1,0 +1,31 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "c6f7d24dd384324fd9d593a738482247de3e180a51d61c91c64e4bc1b19eac7b",
+  "output": "C:\\research\\electrocom61\\figures\\near_duplicate_pair.png",
+  "output_pdf": "C:\\research\\electrocom61\\figures\\near_duplicate_pair.pdf",
+  "pair_identified_by": "runs/20260804_duplicate_contamination",
+  "params": {
+    "dataset": "C:\\research\\electrocom61\\data\\ElectroCom-61_corrected",
+    "dpi": 300,
+    "image_size_px": 640,
+    "interpolation": "nearest (source already stretch-resized once)",
+    "palette": [
+      "#2a78d6",
+      "#eb6834",
+      "#1baf7a",
+      "#eda100",
+      "#e87ba4"
+    ],
+    "stems": [
+      "IMG_20240220_115315",
+      "IMG_20240220_115316"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-14T13:00:30.696754Z",
+  "script": "figure_near_duplicate.py",
+  "script_sha256": "f62eff79b47ffdd61c7cec7543180bffa9acb44ff551761123844a7ff680feaf"
+}

@@ -1,7 +1,320 @@
 \section{A Corrected Split}
 \label{sec:corrected-split}
 
-% TODO: Construction of the burst-aware split. Figure f4_tau_sweep,
-% table t2_split_properties. Note the corrections recorded in
-% notes/writing-corrections.md before reusing any wording from the
-% handoff document.
+% Every number in this section traces to a committed run directory. Sources, by
+% subsection:
+%   4.1  runs/20260804_burst_aware_split_04/summary.md; tables/t2_split_properties
+%   4.2  runs/20260801_device_split/summary.md (filename taxonomy);
+%        runs/20260804_burst_aware_split_04/config.json (tau, seed, eps)
+%   4.3  runs/20260804_burst_aware_split_04/{summary.md, groups_moved.csv,
+%        moves.csv}; tables/t2_split_properties (39 of 61 -> 61 of 61)
+%   4.4  runs/20260804_burst_aware_tau_sweep/summary.md
+%   4.5  runs/20260803_corrected_split_02/summary.md (image-level allocator);
+%        runs/20260804_burst_aware_split_03 via the sweep row at tau=30;
+%        runs/20260814_figure_near_duplicate/per_box_centre_shift.csv
+%   4.6  runs/20260804_build_corrected_dataset_02/summary.md
+%   4.7  runs/20260804_duplicate_contamination/summary.md;
+%        runs/20260805_consecutive_counter_pairs/
+%   4.8  README.md licence section; data/kaggle/latency_history/pass2.json
+%
+% UNSUPPORTED BULLET, LEFT AS A TODO RATHER THAN WRITTEN. See 4.6 below: the
+% drafted bullet claimed 364 same-camera cross-split pairs within 15 s in both
+% the published and the corrected split. No committed run reports that figure.
+% The nearest committed measurements are different quantities and must not be
+% substituted for it:
+%   - runs/20260803_corrected_split_02/ reports cross-split adjacent pairs
+%     537 before / 600 after, but for the SUPERSEDED image-level allocator, not
+%     the released one, and over all gaps rather than a 15 s window.
+%   - runs/20260804_burst_aware_split_04/ reports 177 groups already straddling
+%     the boundary before any move, which counts groups, not pairs.
+% Producing the claimed figure needs a script and a run directory of its own.
+%
+% F3 LEGIBILITY -- MEASURED, NOT ESTIMATED. near_duplicate_pair is rendered at
+% 11.0 x 7.4 in and its smallest text (the per-box shift table) is 6.9 pt at
+% that size. Included at \figcol (3.5 in) that text renders at 2.2 pt; at
+% \textwidth (6.5 in) at 4.1 pt. Both are below the 8 pt floor every other
+% figure in this paper is built to. It is included below at \textwidth because
+% that is the least bad option available, and it needs a re-render at target
+% width before submission. Scaling cannot fix it.
+
+The audit of Section~\ref{sec:dataset-audit} establishes a defect that is
+repairable without collecting data: fifteen classes are unevaluable because the
+sessions containing them were allocated wholly to training. This section
+constructs a split that repairs it, states the constraints the repair had to
+satisfy, and reports what it does and does not achieve. The construction is
+released as a manifest rather than as a claim.
+
+\subsection{What a correction has to satisfy}
+\label{sec:correction-constraints}
+
+Four constraints define the problem. Every class must reach at least five
+instances in both the validation and the test partition, which is what makes it
+evaluable at all. The split sizes must stay exactly 1478/438/205. No image may
+be added, removed or modified. And test--train near-duplicate contamination,
+which Section~\ref{sec:duplicate-contamination} measured at zero, must not
+increase. The first is the objective; the other three are the price of a
+correction that can be compared against the split it replaces.
+
+The size constraint is the one that most needs defending, because it is the one
+that costs the most. If the corrected training set were larger or smaller than
+the published one, any later difference in accuracy between the two could be
+attributed to the amount of training data rather than to its composition, and
+the comparison in Section~\ref{sec:results} would answer a question nobody
+asked. Freezing the three counts exactly means the only difference between the
+two experiments is which images sit in which partition. It also makes the
+correction harder: every image admitted into validation or test must be paid for
+by another image returned to training.
+
+\subsection{The grouping rule}
+\label{sec:grouping-rule}
+
+Whole capture bursts move as a unit; individual images never move alone.
+Section~\ref{sec:duplicate-contamination} established that burst structure
+exists in this dataset, and a burst is precisely a set of frames showing the
+same scene seconds apart. Moving one frame out of a burst therefore places a
+near-duplicate of a training image into an evaluation partition, which is the
+contamination the fourth constraint forbids. Making the burst the atomic unit
+of movement rules that out by construction rather than by detection: a group
+that cannot be split cannot straddle the boundary.
+
+Bursts are formed at a 15-second gap threshold and, critically, per camera
+rather than globally. Sorting every image in the dataset by timestamp and
+cutting at gaps would interleave frames from two photographers shooting at the
+same moment on different devices, manufacturing groups that never existed as
+capture events. Clustering within each device first and only then applying the
+gap threshold keeps a group a record of one camera's continuous activity.
+
+The grouping rule needs a taxonomy of filenames because the archive does not
+carry one. Three families encode a timestamp and can be clustered in time; a
+fourth cannot. Nine images carry an additional \texttt{\_NN} sub-index
+appended to their timestamp, which resolves frames sharing a capture second.
+The 189 untimestamped images admit no temporal clustering at all, so for those
+the grouping falls back to scene content --- matching class inventory and box
+geometry --- which groups by appearance rather than by time. That substitution
+is weaker than a burst and is recorded as such: it is an inference about which
+photographs show the same arrangement, not a measurement of when they were
+taken.
+
+\subsection{The allocation}
+\label{sec:allocation}
+
+The allocator begins from a per-class deficit: for each of the 61 classes, how
+many further instances validation and test each need to reach five. Under the
+published split 39 of the 61 classes already clear that bar in both partitions,
+so 22 carry a deficit, and 15 of those 22 carry the maximum possible one, having
+no instances in either partition to begin with.
+
+Groups are then selected greedily, each step taking the group that closes the
+largest number of outstanding deficits at once. This is why the repair is so
+much cheaper than the deficit count suggests: a single capture group contains
+several components photographed together, so admitting one group can lift
+several classes over the bar simultaneously. Across the whole allocation 68
+images move, and they repair all 22 classes --- taking the split from 39 of 61
+to 61 of 61, as Table~\ref{tab:split-properties} records.
+
+An equal number of images is returned to training, which is what holds the sizes
+exactly. Only groups lying wholly inside one partition are eligible to be
+returned, because returning part of a group would reintroduce the straddling
+that Section~\ref{sec:grouping-rule} exists to prevent, and a group may be
+returned only if removing it leaves every class still at or above five. The
+dataset divides into 776 atomic groups, of which 177 already straddle a
+partition boundary in the published split and are left untouched. Of the
+remainder, validation admitted 18 groups and returned 10; test admitted 13 and
+returned 6.
+
+\subsection{Why 15 seconds}
+\label{sec:tau-choice}
+
+Class feasibility never bound the choice of threshold. At every value swept ---
+15, 20, 25, 30, 35, 45 and 60 seconds --- all fifteen rescued classes retain two
+or more qualifying groups, so the criterion the threshold was originally
+introduced to satisfy is satisfied everywhere. Panel~(b) of
+Figure~\ref{fig:tau-sweep} shows that row filled across the entire sweep, which
+is the negative result that makes the rest of this subsection necessary: had
+feasibility bound, the choice would have been made for us.
+
+What bound it was the return budget. As the threshold grows, groups grow, and
+the number of images the test partition can safely give back collapses --- 59 at
+15 seconds, 26 at 25, 10 at 30, and 1 at 60 --- while the number it owes rises
+in the opposite direction, from 15 to 31. The two cross between 25 and 30
+seconds, and past that crossing the split cannot be rebalanced at all: at 30
+seconds test owes 20 images and can return only 10, so the sizes end at
+1458/438/225.
+
+Fifteen seconds is the smallest value satisfying both constraints, and among the
+three values that hold the sizes it moves the fewest images: 68, against 78 at
+20 seconds and 80 at 25. It is not the value that moves the fewest images
+overall. Thirty seconds moves 64, four fewer, and is excluded because it breaks
+the sizes rather than because it is more expensive.
+
+The criteria do not fail monotonically, and reporting only the chosen value
+would hide that. Forty-five seconds is clean on contamination --- zero
+test--train pairs at every epsilon under both scorings --- yet fails on sizes,
+ending at 1448/438/235. Thirty-five and 60 seconds each carry one test--train
+pair at $\epsilon = 0.05$ under aligned scoring, while both are clean under raw
+scoring at the same threshold, which is why the scoring must be named whenever
+that column is quoted. A threshold chosen by scanning upward until the first
+failure would have stopped at the wrong place.
+
+\begin{figure}[tp]
+  \centering
+  \includegraphics[width=\figcol,height=\figmaxh,keepaspectratio]{f4_tau_sweep.pdf}
+  \caption{Why the released split uses $\tau = 15$~s. (a) the size constraint:
+  at each $\tau$, the images the test split owes back after admitting whole
+  groups, against the images it can safely return. The two cross between 25 and
+  30~s, and past that point the split cannot be rebalanced --- at $\tau = 30$~s
+  test owes 20 and can return only 10, ending at 1458/438/225 instead of
+  1478/438/205. (b) the three admissibility criteria. Class feasibility is
+  satisfied at every $\tau$ tested, so it never bound the choice; what bound it
+  was the collapsing return budget in (a). $\tau = 15$~s is the smallest value
+  meeting all three.}
+  \label{fig:tau-sweep}
+\end{figure}
+
+\subsection{How the split was arrived at}
+\label{sec:split-iterations}
+
+The released split is the third of three attempts, and the two it replaced are
+reported here rather than discarded. The sequence is evidence that the
+constraints in Section~\ref{sec:correction-constraints} were binding on the
+construction rather than assembled afterwards to describe whatever the final
+allocator happened to produce.
+
+The first attempt moved individual images. It succeeded on the objective and on
+the sizes: 64 images moved, all 61 classes cleared the bar, and the split ended
+at 1478/438/205 exactly. It failed on contamination, and the failure is
+concrete. It moved \texttt{IMG\_20240220\_115315} into test while
+\texttt{IMG\_20240220\_115316} --- captured one second later, showing the same
+five components --- stayed in training. Across those five components the box
+centres differ by at most 9.01 pixels on a 640-pixel canvas. That single
+decision created 2 test--train near-duplicate pairs under raw scoring and 4
+under aligned at $\epsilon = 0.05$, where the published split had none, which is
+what established that an allocator blind to duplicates can satisfy every other
+constraint and still make the split worse.
+
+The second attempt made whole groups the unit of movement at a 30-second
+threshold. It eliminated the contamination --- zero test--train pairs at every
+epsilon under both scorings --- and broke the sizes instead, ending at
+1458/438/225. Having each constraint satisfiable alone, and the two attempts
+failing on different ones, is what motivated sweeping the threshold rather than
+choosing it.
+
+The third attempt swept the threshold across seven values and found that 15, 20
+and 25 seconds all satisfy both constraints, of which 15 is the smallest and the
+cheapest. That is the released split: $\tau = 15$~s, scene threshold
+$\epsilon = 0.05$, seed 20260804.
+
+Both superseded runs are retained in the repository with a banner recording why
+they were replaced, and no number inside either was altered when they were
+superseded. A run whose conclusion was overturned is still the only record of
+what was actually computed at the time, and editing it would destroy the
+evidence that the sequence above took place.
+
+% F3 at \textwidth, not \figcol: see the legibility note in this file's header.
+% This is a wide two-panel exhibit; even \textwidth leaves its shift table at
+% 4.1 pt. It needs a re-render at target width before submission.
+\begin{figure}[tp]
+  \centering
+  \includegraphics[width=\textwidth]{near_duplicate_pair.pdf}
+  \caption{The pair that decided the grouping rule.
+  \texttt{IMG\_20240220\_115315} and \texttt{IMG\_20240220\_115316}, captured
+  one second apart, with their annotation boxes drawn and named. Across the five
+  shared components the box centres differ by at most 9.01 pixels on the
+  640-pixel canvas. The first allocator placed the left frame in test and left
+  the right in training; the released split moves whole bursts, so both sit in
+  training. The split shown under each panel is read from the built tree, not
+  asserted, so the figure tracks whatever split is released.}
+  \label{fig:near-duplicate-pair}
+\end{figure}
+
+\subsection{Verification}
+\label{sec:split-verification}
+
+The corrected dataset was materialised by copying from an unmodified v2 tree and
+then verified by re-reading what had been written, under eight checks, all of
+which pass. The image counts per partition are 1478/438/205; the copy loop's
+intent matches what is on disk; no image lacks a label and no label is an
+orphan; the total instance count is 12{,}937, unchanged; all 61 classes hold at
+least five instances in both validation and test; every class identifier lies in
+the range 0 to 60; and every copied file is byte-identical to its source.
+
+The byte-identical check earns its place precisely because it is redundant with
+the others under normal conditions. A truncated or partially written copy would
+pass every count-based check in the list --- the file exists, it has a label, the
+label parses, the class identifiers are in range --- while silently corrupting
+the pixels a detector trains on. Comparing content hashes across all 2{,}121
+images and their 2{,}121 label files is the only check in the set that would
+catch it.
+
+% TODO -- UNSUPPORTED, DO NOT WRITE UNTIL A RUN EXISTS. The drafted bullet here
+% reported an independent check on the allocator: same-camera cross-split pairs
+% within 15 s numbering 364 in the published split and 364 in the corrected one,
+% showing the allocator neither created nor removed any. No committed run
+% reports that figure, and the nearest committed numbers measure different
+% things (see this file's header). The claim is worth making -- it is a check on
+% temporal adjacency independent of the label-geometry contamination measure --
+% but it needs a script and its own run directory first.
+
+\input{../tables/t2_split_properties}
+
+\subsection{What the correction does not fix}
+\label{sec:correction-limits}
+
+Validation--train contamination is unchanged. At $\epsilon = 0.05$ the published
+split and the corrected one both carry 1 such pair under raw scoring and 3 under
+aligned, and they are the same pairs: pre-existing in the data as distributed,
+created by neither allocator and removed by neither. The zero reported in
+Section~\ref{sec:duplicate-contamination} and preserved here describes the
+test--train relationship only. Test contamination biases the headline metric and
+validation contamination biases model selection; they are different failures and
+a single cross-split figure that merged them would report neither.
+
+The rescued classes rest on very few images each. Five instances is the
+threshold at which a class becomes measurable, not the sample size at which a
+per-class average precision becomes worth quoting with confidence. The
+correction changes those classes from unmeasurable to measurable and claims
+nothing beyond that, and per-class results in Section~\ref{sec:results} should be
+read with the instance count beside them.
+
+The duplicate measurement's scope carries over unchanged from
+Section~\ref{sec:duplicate-contamination}: only pairs sharing an identical class
+inventory are ever compared. Among the untimestamped images, three
+consecutive-numbered pairs fall outside that scope, one of them across train and
+test. \texttt{IMG\_5243} carries six classes to \texttt{IMG\_5244}'s five, the
+extra being an Arduino-Uno, and the two shared single-instance components sit
+109.6 and 86.3 pixels apart on the 640-pixel canvas. Inspected visually, the
+scene is rearranged rather than re-photographed. That pair was never scored, and
+never scored is not the same as scored and cleared.
+
+Partial overlap between images is pervasive and no split removes it. Every image
+in a capture session shares a background and draws from the same pool of
+components, so a training image resembling a test image in background and in
+several components is the normal condition of this dataset rather than a defect
+of any particular allocation. The contamination figures are bounded claims about
+identically inventoried pairs, and they are not a guarantee that no training
+image resembles a test image.
+
+The threshold is established for one seed. The allocator is greedy, and a
+different seed explores a different corner of the search space; the sweep in
+Section~\ref{sec:tau-choice} answers the question for seed 20260804 and does not
+prove that 15 seconds is the right threshold in general. What it establishes is
+that a threshold satisfying every constraint exists and that this one does.
+
+\subsection{What is released}
+\label{sec:split-release}
+
+The split is released as a manifest assigning each image name to a partition.
+Applied to a copy of ElectroCom61 v2 obtained from the Mendeley archive, it
+reproduces the corrected split exactly, because the seed is fixed and the
+allocation deterministic. The manifest is offered under CC BY 4.0, the licence
+of the dataset it derives from, and the attribution to the dataset authors
+travels with it \citep{electrocom61}.
+
+A copy of the re-split images is also published alongside the manifest, as a
+convenience for anyone who would otherwise download the archive and rebuild the
+tree locally. That copy is a redistribution of the dataset's images, carries the
+same CC BY 4.0 terms and the same attribution, and modifies nothing: the
+corrected split changes which directory an image sits in and no image's pixels
+or annotations. Both artefacts describe the same assignment, and the manifest is
+the authoritative one --- it is what the verification in
+Section~\ref{sec:split-verification} was run against.

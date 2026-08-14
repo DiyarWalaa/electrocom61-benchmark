@@ -371,8 +371,9 @@ not present in `figures/`. Run it after any regeneration.
 ## Audit-phase figures
 
 These two predate the figures phase and are included in the paper **as-is**.
-They are PNG only — no PDF was produced — and they are not built by
-`make_figures.py`, so they do not inherit its style. That is deliberate: they
+They are not built by `make_figures.py`, so they do not inherit its style.
+`near_duplicate_pair` now ships as PDF **and** PNG (see below);
+`split_verification_sheet` remains PNG by decision. That is deliberate: they
 are evidence exhibits rather than plots, and regenerating them would change
 nothing but risk disturbing images already reviewed.
 
@@ -385,8 +386,18 @@ boxes drawn — shot one second apart, five identical components. Shows the
 near-duplicate pair that the released burst-aware split keeps together and that
 an earlier image-level allocator had split across train and test.
 
-3300 × 2220 px at 300 dpi. Runs `_01` through `_03` are superseded and carry a
-`NOTE.md` saying why; `_04` produced the committed image.
+3300 × 2220 px at 300 dpi, i.e. **11.0 × 7.4 in**. Runs `_01` through `_03`
+are superseded and carry a `NOTE.md` saying why; `_04` produced the reviewed
+image and `runs/20260814_figure_near_duplicate/` added the PDF without changing
+the drawing.
+
+**Legibility — measured, and it is a problem.** The smallest text in the figure
+is the per-box shift table at **6.9 pt at 11 in wide**. Included at a 3.5 in
+column it renders at **2.2 pt**; at a 6.5 in text block, at **4.1 pt**. Both
+are below the 8 pt floor every `make_figures.py` figure is built to. Section 4
+includes it at full text width because that is the widest slot available, but
+scaling cannot fix this: the figure needs re-rendering at its target width with
+font sizes chosen for that width, exactly as F1 and F2 were.
 
 ### `split_verification_sheet.png`
 
@@ -428,12 +439,11 @@ committed sources, and the numbers do not move.
 
 **No action on either of these now.**
 
-- **`near_duplicate_pair` → regenerate as PDF once Section 4 is drafted.**
-  It is currently PNG only. The journal wants vector, and regenerating it will
-  change an image that has already been reviewed, so it waits until the section
-  that cites it is written and its framing is settled. `figure_near_duplicate.py`
-  already reads the split from the built tree, so a PDF is a change to
-  `save_figure`, not a redraw of the content.
+- **`near_duplicate_pair` → PDF: DONE 2026-08-14**, now that Section 4 exists
+  and cites it. `figure_near_duplicate.py` writes both formats from the same
+  figure object with `pdf.fonttype 42`; the drawing is unchanged and the PNG is
+  byte-comparable in content. What the PDF does **not** fix is the font size —
+  see the legibility note above, which is the outstanding item.
 
 - **`split_verification_sheet` stays PNG.** It is a photographic contact sheet
   and appendix material: 48 thumbnails of real images, where vector output

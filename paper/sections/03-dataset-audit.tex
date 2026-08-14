@@ -31,12 +31,20 @@
 %        (0.95 pp) and the run flags it as near-nominal in substance but not by
 %        the measure. Written as seven of eight with the borderline stated.
 %
-% PENDING CITATION -- 3.6. The dataset paper's stated rationale for using
-% several phones ("to ensure diverse imaging qualities") cannot be cited:
-% references.bib holds only yolov12paper and yolov13paper, with no entry for
-% the ElectroCom61 dataset paper itself. The paragraph is written from the
-% committed device measurement instead. Add the entry, then restore the
-% rationale as a cited clause.
+% RESOLVED 2026-08-14 -- 3.6 now cites the dataset paper (electrocom61) for the
+% three-phones rationale. One open item remains, recorded at 3.6 itself: the
+% metadata CSV carries FOUR distinct DEVICE_NAME values against the paper's
+% three phones.
+
+This section audits the released ElectroCom61 archive before any detector is
+trained on it: which classes the published split can evaluate, how each capture
+session was allocated across the three partitions, what the shipped metadata
+describes, and whether near-duplicate images straddle the split boundary. Every
+measurement below is taken from the released files alone --- image filenames,
+label files and the metadata CSV --- using only the Python standard library and
+no model. The audit finds that a quarter of the annotation effort sits in classes
+the published split cannot evaluate, that the cause is session allocation rather
+than class frequency, and that the metadata shipped with v2 describes v1.
 
 \subsection{Class coverage under the published split}
 \label{sec:class-coverage}
@@ -54,14 +62,14 @@ the empty one.
 Fifteen of the 61 classes hold zero instances in both the validation and the test
 partition, and 22 hold fewer than five test instances. A class with no test
 instances cannot contribute to a test-set average precision at all, and a class
-with one or two contributes a value estimated from a sample too small to
-distinguish a detector from a coin.
+with one or two contributes a value estimated from a sample too small to support
+a stable estimate.
 
 Those fifteen classes, listed in Table~\ref{tab:unevaluable-classes}, are not
 marginal. They carry 3{,}496 annotation instances between them, 27.0\% of the
 12{,}937 in the dataset, and each holds between 153 and 293 training instances.
 More than a quarter of the annotation effort in ElectroCom61 therefore supports
-classes on which no published result has ever been measured.
+classes that no result reported on the published split can have measured.
 
 The consequence is that every mAP figure reported on this dataset averages over
 roughly 46 classes rather than 61, and the two averages are not comparable
@@ -71,9 +79,9 @@ trained here. A score computed over a reduced set of classes is not wrong, but i
 answers a narrower question than its name suggests, which is why the count is
 reported alongside every figure in Section~\ref{sec:results}.
 
-\begin{figure}[t]
+\begin{figure}[tp]
   \centering
-  \includegraphics[width=\columnwidth]{f1_class_instance_counts.pdf}
+  \includegraphics[width=\figcol,height=\figmaxh,keepaspectratio]{f1_class_instance_counts.pdf}
   \caption{Per-class annotation counts, published split. 15 of 61 classes have
   zero valid+test instances (filled marker, bold label) and cannot be evaluated
   at all; 22 in total have fewer than five test instances --- the 15 above plus
@@ -102,9 +110,9 @@ makes the gap repairable, because it can be closed by reallocating sessions
 rather than by collecting more data --- the construction taken up in
 Section~\ref{sec:corrected-split}.
 
-\begin{figure}[t]
+\begin{figure}[tp]
   \centering
-  \includegraphics[width=\columnwidth]{f2_capture_group_composition.pdf}
+  \includegraphics[width=\figcol,height=\figmaxh,keepaspectratio]{f2_capture_group_composition.pdf}
   \caption{Capture-group composition of the published split. (a) v2 image counts
   per session: 3 of the 9 groups reach neither valid nor test (bold label, filled
   marker) and together hold 775 of the 1478 training images, 52.4\%; all 15
@@ -129,14 +137,17 @@ tolerance is expressed in images rather than percentage points because a
 score it as skewed for rounding it cannot avoid.
 
 Aggregated over all 2{,}121 images the split is 69.7/20.7/9.7, which reads as a
-textbook 70/20/10. That aggregate is an accident of offsetting deviations.
-Relative to a uniform draw, the three train-only groups withhold 155.0
-validation images and 77.5 test images between them; the 28 February group
-carries a validation surplus of 169.6 and the 3 March group a test surplus of
-76.2. The two nearly cancel, leaving the aggregate 13.8 validation images above
-and 7.1 test images below nominal --- under one percentage point in each case.
-This is why the problem is invisible at the level at which splits are normally
-checked, and it is the reason the per-group measurement was made at all.
+textbook 70/20/10. That aggregate is an accident of offsetting deviations, and
+the offsets are large. Relative to a uniform draw, the three train-only groups
+withhold 155.0 validation images and 77.5 test images between them. On the
+validation side the 28 February group returns a surplus of 169.6, and the five
+remaining groups contribute $-0.8$, leaving the aggregate 13.8 validation images
+above nominal. On the test side the 3 March group returns a surplus of 76.2, the
+28 February group subtracts a further 5.2, and the four near-nominal groups
+subtract 0.6, leaving the aggregate 7.1 test images below nominal. Both residuals
+are under one percentage point of the 2{,}121 images. This is why the problem is
+invisible at the level at which splits are normally checked, and it is the reason
+the per-group measurement was made at all.
 
 \subsection{The metadata file describes v1, not v2}
 \label{sec:metadata-provenance}
@@ -147,7 +158,7 @@ the identity test: the set of image stems in v1 and the set of keys in the CSV
 are equal, with zero entries on either side unmatched. Identity is what settles
 the question, because the count test can pass by arithmetic coincidence --- two
 collections of 2{,}071 files need not be the same files. With identity
-established, the split-level test is decisive in turn: the CSV's
+established, the split-level test can be read at face value: the CSV's
 \texttt{DATA\_TYPE} column against the folder each image occupies under v1 gives
 a perfectly diagonal contingency table, 1{,}454 train, 412 validation and 205
 test, with zero disagreements across all 2{,}071 rows.
@@ -207,18 +218,23 @@ iPhone, were split 133\slash 36\slash 20 across train, validation and test. Unde
 v2 they are split 189\slash 0\slash 0, so every image from that device now sits
 in the training partition.
 
-The dataset records four distinct device names across its 2{,}121 images, and the
-iPhone is the only one confined to a single partition. Whatever variation in
-imaging characteristics that device contributes --- sensor, optics, and the
-processing pipeline applied before the image was ever exported --- is therefore
-present in what the detectors learn from and absent from what they are measured
-on. A model that generalises poorly to that device would not register as
-degraded under the published split, because no test image would expose it.
+This matters because the capture equipment was a design decision rather than an
+incidental one: three phones were used to ensure diverse imaging qualities
+\citep{electrocom61}. Under the published split that diversity exists only in
+training. Whatever variation the iPhone contributes --- sensor, optics, and the
+processing pipeline applied before the image was ever exported --- is present in
+what the detectors learn from and absent from what they are measured on, so a
+model that generalises poorly to that device would not register as degraded,
+because no test image would expose it.
 
-% TODO: the dataset paper states that several phones were used to ensure diverse
-% imaging qualities, which is the sentence that makes this subsection's
-% implication sharp. It cannot be cited until references.bib carries an entry
-% for the dataset paper. Restore as a cited clause once it does.
+% NOTE, for resolution rather than for the prose: the metadata CSV records FOUR
+% distinct DEVICE_NAME values across the 2121 images -- ONEPLUS_NORD (391),
+% REDMI (1180), X (311) and iPhone (189), plus 50 images with no CSV row
+% (runs/20260801_device_split/). The paper states three phones. The two counts
+% are both stated as facts above only in the sense that the prose quotes the
+% paper's rationale and not its device count; if the fourth name denotes a
+% distinct handset the sentence above should say four, and if it is an alias or
+% a placeholder that should be recorded. Needs the PDF to settle.
 
 \subsection{Duplicate contamination: a negative result}
 \label{sec:duplicate-contamination}

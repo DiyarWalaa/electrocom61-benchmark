@@ -52,6 +52,31 @@
 % Figures are referenced by filename alone; the directory lives only here.
 \graphicspath{{../figures/}}
 
+% Figure width. Every figure in figures/ is RENDERED at 3.5 in -- one IEEE
+% column -- with its font sizes chosen for that width. Including one at
+% \columnwidth under this placeholder single-column article class scales it by
+% 6.5/3.5, which took F1 from 8.95 in tall to about 16.6 in: taller than any
+% page, so it could not be placed and floated past the bibliography.
+%
+% \figcol is the width figures are actually drawn at. Under a two-column venue
+% template set it to \columnwidth instead -- there the rendered width and the
+% column width agree, and every \includegraphics below follows automatically.
+\newlength{\figcol}
+\setlength{\figcol}{3.5in}
+
+% Height cap. Width alone does not place these figures: F1 is 8.95 in tall at
+% its design width, and this class gives a 9 in text block, so the figure plus
+% its caption cannot fit on any page. LaTeX then defers the float to the end of
+% the document, which is how both figures ended up after the bibliography.
+%
+% \figmaxh caps the height so figure and caption fit together on a float page.
+% With keepaspectratio, whichever of the two limits binds first wins. Under a
+% two-column venue template set \figmaxh to \textheight: there \figcol equals
+% the real column width, the rendered size is already correct, and this cap
+% never binds. It exists only to make the placeholder class able to show them.
+\newlength{\figmaxh}
+\setlength{\figmaxh}{0.86\textheight}
+
 % Tables are generated into ../tables/ by scripts/make_tables.py and pulled in
 % with \input{../tables/<name>}. They are never pasted into a section file.
 

@@ -3,9 +3,9 @@
     "allow": [
       "Bash",
       "PowerShell",
-      "Read",
-      "Edit",
-      "Write",
+      "Read(**)",
+      "Edit(**)",
+      "Write(**)",
       "Glob",
       "Grep"
     ],
@@ -26,7 +26,8 @@
       "Bash(git clean *)",
       "Bash(git reset --hard *)",
       "Bash(git rebase *)",
-      "Bash(git checkout *)",
+      "Bash(git checkout --detach*)",
+      "Bash(git checkout -- *)",
       "Bash(git commit --amend *)",
       "Bash(git filter-branch *)",
       "Bash(git push --force*)",
@@ -36,7 +37,8 @@
       "PowerShell(git clean *)",
       "PowerShell(git reset --hard *)",
       "PowerShell(git rebase *)",
-      "PowerShell(git checkout *)",
+      "PowerShell(git checkout --detach*)",
+      "PowerShell(git checkout -- *)",
       "PowerShell(git commit --amend *)",
       "PowerShell(git filter-branch *)",
       "PowerShell(git push --force*)",
@@ -72,7 +74,11 @@
       "PowerShell(miktex *)",
 
       "PowerShell(powershell -File scripts\\build_paper.ps1 -AllowInstall*)",
-      "PowerShell(powershell -NoProfile -File scripts\\build_paper.ps1 -AllowInstall*)"
+      "PowerShell(powershell -NoProfile -File scripts\\build_paper.ps1 -AllowInstall*)",
+
+      "Read(~/**)",
+      "Edit(~/**)",
+      "Write(~/**)"
     ]
   },
   "hooks": {

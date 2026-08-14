@@ -54,8 +54,8 @@ RULES = [
      "git deletion"),
     (r"^git\s+(rebase|filter-branch)\b",
      "history rewrite"),
-    (r"^git\s+checkout\b",
-     "git checkout (detaches or discards working-tree state)"),
+    # `git checkout` is handled by checkout_verdict(), not here: switching to and
+    # creating branches are allowed, so a blanket pattern is too coarse.
     (r"^git\s+switch\b.*--detach\b",
      "detached checkout"),
     (r"^git\s+reset\b.*--hard\b",
@@ -84,6 +84,39 @@ RULES = [
 
 COMPILED = [(re.compile(p, re.IGNORECASE), why) for p, why in RULES]
 
+IS_CHECKOUT = re.compile(r"^git\s+checkout\b", re.IGNORECASE)
+CREATES_BRANCH = re.compile(r"\s-[bB]\b")
+# A commit-ish rather than a branch name: a bare hex object name, or any
+# revision expression -- HEAD~2, main^, HEAD@{1}, a tag with an offset.
+COMMIT_ISH = re.compile(r"(^|\s)(?:[0-9a-f]{7,40}|\S*(?:@\{|[~^])\S*)(\s|$)",
+                        re.IGNORECASE)
+
+
+def checkout_verdict(segment):
+    """Deny `git checkout` only where it detaches HEAD or discards files.
+
+    Switching branches (`git checkout main`) and creating them (`git checkout
+    -b feature`) are ordinary navigation and stay allowed. What is denied is
+    checking out a commit-ish, which detaches HEAD, and `git checkout --
+    <path>`, which discards working-tree changes with no undo.
+
+    `-b` short-circuits the commit-ish test: the branch NAME is what follows it,
+    and a name like `bead123` is valid hex without being an object.
+    """
+    if not IS_CHECKOUT.search(segment):
+        return None
+    if re.search(r"--detach\b", segment, re.IGNORECASE):
+        return "detached checkout"
+    if re.search(r"\s--(\s|$)", segment):
+        return "git checkout -- <path> (discards working-tree changes)"
+    if CREATES_BRANCH.search(segment):
+        return None
+    # Test only the arguments, so the words `git` and `checkout` cannot match.
+    args = segment.split(None, 2)[2] if len(segment.split()) > 2 else ""
+    if COMMIT_ISH.search(" " + args + " "):
+        return "checkout of a commit (detaches HEAD)"
+    return None
+
 
 def verdict(command):
     """Return a reason string if the command must be denied, else None."""
@@ -91,6 +124,10 @@ def verdict(command):
         segment = segment.strip()
         if not segment:
             continue
+        why = checkout_verdict(segment)
+        if why:
+            return "%s -- blocked by scripts/deny_guard.py (segment: %r)" % (
+                why, segment[:120])
         for pattern, why in COMPILED:
             if pattern.search(segment):
                 return "%s -- blocked by scripts/deny_guard.py (segment: %r)" % (

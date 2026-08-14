@@ -1,8 +1,256 @@
 \section{Dataset Audit}
 \label{sec:dataset-audit}
 
-% TODO: Findings 1-3. Open with the top-10 result from
-% notes/writing-corrections.md: the unevaluable classes are the biggest
-% ones, not the smallest, which forecloses the class-imbalance reading.
-% Figures: f1_class_instance_counts, f2_capture_group_composition.
-% Tables: t1_unevaluable_classes.
+% Every number in this section traces to a committed run directory. Sources, by
+% subsection:
+%   3.1  runs/20260802_class_date_provenance/{class_split_counts.csv,
+%        never_evaluated_classes.csv, summary.md}; data/master_results.csv
+%   3.2  runs/20260802_class_date_provenance/date_split_summary.csv
+%   3.3  runs/20260809_split_ratio_by_group_03/summary.md
+%   3.4  runs/20260802_v1_provenance/summary.md;
+%        runs/20260801_csv_coverage/split_agreement.csv
+%   3.5  runs/20260809_split_v1_vs_v2_by_group_03/summary.md
+%   3.6  runs/20260801_device_split/summary.md;
+%        runs/20260809_split_v1_vs_v2_by_group_03/summary.md
+%   3.7  runs/20260804_duplicate_contamination/summary.md;
+%        runs/20260805_figure_verification_sheet_02/summary.md;
+%        runs/20260802_burst_clusters_02/gap_histogram.csv
+%
+% THREE PLACES WHERE THE DRAFTED BULLET AND THE COMMITTED SOURCE DIVERGED. The
+% source was followed in each case; see the report accompanying this draft.
+%   3.3  the bullet said "within about one point" of 70/20/10. The run
+%        classifies on IMAGES (within 1.5 images of a uniform draw) and states
+%        explicitly that the percentage-point measure is the wrong one, because
+%        it punishes a 54-image session for rounding it cannot avoid. At 1.0 pp
+%        only THREE groups qualify, not four. Written on the images measure.
+%   3.4  the bullet said T4 is decisive. The run designates T2 as the deciding
+%        test and says so in bold: T1 can pass by arithmetic coincidence, so T4
+%        rests on T2 having already established identity. Written that way.
+%   3.5  the bullet said all eight v1 groups were near-nominal. The run scores
+%        SEVEN of eight; the iPhone group misses the tolerance by 1.8 images
+%        (0.95 pp) and the run flags it as near-nominal in substance but not by
+%        the measure. Written as seven of eight with the borderline stated.
+%
+% PENDING CITATION -- 3.6. The dataset paper's stated rationale for using
+% several phones ("to ensure diverse imaging qualities") cannot be cited:
+% references.bib holds only yolov12paper and yolov13paper, with no entry for
+% the ElectroCom61 dataset paper itself. The paragraph is written from the
+% committed device measurement instead. Add the entry, then restore the
+% rationale as a cited clause.
+
+\subsection{Class coverage under the published split}
+\label{sec:class-coverage}
+
+The ten most-annotated classes in ElectroCom61, shown at the top of
+Figure~\ref{fig:class-instance-counts}, hold at most two test instances each, and
+eight of the ten hold none; the eleventh, IC-Base-14-Pin, holds 22.
+The transition between the tenth and eleventh ranks is therefore a step rather
+than a gradient. This is what distinguishes the pattern from class imbalance,
+which is the reading the ordering first invites: an imbalanced dataset produces a
+smooth decline in test representation as class frequency falls, and cannot
+produce a discontinuity between adjacent ranks in which the more frequent side is
+the empty one.
+
+Fifteen of the 61 classes hold zero instances in both the validation and the test
+partition, and 22 hold fewer than five test instances. A class with no test
+instances cannot contribute to a test-set average precision at all, and a class
+with one or two contributes a value estimated from a sample too small to
+distinguish a detector from a coin.
+
+Those fifteen classes, listed in Table~\ref{tab:unevaluable-classes}, are not
+marginal. They carry 3{,}496 annotation instances between them, 27.0\% of the
+12{,}937 in the dataset, and each holds between 153 and 293 training instances.
+More than a quarter of the annotation effort in ElectroCom61 therefore supports
+classes on which no published result has ever been measured.
+
+The consequence is that every mAP figure reported on this dataset averages over
+roughly 46 classes rather than 61, and the two averages are not comparable
+quantities. The framework reports the count directly: under the published split
+it evaluates 45 classes on validation and 46 on test, across all five detectors
+trained here. A score computed over a reduced set of classes is not wrong, but it
+answers a narrower question than its name suggests, which is why the count is
+reported alongside every figure in Section~\ref{sec:results}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{f1_class_instance_counts.pdf}
+  \caption{Per-class annotation counts, published split. 15 of 61 classes have
+  zero valid+test instances (filled marker, bold label) and cannot be evaluated
+  at all; 22 in total have fewer than five test instances --- the 15 above plus
+  seven more, including IC-Chip, the most annotated class in the dataset.}
+  \label{fig:class-instance-counts}
+\end{figure}
+
+% Generated by scripts/make_tables.py; carries its own \caption and \label.
+\input{../tables/t1_unevaluable_classes}
+
+\subsection{The mechanism}
+\label{sec:coverage-mechanism}
+
+Three capture groups sit entirely within the training partition, as panel~(a) of
+Figure~\ref{fig:capture-group-composition} shows: 19 February 2024, with 100
+images; 20 February 2024, with 486; and the untimestamped iPhone group, with 189. Together they hold 775 images, 52.4\% of the 1{,}478 in the
+training set, and none of the three contributes a single image to validation or
+test.
+
+All fifteen unevaluable classes occur only within those three groups. The
+coverage gap in Section~\ref{sec:class-coverage} is therefore not a property of
+the classes but of the sessions they were photographed in: a class that appears
+only in a session allocated wholly to training cannot reach an evaluation
+partition, however many instances of it the dataset contains. This is also what
+makes the gap repairable, because it can be closed by reallocating sessions
+rather than by collecting more data --- the construction taken up in
+Section~\ref{sec:corrected-split}.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[width=\columnwidth]{f2_capture_group_composition.pdf}
+  \caption{Capture-group composition of the published split. (a) v2 image counts
+  per session: 3 of the 9 groups reach neither valid nor test (bold label, filled
+  marker) and together hold 775 of the 1478 training images, 52.4\%; all 15
+  classes that cannot be evaluated occur only within them. (b) the same sessions
+  before and after the v2 re-split, each normalised to its own total, dashed
+  lines where a 70/20/10 split would fall.}
+  \label{fig:capture-group-composition}
+\end{figure}
+
+\subsection{Allocation is not uniform across sessions}
+\label{sec:allocation-uniformity}
+
+Measured session by session, the split takes three distinct shapes. Four groups
+--- 6 March, 9 March, 17 April and 18 November 2024 --- fall within 1.5 images of
+what a uniform 70/20/10 draw over that group would have produced, which is as
+close as integer arithmetic permits. Three contain no validation or test images
+at all. The remaining two are strongly skewed in opposite directions: 28 February
+2024 holds more validation images than training images, at 35.9/55.2/8.9, and 3
+March 2024 holds more test images than training images, at 29.3/20.2/50.5. The
+tolerance is expressed in images rather than percentage points because a
+54-image session moves 1.9 points per file, so a points-based tolerance would
+score it as skewed for rounding it cannot avoid.
+
+Aggregated over all 2{,}121 images the split is 69.7/20.7/9.7, which reads as a
+textbook 70/20/10. That aggregate is an accident of offsetting deviations.
+Relative to a uniform draw, the three train-only groups withhold 155.0
+validation images and 77.5 test images between them; the 28 February group
+carries a validation surplus of 169.6 and the 3 March group a test surplus of
+76.2. The two nearly cancel, leaving the aggregate 13.8 validation images above
+and 7.1 test images below nominal --- under one percentage point in each case.
+This is why the problem is invisible at the level at which splits are normally
+checked, and it is the reason the per-group measurement was made at all.
+
+\subsection{The metadata file describes v1, not v2}
+\label{sec:metadata-provenance}
+
+The metadata CSV shipped inside the v2 archive was tested against an actual v1
+download under four provenance tests, and passed all four. The deciding test is
+the identity test: the set of image stems in v1 and the set of keys in the CSV
+are equal, with zero entries on either side unmatched. Identity is what settles
+the question, because the count test can pass by arithmetic coincidence --- two
+collections of 2{,}071 files need not be the same files. With identity
+established, the split-level test is decisive in turn: the CSV's
+\texttt{DATA\_TYPE} column against the folder each image occupies under v1 gives
+a perfectly diagonal contingency table, 1{,}454 train, 412 validation and 205
+test, with zero disagreements across all 2{,}071 rows.
+
+An independent line of evidence corroborates this. Fifty images in v2 carry no
+CSV row at all, and those fifty are split 35/10/5 across train, validation and
+test. That is exactly the composition of the 18 November 2024 capture session,
+which is the one session absent from v1 entirely. The images the CSV does not
+describe are precisely the images that did not exist when it was written.
+
+The consequence is a rule for reading the dataset rather than a defect in it. The
+folders on disk are authoritative for the v2 split and the CSV is not: the same
+contingency table built against v2 carries 600 off-diagonal rows. But the CSV
+remains a faithful record of the v1 assignments, and it is the only surviving
+record of them, which is what makes the comparison in the next subsection
+possible.
+
+\subsection{What the v2 re-split changed}
+\label{sec:v2-resplit}
+
+Under v1, seven of the eight capture groups the CSV covers were near-nominal by
+the same 1.5-image measure used above. The eighth, the untimestamped iPhone
+group, misses that tolerance by 1.8 images on a 189-image group --- 0.95
+percentage points --- so the departure from a uniform draw is a rounding-scale
+one in every group present.
+
+The v2 re-split, drawn in panel~(b) of
+Figure~\ref{fig:capture-group-composition}, left three of those groups untouched,
+with zero images moved in 6 March, 9 March and 17 April, and changed the other
+five. In the three groups that
+became train-only, validation and test images were folded into training: 20
+validation and 10 test images for 19 February, 97 and 48 for 20 February, and 36
+and 20 for the iPhone group. The two skewed groups absorbed the resulting
+deficits, with 28 February taking the validation shortfall through 189 images
+moved from training to validation, and 3 March taking the test shortfall through
+77 moved from training to test.
+
+Across the 2{,}071 images the CSV covers, 600 changed assignment between v1 and
+v2 --- 29\% of them. These are the same 600 images that produce the off-diagonal
+rows in the \texttt{DATA\_TYPE} comparison of
+Section~\ref{sec:metadata-provenance}; the disagreement between the CSV and the
+folders is a record of the re-split, not an inconsistency within either.
+
+One further observation constrains what can be inferred from the above. The 18
+November 2024 session, which was added in v2 and has no v1 assignment to change,
+was split 35/10/5 of 50 --- exactly 70/20/10, with zero deviation in any of the
+three cells. Whatever produced the v2 split allocated a new session at the
+nominal ratio. No mechanism is claimed here for the changes to the pre-existing
+assignments; the observation is recorded because it bounds the explanations that
+remain available.
+
+\subsection{One camera is never evaluated}
+\label{sec:camera-coverage}
+
+Under v1, the 189 untimestamped images, which the metadata attributes to an
+iPhone, were split 133\slash 36\slash 20 across train, validation and test. Under
+v2 they are split 189\slash 0\slash 0, so every image from that device now sits
+in the training partition.
+
+The dataset records four distinct device names across its 2{,}121 images, and the
+iPhone is the only one confined to a single partition. Whatever variation in
+imaging characteristics that device contributes --- sensor, optics, and the
+processing pipeline applied before the image was ever exported --- is therefore
+present in what the detectors learn from and absent from what they are measured
+on. A model that generalises poorly to that device would not register as
+degraded under the published split, because no test image would expose it.
+
+% TODO: the dataset paper states that several phones were used to ensure diverse
+% imaging qualities, which is the sentence that makes this subsection's
+% implication sharp. It cannot be cited until references.bib carries an entry
+% for the dataset paper. Restore as a cited clause once it does.
+
+\subsection{Duplicate contamination: a negative result}
+\label{sec:duplicate-contamination}
+
+The published split carries no test--train near-duplicate pairs at any threshold
+tested, under either of the two scorings applied, with low-information pairs
+excluded. This is reported as a finding rather than as an absence of one. The
+split has a documented coverage defect, established above, and the natural
+suspicion is that a split allocated in a way that stranded three whole sessions
+in training might also have scattered near-identical frames across the boundary.
+It did not, and a corrected split must therefore preserve this property rather
+than merely avoid making it worse.
+
+The margin behind that result is thin and is disclosed here rather than left to
+be discovered. The closest test--train pair scores 0.0515 against the loosest
+threshold applied, 0.05, clearing it by 3\%. A threshold chosen slightly more
+conservatively would have returned a non-zero count, so the result is
+threshold-sensitive and should be quoted with the threshold attached.
+
+No threshold can be derived empirically from the data itself. The distribution of
+gaps between consecutive captures is unimodal: measured per second of bin width,
+it rises monotonically to a peak in the 3--5 second bin and decays monotonically
+thereafter, on both of the two independent device keyings tested. There is no
+valley between a burst mode and a between-burst mode at which a cut could be
+placed, because there is only one mode. Any grouping threshold is consequently a
+construction rather than a measurement, which is why the one adopted in
+Section~\ref{sec:corrected-split} is justified by the properties of the split it
+produces rather than by the shape of this distribution.
+
+Two scope limits travel with every figure above. Only pairs sharing an identical
+class inventory are compared, so a genuine duplicate in which one component is
+occluded in one frame is never scored; every count is a floor rather than an
+estimate. And 95 low-information cross-split pairs, those carrying two annotated
+boxes or fewer, are excluded from the ranking, because a match between box
+centres is cheap to achieve by chance when there are few boxes to match.

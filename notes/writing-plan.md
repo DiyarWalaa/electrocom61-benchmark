@@ -18,13 +18,13 @@ their claims are settled.
 | 3 | **5 — Benchmark Setup** | **complete** (5.1–5.6 drafted, fact-checked) |
 | 4 | **6 — Results** | **complete** (6.1–6.5 drafted, fact-checked) |
 | 5 | **7 — Discussion** | **complete** (7.1–7.4 drafted, fact-checked) |
-| 6 | 8 — Limitations | stub |
+| 6 | **8 — Limitations** | **complete** (drafted, fact-checked) |
 | 7 | 2 — Related Work | stub |
 | 8 | 9 — Conclusion | stub |
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-Sections 3, 4, 5, 6 and 7 are finished and are the model for the rest: every
+Sections 3 through 8 are finished and are the model for the rest: every
 number in them traces to a committed file, and anything that does not is marked
 in the section file's own header comment rather than left silent.
 
@@ -164,11 +164,15 @@ Evidence used:
 - `reference/electrocom61-yolov9.ipynb` and the README's reading of it — what
   the 95.9% figure does and does not evidence
 
-### Section 8 — Limitations
+### Section 8 — Limitations — DRAFTED
 
-Claims: _to be supplied._
+Eight paragraphs, one page, deliberately blunt. Ten assertions re-derived from
+source. RT-DETR-l was found to be the exception to the training-budget
+paragraph -- it early-stopped at epochs 59 and 73 while every YOLO ran the full
+100 -- so the comparison sets four unconverged models against one converged one,
+which the paragraph now says.
 
-Evidence available: single seed, one GPU, no variance estimate; the augmentation
+Evidence used: single seed, one GPU, no variance estimate; the augmentation
 confound; the scope limit on the contamination figures; RT-DETR-l evaluated at
 `l` scale against YOLO `s` scale.
 

@@ -1,5 +1,89 @@
 \section{Limitations}
 \label{sec:limitations}
 
-% TODO: Single seed, one GPU, no variance estimate. The augmentation
-% confound. The scope limit on the contamination figures.
+% Sources, by paragraph:
+%   single seed        data/master_results.csv (one run per model per split);
+%                      data/latency_by_arch.csv (e2e_ms_p50_gap)
+%   one dataset        Sections 3, 7.3
+%   no testing         --
+%   contamination      Sections 3.7, 4.2, 4.7;
+%                      runs/20260804_duplicate_contamination/
+%   rescued classes    runs/20260804_build_corrected_dataset_02/class_counts_built.csv
+%   one seed, split    runs/20260804_burst_aware_tau_sweep/
+%   conf threshold     Section 5.4; data/config_provenance.csv
+%   training budget    data/kaggle/artifacts/*/*_training_curves.csv;
+%                      data/master_results.csv, epochs_run
+%
+% Kept to one page deliberately. A limitations section is read for what it
+% concedes, and hedging each concession costs the credibility the concession
+% was meant to buy.
+
+Every accuracy figure in this paper comes from a single training run. There is
+no variance estimate for any of them, which is why
+Section~\ref{sec:metric-choice} reports the three middle-ranked architectures as
+a group rather than an ordering: differences of 0.0001 to 0.0023 mAP@50--95
+cannot be separated from run-to-run variation that was never measured. The
+latency figures are better off, because each architecture was timed twice and
+the two measurements disagree by at most 0.24~ms
+(Section~\ref{sec:efficiency-measurement}); the accuracy measurements have no
+equivalent number, and none should be inferred from the latency one.
+
+Every finding here is measured on one dataset. The mechanism behind the coverage
+defect is not specific to ElectroCom61 and should be expected wherever data is
+collected in sessions and split by image (Section~\ref{sec:generalisation}), but
+that is an argument about the mechanism, not a demonstration. Nothing in this
+paper shows the defect on a second dataset, and the frequency with which it
+occurs in published benchmarks is unknown.
+
+No difference reported here is tested for statistical significance. Magnitudes
+are given, and where a repeatability figure exists it is given beside them, but
+no confidence interval, hypothesis test or effect-size estimate appears anywhere
+in this work. Comparative statements should be read as descriptions of what was
+measured on these runs, not as claims that the differences would survive
+replication.
+
+The contamination figures are floors rather than estimates, and three separate
+restrictions make them so. Only pairs whose class inventories match exactly are
+ever compared, so a genuine duplicate with one component occluded is never
+scored (Section~\ref{sec:duplicate-contamination}). Pairs carrying two annotated
+boxes or fewer are excluded from the ranking, which is the conservative choice
+for a ranking and the permissive one for a count of zero
+(Section~\ref{sec:correction-limits}). And the corrected split's figure at the
+loosest threshold is not independent of the grouping that produced it, because
+that grouping used the same threshold (Section~\ref{sec:grouping-rule}); the
+figures at the two stricter thresholds carry no such dependence.
+
+The fifteen rescued classes hold between five and ten test instances each. Five
+instances is the threshold at which a class becomes measurable, not a sample
+size from which a per-class average precision can be quoted with confidence. The
+corrected split makes those classes evaluable and claims nothing further about
+how well they are evaluated.
+
+The grouping threshold and the allocation that follows from it are established
+for one seed. The allocator is greedy, so a different seed explores a different
+region of the search space and could hold the frozen split sizes where this one
+fails or fail where this one holds. The sweep in
+Section~\ref{sec:tau-choice} answers the question for seed 20260804 and does not
+establish that 15 seconds is the right threshold in general.
+
+The confidence threshold used at evaluation is fixed by the Ultralytics release
+rather than stated explicitly in the configuration
+(Section~\ref{sec:eval-protocol}). That is this study's own instance of the
+reporting gap it documents in prior work: an evaluation protocol can be recorded
+in full and still contain a value determined by a library version. Stating the
+library version is what makes it recoverable, which is the reason
+Section~\ref{sec:training-configuration} treats that version as part of the
+specification, but it is a mitigation and not a fix.
+
+Every YOLO run consumed its full hundred-epoch budget without triggering early
+stopping, so none of them had plateaued when training ended. The accuracy
+figures reported for them are therefore a lower bound at this budget rather than
+converged results, and the ordering between architectures could change under a
+longer one. RT-DETR-l is the exception in both directions: it did stop early, at
+epochs 59 and 73 of its two runs, so it alone is reported at a point its own
+early-stopping criterion selected --- which means the comparison sets four
+unconverged models against one converged one. The budget was copied from prior work
+(Section~\ref{sec:training-configuration}) precisely so that it could not be
+offered as an explanation for a difference between this study and those; holding
+it fixed is what makes the comparison controlled and also what leaves this
+limitation in place.

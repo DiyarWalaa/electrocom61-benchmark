@@ -1,0 +1,16 @@
+model,source,layers,params_millions,table_location
+YOLOv8s,yolov12paper,214,17.6,Table I
+YOLOv9s,yolov12paper,930,60.8,Table I
+YOLOv10s,yolov12paper,319,2.6,Table I
+YOLOv11s,yolov12paper,272,2.5,Table I
+EcoDetect-YOLOv2,yolov12paper,196,23.4,Table I
+YOLO_EC,yolov12paper,325,25.1,Table I
+YOLOv12S,yolov12paper,292,19.7,Table I
+YOLOv8s,yolov13paper,214,17.6,Table I
+YOLOv9s,yolov13paper,930,60.8,Table I
+YOLOv10s,yolov13paper,319,2.6,Table I
+YOLOv11s,yolov13paper,272,2.5,Table I
+EcoDetect-YOLOv2,yolov13paper,196,23.4,Table I
+YOLO_EC,yolov13paper,325,25.1,Table I
+YOLOv12S,yolov13paper,292,19.7,Table I
+YOLOv13s,yolov13paper,648,2.5,Table I

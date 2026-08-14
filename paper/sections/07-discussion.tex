@@ -14,29 +14,32 @@
 % tooling has checked them. Each is written narrowly, and each needs a page
 % reference before submission:
 %
-%   1. THE FORK. That YOLOv13 is distributed as a fork outside Ultralytics, and
-%      therefore that the corresponding row in a prior comparison table was
-%      produced on a different codebase from the rows beside it. Section 5.1
-%      already asserts the first half; the second half is the new claim here.
+%   1. THE FORK -- **UNSOURCED**, not merely unverified. That YOLOv13 is
+%      distributed as a fork outside Ultralytics appears in NEITHER prior paper,
+%      so there is no page to point at. Its source would have to be the
+%      iMoonLab repository or the YOLOv13 arXiv paper, neither of which is in
+%      this repository and neither of which has been consulted. This is a
+%      search item. Section 5.1 asserts the same thing and carries the same
+%      gap. Until a source exists, the sentence in 7.1 and the one in 5.1 are
+%      the weakest claims in the paper -- treat them as such.
 %
-%   2. THE CROSS-VALIDATION PROTOCOL. notes/writing-corrections.md records that
-%      the YOLOv13 paper evaluates its proposed model by 3-fold cross-validation
-%      over the entire dataset while the comparison rows in the same table are
-%      single-split figures. This is the strongest item in 7.1 and the least
-%      verifiable from here.
+%   2. THE CROSS-VALIDATION PROTOCOL -- pending verification, source located.
+%      The YOLOv13 paper states 3-fold cross-validation over the entire dataset
+%      at the END OF ITS SECTION III (methodology); the comparison table whose
+%      rows are single-split figures is its TABLE I, in SECTION IV.
+%      notes/writing-corrections.md records the reading. Confirm both locations
+%      against the PDF before submission.
 %
-%   3. THE PUBLISHED COMPLEXITY FIGURES -- and this one is WEAKER than the
-%      drafted bullet claimed. The bullet proposed that "for the three
-%      architectures whose parameter counts can be checked independently, the
-%      published values differ substantially from the measured ones (Section 6.4
-%      and Table 5)". THE REPOSITORY HOLDS NO PUBLISHED PARAMETER COUNTS. Table 5
-%      carries this study's measured values only, and no run, note or data file
-%      records what the prior papers report, so the difference cannot be stated
-%      or sized here. What IS established -- author-verified against all three
-%      PDFs, see 5.5 -- is that the two studies reporting parameter counts do not
-%      say whether those counts are fused or unfused. The paragraph below makes
-%      that narrower point. Restore the stronger one only with the published
-%      numbers recorded in a committed file.
+%   3. THE PUBLISHED COMPLEXITY FIGURES -- input now committed, prose NOT yet
+%      updated. data/published_complexity.csv records what the two papers report
+%      (both Table I, YOLOv12 paper Sec. IV and YOLOv13 paper Sec. IV), typed by
+%      hand from the PDFs and re-checkable row by row via its table_location
+%      column. scripts/compare_published_complexity.py sets it against the
+%      measured values: runs/20260814_compare_published_complexity/. THE
+%      DIFFERENCES ARE LARGE AND RUN IN BOTH DIRECTIONS, and fusion explains
+%      none of them. The paragraph below still makes only the narrower
+%      fused/unfused point; it is awaiting the author's review of the computed
+%      differences before it is strengthened.
 
 The benchmark in Sections~\ref{sec:benchmark-setup} and~\ref{sec:results} was
 built to settle a disagreement in the published record. What it establishes is

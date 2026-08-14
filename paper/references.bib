@@ -208,3 +208,117 @@
                   is not in doubt -- 8.4.115 is recorded in all eleven results
                   JSONs under data/kaggle/},
 }
+
+% ===========================================================================
+% DATA LEAKAGE AND SPLIT CONSTRUCTION. Added 2026-08-14.
+%
+% Found by the author via Consensus; every field below was then resolved
+% against the Crossref REST API rather than transcribed, so DOIs, volumes,
+% issues, article numbers and author lists come from the registry entry. That
+% makes these better sourced than the model and metric citations above -- but
+% NOT verified: nobody has read these papers from within this repository, and
+% the registry can only confirm that a work exists with these fields, not what
+% it says. EVERY ENTRY IS MARKED VERIFY for that reason.
+%
+% Two discrepancies found during lookup, both recorded rather than silently
+% adopted:
+%   - Apicella et al. was supplied as 2024. Crossref dates it 2025.
+%   - Graber et al. carries a published ADDENDUM (10.1038/s42256-025-01174-9,
+%     Nature Machine Intelligence 8(2):292, 2026). Read it before citing the
+%     original; an addendum can change what the paper is taken to have shown.
+% ===========================================================================
+
+% VERIFY: read before citing. Fields from Crossref.
+@article{kapoor2023leakage,
+  author  = {Kapoor, Sayash and Narayanan, Arvind},
+  title   = {Leakage and the reproducibility crisis in machine-learning-based
+             science},
+  journal = {Patterns},
+  volume  = {4},
+  number  = {9},
+  pages   = {100804},
+  year    = {2023},
+  doi     = {10.1016/j.patter.2023.100804},
+  note    = {VERIFY: not read from within this repository},
+}
+
+% VERIFY: read before citing. Fields from Crossref.
+@article{bernett2024guiding,
+  author  = {Bernett, Judith and Blumenthal, David B. and Grimm, Dominik G. and
+             Haselbeck, Florian and Joeres, Roman and Kalinina, Olga V. and
+             List, Markus},
+  title   = {Guiding questions to avoid data leakage in biological machine
+             learning applications},
+  journal = {Nature Methods},
+  volume  = {21},
+  number  = {8},
+  pages   = {1444--1453},
+  year    = {2024},
+  doi     = {10.1038/s41592-024-02362-y},
+  note    = {VERIFY: not read from within this repository},
+}
+
+% VERIFY: read before citing. Fields from Crossref.
+@article{joeres2025datasail,
+  author  = {Joeres, Roman and Blumenthal, David B. and Kalinina, Olga V.},
+  title   = {Data splitting to avoid information leakage with {DataSAIL}},
+  journal = {Nature Communications},
+  volume  = {16},
+  number  = {1},
+  pages   = {3337},
+  year    = {2025},
+  doi     = {10.1038/s41467-025-58606-8},
+  note    = {VERIFY: not read from within this repository},
+}
+
+% VERIFY: read before citing. Fields from Crossref.
+@article{rosenblatt2024leakage,
+  author  = {Rosenblatt, Matthew and Tejavibulya, Link and Jiang, Rongtao and
+             Noble, Stephanie and Scheinost, Dustin},
+  title   = {Data leakage inflates prediction performance in connectome-based
+             machine learning models},
+  journal = {Nature Communications},
+  volume  = {15},
+  number  = {1},
+  pages   = {1829},
+  year    = {2024},
+  doi     = {10.1038/s41467-024-46150-w},
+  note    = {VERIFY: not read from within this repository},
+}
+
+% VERIFY: read before citing. Fields from Crossref.
+% NOTE THE YEAR. Supplied as 2024; Crossref dates it 2025, and the DOI prefix
+% (s10462-025-) agrees with 2025. The Crossref year is used here.
+@article{apicella2025leakage,
+  author  = {Apicella, Andrea and Isgr{\`o}, Francesco and Prevete, Roberto},
+  title   = {Don't push the button! {E}xploring data leakage risks in machine
+             learning and transfer learning},
+  journal = {Artificial Intelligence Review},
+  volume  = {58},
+  number  = {11},
+  pages   = {339},
+  year    = {2025},
+  doi     = {10.1007/s10462-025-11326-3},
+  note    = {VERIFY: not read from within this repository. Supplied as 2024;
+             Crossref dates it 2025},
+}
+
+% VERIFY -- AND READ THE ADDENDUM FIRST. Fields from Crossref.
+% An addendum was published at 10.1038/s42256-025-01174-9 (Nature Machine
+% Intelligence 8(2):292, 2026). This paper is intended to carry the strongest
+% comparative claim in Section 7.3, so what the addendum changes matters more
+% here than for any other entry in this file.
+@article{graber2025resolving,
+  author  = {Graber, David and Stockinger, Peter and Meyer, Fabian and
+             Mishra, Siddhartha and Horn, Claus and Buller, Rebecca},
+  title   = {Resolving data bias improves generalization in binding affinity
+             prediction},
+  journal = {Nature Machine Intelligence},
+  volume  = {7},
+  number  = {10},
+  pages   = {1713--1725},
+  year    = {2025},
+  doi     = {10.1038/s42256-025-01124-5},
+  note    = {VERIFY: not read from within this repository. An addendum exists
+             at 10.1038/s42256-025-01174-9; read it before citing},
+}

@@ -247,7 +247,46 @@ try {
     Write-Host ''
     Write-Host "Boxes: $overfull overfull, $underfull underfull.  Rerun requests: $rerun."
 
-    if ($fatal -or -not $built -or $unsettled) { exit 1 }
+    # --- internal markers must not reach the printed bibliography ------------
+    # BibTeX PRINTS the `note` field. Editorial markers parked there -- VERIFY,
+    # PLACEHOLDER, TODO, UNSOURCED -- are typeset into the References section
+    # and shipped to the reader. That happened: the References section carried
+    # "VERIFY: author list ... are UNSOURCED" and a sentence explaining that a
+    # corporate author was a placeholder for BibTeX's sorting.
+    #
+    # The fix was to move every such note into a % comment, which BibTeX
+    # ignores. This check is what stops it coming back, because the failure is
+    # invisible in references.bib -- the markers look like annotations there,
+    # and only main.bbl shows they were typeset.
+    #
+    # main.bbl is checked rather than references.bib: comments are legitimate
+    # and expected in the source, so scanning the source would fail on its own
+    # documentation. main.bbl is BibTeX's OUTPUT and contains only what prints.
+    $leakTokens = @('VERIFY', 'PLACEHOLDER', 'TODO', 'UNSOURCED')
+    $leaked = @()
+    if (Test-Path $blgPath -PathType Leaf) { }   # no-op; keeps $blgPath in scope
+    $bblPath = Join-Path $paperDir "$jobName.bbl"
+    if (Test-Path $bblPath) {
+        $bblLines = Get-Content $bblPath
+        foreach ($tok in $leakTokens) {
+            $hits = $bblLines | Select-String -SimpleMatch -CaseSensitive $tok
+            foreach ($h in $hits) {
+                $leaked += ("{0}  (line {1}): {2}" -f $tok, $h.LineNumber, $h.Line.Trim())
+            }
+        }
+    }
+
+    if ($leaked.Count -gt 0) {
+        Write-Host ''
+        Write-Host "INTERNAL MARKERS IN THE PRINTED BIBLIOGRAPHY ($($leaked.Count)):" -ForegroundColor Red
+        foreach ($l in $leaked) { Write-Host "  - $l" }
+        Write-Host ''
+        Write-Host '  These are typeset into the References section and shipped to' -ForegroundColor Yellow
+        Write-Host '  the reader. BibTeX prints the `note` field; move the text into a'
+        Write-Host '  % comment in references.bib, which BibTeX ignores, then rebuild.'
+    }
+
+    if ($fatal -or -not $built -or $unsettled -or $leaked.Count -gt 0) { exit 1 }
     exit 0
 }
 finally {

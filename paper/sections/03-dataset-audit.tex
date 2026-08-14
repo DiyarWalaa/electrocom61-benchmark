@@ -227,14 +227,25 @@ what the detectors learn from and absent from what they are measured on, so a
 model that generalises poorly to that device would not register as degraded,
 because no test image would expose it.
 
-% NOTE, for resolution rather than for the prose: the metadata CSV records FOUR
-% distinct DEVICE_NAME values across the 2121 images -- ONEPLUS_NORD (391),
-% REDMI (1180), X (311) and iPhone (189), plus 50 images with no CSV row
-% (runs/20260801_device_split/). The paper states three phones. The two counts
-% are both stated as facts above only in the sense that the prose quotes the
-% paper's rationale and not its device count; if the fourth name denotes a
-% distinct handset the sentence above should say four, and if it is an alias or
-% a placeholder that should be recorded. Needs the PDF to settle.
+The number of cameras is itself unsettled between the two sources. The metadata
+records four distinct device identifiers --- \texttt{ONEPLUS\_NORD} on 391
+images, \texttt{REDMI} on 1{,}180, \texttt{X} on 311 and \texttt{iPhone} on 189,
+with a further 50 images carrying no metadata row --- while the dataset paper
+describes three cameras, tabulating them as Smartphone~1, 2 and 3 and giving the
+third the display and cover-glass specifications of an iPhone
+\citep{electrocom61}. Three of the four identifiers therefore have a counterpart
+in the paper and \texttt{X} has none, on 14.7\% of the images. Whether that
+identifier denotes a separate handset or is an alias for one of the three cannot
+be determined from the released files, which record the name and nothing else.
+
+This is the second respect in which the shipped metadata does not match the
+paper's description of the dataset, the first being the split assignments of
+Section~\ref{sec:metadata-provenance}. Neither is offered here as evidence about
+the other, and no cause is attributed to either. What they establish jointly is
+narrower and sufficient: the metadata file is not a reliable guide to the archive
+it ships inside, and any property of the dataset taken from it --- split, device,
+or capture session --- has to be checked against the files themselves before it
+is used.
 
 \subsection{Duplicate contamination: a negative result}
 \label{sec:duplicate-contamination}

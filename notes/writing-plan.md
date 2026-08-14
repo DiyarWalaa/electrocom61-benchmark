@@ -13,8 +13,8 @@ their claims are settled.
 
 | Order | Section | Status |
 |---|---|---|
-| 1 | 3 — Dataset Audit | stub |
-| 2 | 4 — A Corrected Split | stub |
+| 1 | **3 — Dataset Audit** | **complete** (3.1–3.7 drafted, fact-checked) |
+| 2 | 4 — A Corrected Split | stub — next |
 | 3 | **5 — Benchmark Setup** | **complete** (5.1–5.6 drafted, fact-checked) |
 | 4 | 6 — Results | stub |
 | 5 | 7 — Discussion | stub |
@@ -24,9 +24,9 @@ their claims are settled.
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-Section 5 is finished and is the model for the rest: every number in it traces
-to a committed file, and the two places where it does not are marked in the
-file's own header comment rather than left silent.
+Sections 3 and 5 are finished and are the model for the rest: every number in
+them traces to a committed file, and anything that does not is marked in the
+section file's own header comment rather than left silent.
 
 ## Writing rules
 
@@ -72,11 +72,15 @@ Claim-plus-evidence bullets are supplied per section before drafting. Recorded
 here as they arrive; the *Evidence available* column is what the repository
 already holds, so drafting does not have to go looking for it.
 
-### Section 3 — Dataset Audit
+### Section 3 — Dataset Audit — DRAFTED
 
-Claims: _to be supplied._
+Seven subsections: class coverage, the mechanism, allocation uniformity,
+metadata provenance, what the v2 re-split changed, camera coverage, duplicate
+contamination. 38 assertions re-derived from source. Three drafted bullets
+diverged from their committed source and the source was followed in each case;
+the divergences are recorded in the section file's header.
 
-Evidence available:
+Evidence used:
 - `runs/20260801_csv_coverage/` — 2121 images on disk against 2071 CSV rows;
   `DATA_TYPE` against the directory each image sits in
 - `runs/20260801_device_split/` — images per capture device per split, device
@@ -153,27 +157,44 @@ confound; the scope limit on the contamination figures; RT-DETR-l evaluated at
 
 Claims: _to be supplied._
 
-Blocker: `references.bib` holds **two** entries (`yolov12paper`,
-`yolov13paper`). Section 5 twice refers to "the three published studies" on this
-dataset. A third entry is required before either sentence can carry a citation.
+Unblocked 2026-08-14: `references.bib` now holds **three** entries —
+`yolov12paper`, `yolov13paper` and `electrocom61`, the dataset paper. Both
+`yolov12paper` and `yolov13paper` still carry `TODO` notes on unverified fields,
+visible in the rendered bibliography, and must be checked against their PDFs
+before submission.
 
 ### Section 9 — Conclusion, Section 1 — Introduction, Abstract
 
 Written last, from the settled claims of 3–8. No skeleton until those are drafted.
 
-## Open items carried from Section 5
+## Open items
 
-These are in `05-benchmark-setup.tex`'s header comment and must be closed before
-submission. They are listed here so they are not lost when that file is next
-edited.
+Mirrored from the section files' header comments so they are not lost when those
+files are next edited. Closed items are kept with their resolution for one
+revision, then dropped.
 
-1. **5.3 says "five convolutional detectors"; it should be four.** Four are
-   convolutional; the fifth is the transformer the sentence contrasts them
-   against. Author's fix.
-2. **5.3's diverged-run numbers** (epochs 6/7/19/4, 0.0039, 0.0057) are not yet
-   verifiable from a committed file.
-3. **The fused/unfused claim about three published studies** needs the three
-   PDFs; it cannot be checked from this repository.
-4. **5.4 references `sec:dataset-audit`**, which resolves to an empty Section 3.
-   A resolved reference to an empty section looks correct in the PDF and cannot
-   be found by grepping for undefined references. Re-check when 3 is written.
+**Open**
+
+1. **The fourth device identifier.** The metadata records four device names;
+   the dataset paper describes three cameras. `X` carries 311 images, 14.7\% of
+   the dataset, and has no counterpart in the paper. Stated as a fact in 3.6
+   with no cause attributed. Settling whether it is a separate handset or an
+   alias needs something the released files do not contain.
+
+**Closed 2026-08-14** — all four items previously listed here.
+
+- *5.3 "five convolutional detectors"* — the prose already reads four. The
+  header comment claiming otherwise was stale, not the prose.
+- *5.3's diverged-run numbers* — `data/kaggle/results_rtdetr_l_pub.json` is
+  committed and `runs/20260812_verify_diverged_run/` checks every figure against
+  it, all PASS. Two cautions from that run are worth carrying forward:
+  `best_epoch` is derived, not stored, and mAP@50 is exactly zero at epoch 5 as
+  well as after divergence, so zero mAP cannot on its own date the divergence.
+  5.3 dates it from the loss terms and is unaffected.
+- *The fused/unfused claim* — verified by the author against all three PDFs, and
+  the finding was finer than the claim: the dataset paper reports no parameter
+  counts at all. 5.5 now separates the two studies that report counts without
+  stating fusion from the one that reports none.
+- *5.4's forward reference to `sec:dataset-audit`* — Section 3 is written and
+  establishes the 45/46 class counts and their cause, which is what 5.4 relies
+  on it for.

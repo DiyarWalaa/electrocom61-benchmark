@@ -110,6 +110,17 @@ in this study's own measurements, and every published value here falls outside
 the interval between the fused and unfused figures. Fusion therefore explains
 none of them.
 
+The same pattern appears in how variance is handled, and there it costs more.
+The earlier benchmark study does report it: every cell of its results table
+carries a mean and standard deviation with a 95\% confidence interval, and its
+text reports paired $t$-tests at $p < 0.05$ \citep{yolov12paper}. What it does
+not state is how many runs those estimates were computed over, or by what
+procedure --- and without the number of runs, a standard deviation cannot be
+converted into anything a reader can check or reproduce. The later study
+reproduces the same table without the variance columns \citep{yolov13paper}. A
+figure reported with an interval whose derivation is unstated is not more
+checkable than one reported without it; it only appears to be.
+
 The two papers report the same seven rows with identical values, the second
 adding one row for its own architecture, and they share three authors --- three
 of the four listed on the earlier paper are among the six on the later one

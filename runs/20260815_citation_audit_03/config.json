@@ -1,0 +1,22 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "c6f7d24dd384324fd9d593a738482247de3e180a51d61c91c64e4bc1b19eac7b",
+  "output": "notes\\citation-audit.md",
+  "params": {
+    "citation_instances": 74,
+    "entries_cited": 35,
+    "entries_in_bib": 36,
+    "prior_study_instances": 25,
+    "uncited": [
+      "dodge2020finetuning"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-15T15:15:14.654369Z",
+  "script": "citation_audit.py",
+  "script_sha256": "1bcdb556d1ad8a68a23859c162a95f9318b391415ef0f94168f10818e6e262e0",
+  "unit": "one row per citation USE, not per entry"
+}

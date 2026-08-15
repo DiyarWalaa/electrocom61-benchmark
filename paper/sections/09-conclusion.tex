@@ -26,9 +26,9 @@ that differences between the two splits are attributable to the split.
 The audit found that the published partition cannot evaluate 15 of the 61
 classes at all, because they hold no instances in either the validation or the
 test set. The cause is how capture sessions were allocated rather than how rare
-those classes are. Rarity would leave the least frequent classes unevaluable;
-what the data shows is close to the reverse, with the ten most heavily annotated
-classes among the least evaluable in the dataset.
+those classes are. Rarity would leave the least frequent classes unevaluable and
+no others; instead the fifteen span almost the entire frequency range, and eight
+of the ten most heavily annotated classes are among them.
 
 The benchmark found that correcting the split raises every model's score, on
 both accuracy metrics and both evaluation partitions, without exception. The
@@ -49,6 +49,6 @@ cannot say whether the better model is fast enough to use.
 The corrected split is released as a manifest, with the scripts and run records
 that produced and verified it, so that every figure reported here can be
 recomputed rather than taken on trust. What this study cannot establish from one
-dataset is how often the defect it describes occurs elsewhere; that would take
-the same audit, which costs minutes, run against benchmarks whose collection was
-organised in sessions.
+dataset is how often the defect it describes occurs elsewhere; establishing that
+would take the checks above, which cost minutes each, run against other
+benchmarks whose collection was organised in sessions.

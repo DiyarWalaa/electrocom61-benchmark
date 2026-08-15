@@ -19,8 +19,22 @@
 %       -> data/config_provenance.csv, rows marked `added` (= stated by
 %          neither paper) and the `ultralytics` row's citation column,
 %          "stated by neither paper"
-%   "none reports mAP@50-95, per-class AP, or classes evaluated"
+%   "per-class AP and classes evaluated are tabulated by none"
 %       -> Section 5.4, which makes the same claim
+%
+% CORRECTED 2026-08-15, AFTER A FALSE CLAIM REACHED THE BUILT PDF. 2.4 read
+% "none of them reports mAP@50-95, a repeatability estimate, or a timing
+% measurement". Both halves before "timing" were wrong:
+%   - Both benchmark studies PLOT mAP@50-95 in their training-curve figures.
+%     What neither does is tabulate a value, which is the accurate and still
+%     useful statement: no published figure exists to compare against.
+%   - The YOLOv12 paper DOES report variance -- mean and standard deviation with
+%     a 95% confidence interval per cell, and paired t-tests at p < 0.05 in its
+%     text. The accurate finding is stronger than the false one: it states
+%     neither the number of runs nor the procedure, and the later paper carries
+%     the same table without them.
+% The same two claims were traced to 2.1, 5.4 and 6.2 and corrected there. The
+% variance finding is stated here and argued in 7.1.
 %   "none measures inference speed" -> Sections 6.5 and 7.4
 %
 % ---------------------------------------------------------------------------
@@ -85,11 +99,13 @@ figures come from, what random seed was drawn, and which release of the model
 library produced the architectures. The last two are recorded in this study's
 own configuration table as settings neither prior paper states.
 
-Four quantities are reported by none of them either: mAP@50--95, per-class
-average precision, the number of classes on which the evaluation was actually
-computed, and any measurement of inference speed. These are properties of the
-published record rather than of the models, and what follows from them is taken
-up in Section~\ref{sec:disagreement}.
+Three quantities are tabulated by none of them: per-class average precision, the
+number of classes on which the evaluation was actually computed, and any
+measurement of inference speed. A fourth, mAP@50--95, appears in the
+training-curve figures of both benchmark studies but in neither of their results
+tables, so no published value of it exists for any model. These are properties
+of the published record rather than of the models, and what follows from them is
+taken up in Section~\ref{sec:disagreement}.
 
 \subsection{Electronic component detection and e-waste sorting}
 \label{sec:related-ewaste}
@@ -187,6 +203,12 @@ an explicit design goal in recent detectors --- in the transformer line since
 DETR \citep{detr}, and within the YOLO family in architectures trained to
 produce a single prediction per object \citep{yolov10}.
 
-None of these conventions appears in the three studies reported on
-ElectroCom61: none of them reports mAP@50--95, a repeatability estimate, or a
-timing measurement.
+These conventions appear only partly in the three studies reported on
+ElectroCom61. Both benchmark studies plot mAP@50--95 in their training-curve
+figures, but neither tabulates a value for any model, so no figure from either
+is available to compare against. One of the two does report variance: its
+results table gives each figure as a mean and standard deviation with a 95\%
+confidence interval, and its text reports paired $t$-tests at $p < 0.05$. It
+states neither how many runs produced those estimates nor by what procedure,
+and the later study reproduces the same table without them. None of the three
+reports a timing measurement.

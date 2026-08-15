@@ -8,15 +8,17 @@
 % (citation column) and in notes/writing-corrections.md.
 % ---------------------------------------------------------------------------
 
-% COMPLETE 2026-08-14. Fields taken from reference 34 of the YOLOv13 paper's
-% own bibliography, which cites this work in full:
-%   A. M. Elhenidy, M. E. Abd Alkhalec Tharwat, S. M. BAlsabti and R. Gaib,
-%   "Automated Electronic Components Waste Detection Using YOLOv12," 2025 4th
-%   International Conference on Electronic Engineering (ICEEM), Menouf, Egypt,
-%   2025, pp. 1-6, doi: 10.1109/ICEEM66692.2025.11225036
+% COMPLETE 2026-08-14 from reference 34 of the YOLOv13 paper; AUTHOR NAMES
+% EXPANDED 2026-08-15 from the Crossref record for doi
+% 10.1109/ICEEM66692.2025.11225036, which carries full given names:
+%   Ali M. Elhenidy; Muhammed E Abd Alkhalec Tharwat; Saif M. BAlsabti;
+%   Raid Gaib
+% (the second author's middle name is an initial in the record itself).
+% Expanded so this entry and yolov13paper below render the three shared authors
+% identically rather than as "R. Gaib" beside "Raid Gaib".
 @inproceedings{yolov12paper,
-  author    = {Elhenidy, A. M. and Abd Alkhalec Tharwat, M. E. and
-               BAlsabti, S. M. and Gaib, R.},
+  author    = {Elhenidy, Ali M. and Abd Alkhalec Tharwat, Muhammed E. and
+               BAlsabti, Saif M. and Gaib, Raid},
   title     = {Automated Electronic Components Waste Detection Using {YOLOv12}},
   booktitle = {2025 4th International Conference on Electronic Engineering
                (ICEEM)},
@@ -28,25 +30,33 @@
 
 % INDEXED AND CONFIRMED, 2026-08-15. Supersedes the earlier in-press entry.
 % Source: IEEE Xplore document 11602786. Conference held 19-21 April 2026.
+% Full given names are the Xplore record's.
 %
 % PAGE RANGE OMITTED DELIBERATELY: the Xplore record does not show one, and a
 % guessed range in a citation is worse than an absent field. Add it if the
-% published PDF carries page numbers.
+% published PDF carries page numbers. Note that yolov12paper above DOES have a
+% page range (1-6, from Crossref), so the asymmetry between the two entries is
+% a property of the records, not an oversight here.
 %
 % AUTHOR SPELLING -- there is a discrepancy and this entry follows the
-% publisher. IEEE Xplore records the first author as "Raid Gaib"; the paper's
-% own PDF header reads "Raid Gaibi". The Xplore spelling is used here, and in
-% yolov12paper above, which already carried "Gaib, R." for what appears to be
-% the same person. Rationale: the publisher's record is what a reader resolving
-% the DOI will match against, and using one spelling across both entries keeps
-% the same author from appearing as two people in the bibliography.
+% publisher. IEEE records the first author as "Gaib"; the paper's own PDF header
+% reads "Gaibi". The IEEE spelling is used here and in yolov12paper above,
+% because the publisher's record is what a reader resolving the DOI will match
+% against, and one spelling across both entries stops the same person rendering
+% as two people in the bibliography.
+%
+% THREE AUTHORS ARE SHARED with yolov12paper, and the two records agree on their
+% full given names, not merely their surnames: Ali M. Elhenidy, Saif M.
+% BAlsabti and Raid Gaib. That is the evidence behind the author-overlap clause
+% in Section 7.1.
 %
 % The ISBN is gone. It was in the entry only as a locator while the paper had no
 % DOI; the DOI supersedes it.
 @inproceedings{yolov13paper,
-  author    = {Gaib, R. and BAlsabti, S. M. and Ahmed, S. K. and
-               Yousif, S. M. and Albustani, Q. and Elhenidy, A. M.},
-  title     = {E-waste Detection based on {YOLOv13}},
+  author    = {Gaib, Raid and BAlsabti, Saif M. and Ahmed, Shaimaa Khamees and
+               Yousif, Siba Monther and Albustani, Qussay and
+               Elhenidy, Ali M.},
+  title     = {E-Waste Detection Based on {YOLOv13}},
   booktitle = {2026 IEEE International Conference on Smart Sustainable Systems
                for Computer and Engineering Applications (3SCEA)},
   address   = {Cairo, Egypt},

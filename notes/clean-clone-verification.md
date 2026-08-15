@@ -36,21 +36,37 @@ run: **34 scripts, 0 tracebacks.** Paper builds cold in four passes, 35 pages,
 **17 identical, 6 differing, and both differences are self-inflicted
 timestamps rather than content.**
 
-### What still differs, and why neither is fixable without a decision
+### The PDF timestamps — FIXED 2026-08-16
 
-- **Five PDFs differ in five or six bytes each**, at one offset, inside
-  matplotlib's `/CreationDate (D:...)`. Nothing else in any of them changes, and
-  the PNG of each figure is byte-identical because the PNG writer emits no such
-  field. Fixable by setting `SOURCE_DATE_EPOCH` before rendering, which is a
-  choice about whether a figure should record when it was made.
-- **`notes/citation-audit.md` differs on line 3 of 141**, which names the run
-  directory that produced it — `runs/20260816_citation_audit/` against
-  `_02/` on the next run. The other 140 lines are identical. This is
-  self-referential provenance: the file records where its own record lives, and
-  a new run means a new directory. It cannot be byte-reproducible while it keeps
-  that line. Note that a positional byte comparison overstates this badly (27806
-  of 29137 bytes "differ") because the longer directory name shifts everything
-  after it; compare by line.
+Five PDFs differed in five or six bytes each, at one offset, inside matplotlib's
+`/CreationDate (D:...)`. Nothing else in any of them changed, and every PNG
+matched exactly, because the PNG writer emits no such field.
+
+`ec61.pdf_metadata()` now pins it: `SOURCE_DATE_EPOCH` is honoured when set
+(the cross-project convention, Unix seconds UTC), and otherwise the date falls
+back to a fixed `PDF_EPOCH` of 2026-08-16 UTC rather than to `now` — the point
+being a byte-identical rebuild on a machine that has configured nothing. It
+lives in `ec61` because two scripts write PDFs; `figure_near_duplicate.py` had
+the same defect and was untested only because it needs the dataset.
+
+Omitting `/CreationDate` altogether would also be reproducible. A fixed date was
+preferred because a PDF with no creation date looks damaged to some readers.
+
+### `notes/citation-audit.md` is left as it is, deliberately
+
+It differs on **line 3 of 141**, which names the run directory that produced it
+— `runs/20260816_citation_audit/` against `_02/` on the next run. The other 140
+lines are identical.
+
+**This is not a defect and is not being fixed.** The file records where its own
+provenance record lives, and every run writes a new directory, so the line is
+correct on the run that wrote it and stale on any other. It cannot be
+byte-reproducible while it keeps that line, and the line is worth more than the
+reproducibility: without it the note does not say which run's audit it is.
+
+Compare this file by line, not by byte offset. A positional comparison
+overstates it wildly — 27806 of 29137 bytes "differ" — because the longer
+directory name shifts everything after it.
 
 ## The four defects from the first run, and their fixes
 

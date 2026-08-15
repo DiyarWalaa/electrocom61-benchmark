@@ -197,7 +197,9 @@ def save_figure(fig, name):
         os.makedirs(FIG_DIR)
     pdf = os.path.join(FIG_DIR, name + ".pdf")
     png = os.path.join(FIG_DIR, name + ".png")
-    fig.savefig(pdf)                  # vector, no dpi needed
+    # Only the PDF backend writes a creation date, so only it takes the
+    # metadata argument. ec61.pdf_metadata() pins it; see the note there.
+    fig.savefig(pdf, metadata=ec61.pdf_metadata())
     fig.savefig(png, dpi=PNG_DPI)
     plt.close(fig)
     return pdf, png

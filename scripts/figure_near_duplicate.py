@@ -386,7 +386,10 @@ def main():
     if not os.path.isdir(OUT_DIR):
         os.makedirs(OUT_DIR)
     fig.savefig(OUT_PNG, dpi=DPI, facecolor=SURFACE)
-    fig.savefig(OUT_PDF, facecolor=SURFACE)   # vector, no dpi needed
+    # Pinned /CreationDate, same reason as make_figures.py: a wall-clock
+    # stamp is the one thing that stops a regenerated PDF hashing equal.
+    fig.savefig(OUT_PDF, facecolor=SURFACE,   # vector, no dpi needed
+                metadata=ec61.pdf_metadata())
     plt.close(fig)
 
     out_px = (int(FIG_W_IN * DPI), int(FIG_H_IN * DPI))

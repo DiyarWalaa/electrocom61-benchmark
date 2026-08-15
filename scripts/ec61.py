@@ -17,7 +17,7 @@ import os
 import platform
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timezone
 
 # --------------------------------------------------------------------------
 # Repository layout
@@ -470,6 +470,52 @@ def write_config(run_dir, script_path, params, extra=None):
     with open(os.path.join(run_dir, "config.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(cfg, fh, indent=2, sort_keys=True)
     return cfg
+
+
+# --------------------------------------------------------------------------
+# Reproducible PDF metadata
+# --------------------------------------------------------------------------
+#
+# matplotlib writes the wall-clock time into a PDF's /CreationDate. On
+# 2026-08-16 that was the ONLY thing separating a regenerated figure from its
+# committed copy: five or six bytes, at one offset, in files of 24-38 KB.
+# Everything else matched, and every PNG matched exactly, because the PNG writer
+# emits no such field. A figure that records when it was rendered cannot be
+# compared to the committed one by hash, which is the check this repository
+# relies on.
+#
+# Lives here rather than in make_figures.py because two scripts write PDFs --
+# make_figures.py and figure_near_duplicate.py -- and one fixed date is the
+# point.
+
+# Stamped when SOURCE_DATE_EPOCH is not set: 2026-08-16 UTC, the date the figure
+# pipeline was made reproducible. Timezone-aware on purpose -- a naive datetime
+# is written in local time, so two machines in different zones would disagree.
+PDF_EPOCH = datetime(2026, 8, 16, 0, 0, 0, tzinfo=timezone.utc)
+
+
+def pdf_metadata():
+    """`metadata=` for fig.savefig() of a PDF, with a reproducible date.
+
+    SOURCE_DATE_EPOCH is honoured because it is the cross-project convention for
+    exactly this (Unix seconds, UTC). Unset, the date falls back to PDF_EPOCH
+    rather than to `now`: the point is a byte-identical rebuild on a machine
+    that has configured nothing.
+
+    Returning None for CreationDate would omit the field entirely and also be
+    reproducible. A fixed date is preferred because a PDF carrying no creation
+    date looks damaged to some readers, and because this value says something
+    true -- the date the pipeline was pinned.
+    """
+    stamp = os.environ.get("SOURCE_DATE_EPOCH")
+    if stamp:
+        try:
+            return {"CreationDate": datetime.fromtimestamp(int(stamp), timezone.utc)}
+        except (ValueError, OverflowError, OSError):
+            # A malformed value must not silently reintroduce `now`.
+            sys.stderr.write("SOURCE_DATE_EPOCH=%r is not usable; using the "
+                             "fixed stamp instead\n" % stamp)
+    return {"CreationDate": PDF_EPOCH}
 
 
 def write_csv(path, header, rows):

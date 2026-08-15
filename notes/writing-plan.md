@@ -20,16 +20,15 @@ their claims are settled.
 | 5 | **7 — Discussion** | **complete** (7.1–7.4 drafted, fact-checked) |
 | 6 | **8 — Limitations** | **complete** (drafted, fact-checked) |
 | 7 | **2 — Related Work** | **complete** (2.1–2.4 drafted, fact-checked) |
-| 8 | 9 — Conclusion | stub |
+| 8 | **9 — Conclusion** | **complete** (drafted, constraint-checked) |
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-**Sections 2 through 8 are complete and fact-checked.** They are the model for
+**Sections 2 through 9 are complete and fact-checked.** They are the model for
 the rest: every number in them traces to a committed file, and anything that does
 not is marked in the section file's own header comment rather than left silent.
 
-**Remaining: 9, 1 and the abstract.** None is blocked. They are written last by
-design, from the settled claims of 2 through 8, and those claims are settled.
+**Remaining: Section 1 and the abstract.** Neither is blocked.
 
 ## Writing rules
 
@@ -206,38 +205,12 @@ detector count is not recorded, and the README's reading of the archived
 notebook is that the 95.9% figure comes from a dictionary unlabelled as to which
 metric it is, so attaching "mAP@50" to it asserts more than the source supports).
 
-### Section 9 — Conclusion, Section 1 — Introduction, Abstract
+### Section 9 — Conclusion — DRAFTED
 
-Written last, from the settled claims of 3–8. No skeleton until those are drafted.
+Five short paragraphs, 377 words. Held to three constraints and each checked
+mechanically rather than by eye: no citation (none present); no numeral that
+does not appear elsewhere (only 15 and 61, both from Section 3); and no sentence
+of 60 characters or more shared verbatim with any other section (zero, against
+all five checked). The closest near-match to Section 7 scores 0.58 and is
+between two different claims that share the words "capture session".
 
-## Open items
-
-Mirrored from the section files' header comments so they are not lost when those
-files are next edited. Closed items are kept with their resolution for one
-revision, then dropped.
-
-**Open**
-
-1. **The fourth device identifier.** The metadata records four device names;
-   the dataset paper describes three cameras. `X` carries 311 images, 14.7\% of
-   the dataset, and has no counterpart in the paper. Stated as a fact in 3.6
-   with no cause attributed. Settling whether it is a separate handset or an
-   alias needs something the released files do not contain.
-
-**Closed 2026-08-14** — all four items previously listed here.
-
-- *5.3 "five convolutional detectors"* — the prose already reads four. The
-  header comment claiming otherwise was stale, not the prose.
-- *5.3's diverged-run numbers* — `data/kaggle/results_rtdetr_l_pub.json` is
-  committed and `runs/20260812_verify_diverged_run/` checks every figure against
-  it, all PASS. Two cautions from that run are worth carrying forward:
-  `best_epoch` is derived, not stored, and mAP@50 is exactly zero at epoch 5 as
-  well as after divergence, so zero mAP cannot on its own date the divergence.
-  5.3 dates it from the loss terms and is unaffected.
-- *The fused/unfused claim* — verified by the author against all three PDFs, and
-  the finding was finer than the claim: the dataset paper reports no parameter
-  counts at all. 5.5 now separates the two studies that report counts without
-  stating fusion from the one that reports none.
-- *5.4's forward reference to `sec:dataset-audit`* — Section 3 is written and
-  establishes the 45/46 class counts and their cause, which is what 5.4 relies
-  on it for.

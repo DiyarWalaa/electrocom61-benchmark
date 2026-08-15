@@ -88,14 +88,9 @@ RT-DETR-l, was used. Its higher parameter count and computational cost are
 reported alongside its accuracy in Section~\ref{sec:results} rather than treated
 as a confound.
 
-YOLOv13 \citep{yolov13} was not evaluated, despite appearing in one prior study
-of this dataset \citep{yolov13paper}. It is not among the architectures provided
-by the Ultralytics release used here, so evaluating it would have required installing
-software that no other run in this benchmark used, changing the framework under
-which every other model was trained. Holding one release constant across all ten
-runs was judged more important than covering one additional architecture. This
-constraint is itself relevant to the comparability of published results on this
-dataset and is returned to in Section~\ref{sec:discussion}.
+YOLOv13 \citep{yolov13} was not evaluated. It is not provided by the Ultralytics
+release used here, and installing the separate distribution would change the
+framework version under which every other model was trained.
 
 \subsection{Training configuration}
 \label{sec:training-configuration}

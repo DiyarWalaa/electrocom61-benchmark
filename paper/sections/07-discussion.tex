@@ -92,7 +92,9 @@ The fourth is the framework. Neither study states an Ultralytics version
 \citep{ultralytics}, which is what fixes the layer composition, detection head,
 loss function and default augmentation of every model distributed under a given
 name, so two studies can report results for the same architecture while training
-different networks.
+different networks. One architecture in the later comparison table is not
+provided by that package at all \citep{yolov13}, so that row was produced on a
+different codebase from the rows beside it.
 
 The complexity columns are separable from the accuracy ones, because both
 studies do state parameter counts, and those can be set beside measured values
@@ -107,11 +109,12 @@ in this study's own measurements, and every published value here falls outside
 the interval between the fused and unfused figures. Fusion therefore explains
 none of them.
 
-The two papers report the same seven rows with identical values, and the second
-adds one row for its own architecture. Whatever the source of those seven
-figures, they were not independently re-derived by the second study, so the
-published record contains one measurement of them rather than two agreeing
-ones. That bears on how much evidence stands behind the numbers, and it is
+The two papers report the same seven rows with identical values, the second
+adding one row for its own architecture, and they share three authors --- three
+of the four listed on the earlier paper are among the six on the later one
+\citep{yolov12paper,yolov13paper}. Whatever the source of those seven figures,
+they were not independently re-derived by the second study, so the published
+record contains one measurement of them rather than two agreeing ones. That bears on how much evidence stands behind the numbers, and it is
 stated here as a property of the record. What produced the discrepancy is not
 established: a different variant, input resolution, class count or framework
 release would each be sufficient, and none of the papers states which of those
@@ -162,12 +165,12 @@ coverage gap, its mechanism and its extent. That matters for whether such a
 check is worth running: it is not a research contribution, it is a few minutes
 of arithmetic over files that any user of a dataset already has.
 
-The transferable lesson is the direction of the error. A split defect is assumed
-to inflate scores, because the familiar defect is leakage --- a test image also
-seen in training is easy for the wrong reason --- and corrections in that
-direction lower the numbers they are measured against, as when two groups
-independently corrected the split of a single binding-affinity benchmark and
-previously reported performance fell
+The transferable lesson is the direction of the error. The familiar defect is
+leakage --- a test image also seen in training is easy for the wrong reason ---
+which inflates the scores measured against it \citep{kapoor2023leakage}, and
+corrections in that direction lower them, as when two groups independently
+corrected the split of a single binding-affinity benchmark and previously
+reported performance fell
 \citep{graber2025resolving,graber2025addendum}. Here the defect was exclusion
 rather than leakage, and what it excluded was disproportionately easy, so it
 \emph{deflated} the scores (Section~\ref{sec:accuracy}). ``A broken split means
@@ -185,12 +188,19 @@ single seed: they are separated by 0.0023 mAP@50--95 on the corrected split
 not by a small margin --- the same three span 33.53~ms, roughly 140 times the
 measurement's own spread.
 
-The complexity proxy most often reported in its place would have misled. Ordered
-by parameter count, these architectures fall in an order almost unrelated to
-their measured speed: the one with the fewest parameters is the second slowest
-of the five (Section~\ref{sec:efficiency}). A study offering parameter counts as
-a stand-in for deployment cost would have handed a reader the wrong ordering,
-and nothing in such a study would reveal that.
+The complexity proxy most often reported in its place would have misled, and the
+failure is a documented one rather than a local accident: parameter counts and
+FLOPs are both reported to correlate poorly with measured on-device latency
+\citep{vasu2023mobileone,chen2023run}, and a benchmark of nine YOLO variants
+across three edge systems-on-chip reports latency tracking accuracy more closely
+than either \citep{kong2026edge}. The measurements here agree on parameter count
+and only partly on FLOPs. Ordered by parameter count, these architectures fall
+in an order almost unrelated to their measured speed --- the one with the fewest
+parameters is the second slowest of the five --- while GFLOPs reproduces the
+latency order except for its leading pair (Section~\ref{sec:efficiency}). A
+study offering parameter counts as a stand-in for deployment cost would have
+handed a reader the wrong ordering, and nothing in such a study would reveal
+that.
 
 A speed ranking is also uninterpretable without a repeatability figure beside
 it. The 0.96~ms separating the two fastest architectures here means something

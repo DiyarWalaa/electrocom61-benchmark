@@ -68,8 +68,10 @@ by another image returned to training.
 \subsection{The grouping rule}
 \label{sec:grouping-rule}
 
-Whole groups of images move as a unit; individual images never move alone. What
-motivates this is not that bursts can be detected in the data ---
+Whole groups of images move as a unit; individual images never move alone, which
+is the group-aware splitting that leakage-avoiding tools apply in other domains
+\citep{joeres2025datasail}. What motivates it here is not that bursts can be
+detected in the data ---
 Section~\ref{sec:duplicate-contamination} shows they cannot, because the
 distribution of gaps between consecutive captures is unimodal and offers no
 valley at which one photographic session ends and the next begins. It is that

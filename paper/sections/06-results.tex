@@ -193,7 +193,9 @@ give a reader the wrong ordering here; reporting GFLOPs would give very nearly
 the right one.
 
 The two architectures without non-maximum suppression carry the lowest
-postprocessing cost, and the size of that advantage should be stated carefully.
+postprocessing cost, which is the saving an NMS-free detection head is designed
+to produce \citep{yolov10}, and the size of that advantage should be stated
+carefully.
 YOLO26s spends 0.38~ms in postprocessing and RT-DETR-l 0.57~ms, against 1.06 to
 1.08~ms for the three architectures that run NMS --- a ratio of 2.8 between the
 extremes, and an absolute saving of about 0.68~ms for YOLO26s against YOLO11s.

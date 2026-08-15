@@ -1,127 +1,141 @@
-# Clean-checkout verification, 2026-08-15
+# Clean-checkout verification
 
-First time this has been done. Everything below is about the repository at
-commit `0024dd7`, checked out into a directory with no local state.
+Two runs. The first (2026-08-15, against `0024dd7`) was the first time this
+repository had been run anywhere but the author's machine; it found four
+defects. The second (2026-08-16, against `85b74b3`) confirms the fixes and
+records what still differs and why.
 
-## How the clean tree was made
+## How the clean tree is made
 
-`git clone` is refused by `scripts/deny_guard.py`, which matches `^git\s+clone`
-and reports "network clone" — it does not distinguish a local path from a
-remote. A worktree was used instead:
+`git clone` from a local path is now allowed by `scripts/deny_guard.py` — the
+rule was narrowed on 2026-08-15 — but is **still refused by the permission layer
+in `.claude/settings.json`**, which carries `Bash(git clone *)` and
+`PowerShell(git clone *)`. Until those are narrowed the same way, use a
+worktree, which materialises exactly the tracked files at a commit and nothing
+`.gitignore` excludes:
 
     git worktree add --detach C:\research\ec61-verify HEAD
+    ...
+    git worktree remove --force C:\research\ec61-verify
 
-For this purpose the two are equivalent: both materialise exactly the tracked
-files at `HEAD` and nothing that `.gitignore` excludes. The worktree is still
-registered; remove it with `git worktree remove C:\research\ec61-verify`.
+## Result of the second run
 
-**The clean tree is HEAD, not the working tree.** At the time of the run the
-working tree carried uncommitted changes to 14 files plus 3 new ones
-(`data/published_accuracy.csv`, `paper/sections/10-availability.tex`,
-`tables/t7_allocation_deviation.tex` and T7's generator). None of that was
-tested here. Re-run after committing.
-
-## Byte-for-byte comparison of regenerated outputs
+Twelve generator and verifier scripts, all exit 0. Every script in `scripts/`
+run: **34 scripts, 0 tracebacks.** Paper builds cold in four passes, 35 pages,
+0 overfull and 0 underfull boxes, 0 rerun requests.
 
 | Output | Result |
 |---|---|
-| `data/master_results.csv` | **identical** |
-| `data/latency_by_arch.csv` | **identical** |
-| `tables/t1`–`t6` (6 files) | **identical** |
-| `figures/*.png` (7 files) | **identical** |
-| `figures/f1,f2,f4,f5,f6 .pdf` (5 files) | **differ — 6 bytes each** |
-| `notes/citation-audit.md` | **differs — 1 line** |
-| `figures/near_duplicate_pair.*`, `split_verification_sheet.png` | **not regenerable** (see below) |
+| `tables/t1`–`t7` (7 files) | **byte-identical** |
+| `data/master_results.csv`, `data/latency_by_arch.csv` | **byte-identical** |
+| `figures/*.png` (7 files) | **byte-identical** |
+| `figures/near_duplicate_pair.pdf` | **byte-identical** |
+| `figures/f1,f2,f4,f5,f6 .pdf` | differ, 5–6 bytes each |
+| `notes/citation-audit.md` | differs, 1 line of 141 |
 
-Both differences are benign and both are self-inflicted timestamps.
+**17 identical, 6 differing, and both differences are self-inflicted
+timestamps rather than content.**
 
-- **The PDFs differ in exactly six bytes**, at one offset, inside matplotlib's
-  `/CreationDate (D:20260814170330+03'00')`. Nothing else in any of the five
-  files changes. The PNGs of the same figures are byte-identical, because the
-  PNG writer emits no creation date. Set `SOURCE_DATE_EPOCH`, or
-  `matplotlib.rcParams["pdf....")` metadata, if byte-reproducible PDFs are
-  wanted.
-- **`citation-audit.md` differs only in the run directory it names** — it
-  records `runs/20260815_citation_audit_05` and a re-run writes `_06`. The line
-  is self-referential provenance, so this file can never be byte-reproducible by
-  construction. The 79 citation rows below it are identical.
+### What still differs, and why neither is fixable without a decision
 
-## Defects found
+- **Five PDFs differ in five or six bytes each**, at one offset, inside
+  matplotlib's `/CreationDate (D:...)`. Nothing else in any of them changes, and
+  the PNG of each figure is byte-identical because the PNG writer emits no such
+  field. Fixable by setting `SOURCE_DATE_EPOCH` before rendering, which is a
+  choice about whether a figure should record when it was made.
+- **`notes/citation-audit.md` differs on line 3 of 141**, which names the run
+  directory that produced it — `runs/20260816_citation_audit/` against
+  `_02/` on the next run. The other 140 lines are identical. This is
+  self-referential provenance: the file records where its own record lives, and
+  a new run means a new directory. It cannot be byte-reproducible while it keeps
+  that line. Note that a positional byte comparison overstates this badly (27806
+  of 29137 bytes "differ") because the longer directory name shifts everything
+  after it; compare by line.
 
-### 1. `check_figures_readme.py` fails on any fresh checkout
+## The four defects from the first run, and their fixes
 
-Exit 1 in the clean tree, exit 0 here, same file. It reports "5 ```latex fences
-opened but 0 closed" and "no figure environments found at all" — which reads
-exactly like the corruption it exists to detect.
+### 1. Fifteen scripts crashed on the missing dataset — FIXED
 
-The cause is line endings, not corruption. Line 65 opens the file with
-`newline=""`, which disables universal-newline translation, and line 82 matches
-```` ```latex\n ````. `core.autocrlf` is `true`, so a fresh checkout materialises
-`figures/README.md` with 479 CRLFs where the generator wrote 479 LFs, and every
-`\n`-anchored pattern misses.
+They raised an unhandled `OSError`/`FileNotFoundError`, among them
+`build_corrected_dataset.py`, which is the script the well-behaved ones tell the
+reader to run next — so following the repository's own instructions produced a
+stack trace.
 
-This is the worst of the findings because the check is a corruption alarm: on a
-fresh checkout it fires unconditionally, and an alarm that always fires is one
-nobody reads. Fix by opening with `newline=None` (or normalising `\r\n` before
-matching).
+`ec61.require_inputs()` now holds one message per required input
+(`dataset_v2`, `corrected`, `metadata`), naming the missing tree and the command
+or DOI that produces it. Every script that needs one calls it first. The three
+scripts that hand-rolled the same check were routed through it too. Six of the
+fifteen also called `main()` and discarded its return value, so they would have
+exited 0 on a clean failure; they now `sys.exit(main())`.
 
-### 2. Two verification scripts fail, and they fail here too
+Second run: **20 scripts exit non-zero, 0 with a traceback.** Nineteen want the
+git-ignored dataset, which is correct and by design; `scaffold_config_provenance.py`
+refuses to overwrite a hand-filled file, also by design.
 
-`verify_efficiency_claims.py` and `verify_eval_protocol.py` exit 1 in the clean
-tree **and in this working copy**. They are not clean-tree casualties; the clean
-run merely surfaced them.
+### 2. Regenerating a text file showed as modified when its bytes matched — FIXED, and it exposed a second defect
 
-    verify_eval_protocol   : master_results.csv has 11 rows, expected 10
-                             counted 22 complete evaluations, expected 20
-    verify_efficiency      : rtdetr-l: expected 2 per-session measurements, got 3
+`.gitattributes` pins `*.tex`, `*.md`, `*.csv`, `*.json` to `text eol=lf`.
 
-All three are the same stale expectation. `master_results.csv` carries 11 rows —
-10 `inclusion=benchmark` and 1 `inclusion=diverged` (the `rtdetr_l_pub` run
-retained deliberately, per Section 5.3). Tables and figures read it through
-`ec61.load_benchmark_rows`, which filters on `inclusion`; these two scripts count
-raw rows instead.
+That fixed the tables and immediately uncovered what the old arrangement had
+hidden. `make_tables.py` passed `newline="\n"` explicitly; **nothing else did**,
+so with the checkout pinned to LF the CSVs and every `summary.md` came out CRLF
+and `master_results.csv` differed from HEAD in 1904 of its 2351 bytes. Two
+causes:
 
-**No paper number is affected** — nothing in the paper reads these two scripts'
-output. What is affected is the claim that the repository verifies itself: two of
-its verifiers have been failing.
+- `csv.writer` defaults to `lineterminator="\r\n"` on every platform regardless
+  of how the file was opened, so `ec61.write_csv`'s `newline=""` was not enough.
+  It now passes `lineterminator="\n"`.
+- 31 writers used `open(..., "w", encoding="utf-8")` with no `newline=`, so the
+  text layer translated to `os.linesep`. All now pass `newline="\n"`.
 
-### 3. The build needs a fourth LaTeX pass on a cold start
+This is worth keeping in view: the line-ending fix was not cosmetic, and it did
+not *cause* the CSV problem — it *revealed* one that had been invisible because
+two wrongs matched.
 
-`build_paper.ps1` runs three passes, then one more if references have not
-settled. In this working copy three suffice, because stale `.aux` files carry the
-cross-references in. In the clean tree the fallback pass fired. The script
-handled it and produced the correct document; worth knowing that the 3-pass loop
-is only sufficient warm.
+### 3. `check_figures_readme.py` fired on every fresh checkout — FIXED
 
-### 4. Regenerating any text output makes `git status` show a false modification
+It read the file with `newline=""` and matched ` ```latex\n `, so under CRLF it
+reported "5 fences opened but 0 closed" — indistinguishable from the corruption
+it exists to detect. Structural checks now run on normalised text; check 1 still
+reads raw bytes, since a stray control character is the entire point.
 
-The generators write LF (`newline="\n"`, deliberately). `core.autocrlf=true`
-materialises CRLF on checkout. After regenerating, the file's raw bytes equal the
-committed blob — verified directly against `git show HEAD:<path>` for all six
-tables — but `git status` still lists them as modified. A real change would look
-identical to this noise. A `.gitattributes` pinning `*.tex`, `*.md` and `*.csv`
-to `text eol=lf` would remove the ambiguity.
+Re-tested against eight injections after the change: baseline LF, CRLF and
+CR-only files all pass; a backspace (the original corruption), a backspace in a
+CRLF file, an unclosed fence, a dropped `\end{figure}`, a vertical tab, and an
+`\includegraphics` naming a file that does not exist all still fail. Exit 0 in
+the clean checkout.
 
-## What cannot run without the dataset, which is by design
+### 4. Two verifiers had been failing, here as well as in a clean checkout — FIXED
 
-Of 32 scripts run, 9 exit 0, 19 fail for want of `data/ElectroCom-61_v2/` or the
-built `data/ElectroCom-61_corrected/`, 1 refuses by design
-(`scaffold_config_provenance.py` will not overwrite the hand-filled file), and 3
-are the defects above.
+`verify_eval_protocol.py` and `verify_efficiency_claims.py` counted raw rows of
+`master_results.csv`, so they saw 11 where they expected 10 and three RT-DETR-l
+measurements where they expected two. The eleventh row is the diverged
+`rtdetr_l_pub` run, marked `inclusion=diverged`. Both now read through
+`ec61.load_benchmark_rows`, as every table and figure already did. No paper
+number was affected — nothing reads their output. Both exit 0.
 
-The dataset is gitignored on purpose — it is an input, reproduced by download
-instruction. So 19 failures are expected. **How they fail is not uniform:**
+### Also fixed: the build depended on state it exists to be independent of
 
-- **4 exit cleanly with an actionable message** — `figure_near_duplicate.py`,
-  `figure_verification_sheet.py`, `consecutive_counter_pairs.py` and
-  `v1_provenance.py` name the missing tree and print the command that builds it.
-- **15 crash with an unhandled traceback**, including
-  `build_corrected_dataset.py` — which is the script the other four *tell the
-  user to run next*. Following the advice the repository gives produces a
-  `Traceback ... OSError: missing source image directory`.
+`build_paper.ps1` ran three pdflatex passes and relied on a rerun loop to catch
+the rest. Three sufficed only because stale `.aux` files carried the
+cross-references in; a fresh checkout needed the fallback. It now runs four
+passes by default, and the second run's cold build reported **0 rerun
+requests** — the fallback is a backstop again rather than part of the normal
+path.
 
-Three committed figures are produced by two of those scripts and were therefore
-never regenerated: `near_duplicate_pair.pdf`, `near_duplicate_pair.png` and
-`split_verification_sheet.png`. They match only because nothing rewrote them.
-Their reproducibility is untested and stays untested until a checkout has the
+### Also narrowed: the deny guard
+
+`scripts/deny_guard.py` matched `^git\s+clone` unconditionally and called a
+local clone a "network clone", which is what stopped the first verification from
+cloning at all. `clone_verdict()` now blocks `https://`, `http://`, `ssh://`,
+`git://`, `ftp(s)://` and both scp-style spellings, and allows local paths and
+`file://`. `git worktree remove` was never blocked by the guard — the earlier
+note that it was is wrong. Selftest: 39 must-block, 33 must-allow, 0 failures.
+
+## Still untested, and why
+
+Three committed figures — `near_duplicate_pair.pdf`, `near_duplicate_pair.png`
+and `split_verification_sheet.png` — are produced by scripts that need the
+dataset, so they were never regenerated. They match only because nothing
+rewrote them. Their reproducibility stays untested until a checkout has the
 dataset beside it.

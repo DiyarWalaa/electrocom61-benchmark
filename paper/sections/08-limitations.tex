@@ -22,12 +22,12 @@ Every accuracy figure in this paper comes from a single training run. There is
 no variance estimate for any of them, which is why
 Section~\ref{sec:metric-choice} reports the three middle-ranked architectures as
 a group rather than an ordering: differences of 0.0001 to 0.0023 mAP@50--95
-cannot be separated from run-to-run variation that was never measured. The seed
-alone moves accuracy by a margin that has been measured elsewhere and is not
-negligible \citep{picard2021seed}, and a model comparison resting on differences
-this small is precisely the case in which conclusions have been shown not to
-survive the randomness they were drawn through
-\citep{gundersen2023reporting}. The
+cannot be separated from run-to-run variation that was never measured. Seed
+scans on standard image benchmarks report the spread between seeds as modest
+while individual seeds well above and well below the average remain easy to
+find \citep{picard2021seed}, and a model comparison resting on differences this
+small is precisely the case in which conclusions have been shown not to survive
+the randomness they were drawn through \citep{gundersen2023reporting}. The
 latency figures are better off, because each architecture was timed twice and
 the two measurements disagree by at most 0.24~ms
 (Section~\ref{sec:efficiency-measurement}); the accuracy measurements have no

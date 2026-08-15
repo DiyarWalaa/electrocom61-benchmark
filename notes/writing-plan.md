@@ -186,19 +186,18 @@ splits, leakage and evaluation validity; metrics and efficiency reporting. It
 DESCRIBES; Section 7 argues. Checked mechanically: no sentence over 60
 characters is shared verbatim between the two.
 
-The literature search is done. 19 of the bibliography's 28 entries are cited
+The literature search is done. 25 of the bibliography's 34 entries are cited
 here, including the three that were waiting for it — `apicella2025leakage`,
 `bernett2024guiding` and `rosenblatt2024leakage`.
 
-**One gap, and it is a real one.** 2.2 was briefed to survey six prior systems:
-an on-line sorting system for components detached from waste PCBs; real-time
-component identification from waste PCBs; e-waste classification with YOLOv5 and
-v7; a comparison of YOLOv5, v7 and v8; battery detection in waste equipment by
-X-ray; board-component disassembly. **None has a bibliography entry**, and the
-brief gave descriptions rather than titles or DOIs, so resolving them would have
-meant choosing which paper each description refers to. That is an editorial
-judgement rather than a lookup, so the survey paragraph was omitted rather than
-written on guessed citations. Supply titles or DOIs and it is a short addition.
+**Gap closed 2026-08-15.** 2.2's survey paragraph was omitted in the first draft
+because the six prior systems were described rather than named, and resolving
+descriptions to papers is an editorial judgement rather than a lookup. Full
+titles, authors and venues were then supplied, every field resolved against
+Crossref, and the paragraph written: `lu2022sorting`, `sharma2024vision`,
+`rajeev2025ewaste`, `sarswat2024realtime`, `sterkens2021xray`,
+`puttero2024disassembly`. Three supplied years disagreed with Crossref and
+Crossref was preferred in each case.
 
 **Two claims from the brief were written weaker,** both in 2.1 and both recorded
 in the section header: "three backgrounds" (no background count is recorded

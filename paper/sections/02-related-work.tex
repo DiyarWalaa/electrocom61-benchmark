@@ -24,25 +24,24 @@
 %   "none measures inference speed" -> Sections 6.5 and 7.4
 %
 % ---------------------------------------------------------------------------
-% 2.2 IS WRITTEN IN A WEAKER FORM THAN BRIEFED, AND THIS IS THE ONE REAL GAP.
+% 2.2's SURVEY PARAGRAPH: RESOLVED 2026-08-15. The six systems were supplied
+% with full titles, authors and venues, and every field was resolved against
+% Crossref before being written. The earlier draft omitted the paragraph rather
+% than guess which papers the descriptions referred to.
 %
-% The brief asked for six prior systems: an on-line sorting system for
-% components detached from waste PCBs; real-time component identification from
-% waste PCBs; e-waste classification with YOLOv5 and v7; a comparison of YOLOv5,
-% v7 and v8; battery detection in waste equipment by X-ray; and board-component
-% disassembly. NONE OF THESE HAS A BIBLIOGRAPHY ENTRY. references.bib holds 28
-% entries and not one of them is any of those six works.
-%
-% They were NOT guessed at. The brief gave descriptions rather than titles or
-% authors, so resolving them would have meant choosing which published paper
-% each description refers to -- an editorial judgement, not a lookup, and one
-% that would put unverifiable citations behind sentences about other people's
-% systems. The subsection is therefore written from the three studies on this
-% dataset, which ARE cited, and the survey paragraph is omitted rather than
-% written without sources.
-%
-% To restore it: supply titles or DOIs for the six and the paragraph is short.
+% THREE SUPPLIED YEARS DISAGREED WITH CROSSREF and Crossref was preferred; see
+% the entries' own comments. lu2022sorting (supplied 2021, Crossref 2022) and
+% sharma2024vision (supplied 2023, Crossref 2024) both have DOI segments
+% carrying the earlier year, which is the likely source of the confusion.
 % ---------------------------------------------------------------------------
+%
+% 2.1's NOVELTY SENTENCE WAS DROPPED, not attributed. It read "It is the only
+% public dataset of its kind at this class count". That rests on the dataset
+% paper's own gap analysis, and this paper objects elsewhere to claims resting
+% on a source's self-assessment. Attributing it would have kept a superlative
+% we cannot check and that does no work: the reason these results are worth
+% reconciling is that three studies disagree about them, which the next
+% paragraph states directly.
 %
 % TWO CLAIMS FROM THE BRIEF NOT WRITTEN, both in 2.1:
 %   - "three backgrounds". Nothing in this repository records a background
@@ -68,8 +67,7 @@ benchmark adopts.
 ElectroCom61 contains 2{,}121 images of 61 electronic component classes carrying
 12{,}937 annotations, photographed with several smartphones and distributed
 under CC BY 4.0 with a published partition of 1478/438/205 images
-\citep{electrocom61}. It is the only public dataset of its kind at this class
-count, which is what makes the results reported on it worth reconciling.
+\citep{electrocom61}.
 
 Three published studies report detection results on it. The dataset paper's own
 technical validation reports a headline figure of 95.9\% \citep{electrocom61};
@@ -97,10 +95,24 @@ hazardous material, which is the standing motivation for automating the
 recognition step; the dataset was assembled for that purpose
 \citep{electrocom61}.
 
+Systems addressing it span the recovery pipeline. Components detached from waste
+boards have been sorted automatically on a conveyor \citep{lu2022sorting}, and
+identified in place on the board itself \citep{sharma2024vision}. Classification
+of e-waste more broadly has been approached with customisable YOLO variants
+\citep{rajeev2025ewaste} and with convolutional classifiers built for real-time
+operation \citep{sarswat2024realtime}. Two problems sit either side of component
+recognition: batteries must be found before disassembly, which has been done on
+X-ray images of whole appliances \citep{sterkens2021xray}, and the components
+must then be located precisely enough to be removed, which has been treated as a
+detection problem on board images \citep{puttero2024disassembly}. The common
+thread is architectural: the YOLO family predominates wherever detection rather
+than classification is required.
+
 Both benchmark studies on this dataset are themselves e-waste detection systems,
-and both build on the YOLO family \citep{yolov12paper,yolov13paper}. That family
-dominates the work reported on ElectroCom61: every published detection result on
-the dataset, including its own technical validation, comes from a YOLO variant.
+and both build on that family \citep{yolov12paper,yolov13paper}. It dominates
+the work reported on ElectroCom61 in particular: every published detection
+result on the dataset, including its own technical validation, comes from a YOLO
+variant.
 Real-time operation is the reason usually given for that choice, and it is worth
 being precise about the evidence: no study on ElectroCom61 reports a speed
 measurement of any kind, so the preference for real-time architectures is stated
@@ -153,8 +165,9 @@ on-device latency \citep{vasu2023mobileone,chen2023run}, and on low-compute edge
 hardware latency has been reported to track detection accuracy more closely than
 either \citep{kong2026edge}.
 
-Single-run results carry a similar hazard. The random seed alone moves accuracy
-by a margin large enough to reorder architectures \citep{picard2021seed}, and
+Single-run results carry a similar hazard. Scanning many seeds on standard image
+benchmarks finds the spread between them modest, but seeds performing markedly
+better or worse than the average easy to come across \citep{picard2021seed}, and
 conclusions drawn from model comparisons with small effect sizes have been shown
 to be unreliable without repeated runs \citep{gundersen2023reporting}; where
 random effects during training have been studied directly, a statistically

@@ -192,11 +192,15 @@ the three papers this study argues with: the detector families evaluated, prior
 work on electronic-component and e-waste detection generally, and whatever else
 the search turns up. None of that has been gathered.
 
-One search item is outstanding:
+No search items outstanding.
 
-- **Whether YOLOv13 is distributed outside the Ultralytics package.** The claim
-  was removed from 5.1 and 7.1 rather than left unsourced. Its source would be
-  the iMoonLab repository or the YOLOv13 arXiv paper, neither consulted.
+**Closed 2026-08-15:** whether YOLOv13 is distributed outside the Ultralytics
+package. Three sources, all checked: the iMoonLab/yolov13 repository, whose
+README states "The code is based on [Ultralytics]"; Ultralytics issues 21181 and
+21243, both requesting integration and both closed as not planned; and the
+architecture paper. The claim is grounded in 5.1 and 7.1 and the repository is
+cited as `yolov13repo`. It has no CITATION.cff and no Zenodo DOI, so it is cited
+as software with a URL and an access date.
 
 **Closed 2026-08-15:** `yolov13paper`'s venue, pages and DOI. It was indexed
 after all — IEEE Xplore document 11602786, 2026 IEEE International Conference on

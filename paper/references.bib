@@ -448,3 +448,106 @@
   archivePrefix = {arXiv},
   doi       = {10.48550/arXiv.2405.14458},
 }
+
+% ===========================================================================
+% THE YOLOv13 DISTRIBUTION QUESTION. Added 2026-08-15.
+%
+% This closes a search item that was open since 2026-08-14. The claim -- that
+% YOLOv13 is not provided by the Ultralytics package and lives in a separate
+% distribution -- was REMOVED from 5.1 and 7.1 as unsourced, then reintroduced
+% in weaker words by a later rewrite, and is now grounded. Three sources, all
+% checked on 2026-08-15:
+%
+%   1. The repository below. Its README states: "The code is based on
+%      [Ultralytics](https://github.com/ultralytics/ultralytics). Thanks for
+%      their excellent work!" It is a separate repository under a different
+%      owner, not a module inside the package. Licence AGPL-3.0.
+%   2. Ultralytics issues 21181 ("Yolov 13 has been released") and 21243
+%      ("Integrating YOLOv13 Models Into Ultralytics Python Package!"), both
+%      requesting integration, BOTH CLOSED AS NOT PLANNED. Neither page shows a
+%      maintainer statement explaining the decision, so they evidence that
+%      integration was declined, not why.
+%   3. yolov13 above, the architecture paper, already cited.
+%
+% NO CITATION.cff AND NO ZENODO DOI exist for the repository, so it is cited as
+% software with a URL and an access date. Checked directly, not assumed.
+%
+% The two issue threads are NOT given bib entries: they are evidence for the
+% comment, and citing closed issue threads in a paper's bibliography would give
+% them more standing than they carry.
+@misc{yolov13repo,
+  author       = {{iMoonLab}},
+  title        = {{YOLOv13}},
+  year         = {2025},
+  howpublished = {\url{https://github.com/iMoonLab/yolov13}},
+  urldate      = {2026-08-15},
+}
+
+% ===========================================================================
+% RANDOM SEEDS AND RUN-TO-RUN VARIANCE. Added 2026-08-15.
+%
+% Found by the author via Consensus; fields resolved against Crossref or arXiv.
+% NOT VERIFIED -- none read from within this repository.
+% ===========================================================================
+
+% VERIFY: read before citing. Title and author from arXiv:2109.08203
+% (v1 2021-09-16, v2 2023-05-11). Preprint; no venue was found.
+@misc{picard2021seed,
+  author       = {Picard, David},
+  title        = {Torch.manual\_seed(3407) is all you need: On the influence of
+                  random seeds in deep learning architectures for computer
+                  vision},
+  year         = {2021},
+  eprint       = {2109.08203},
+  archivePrefix = {arXiv},
+  doi          = {10.48550/arXiv.2109.08203},
+  howpublished = {arXiv:2109.08203},
+}
+
+% VERIFY: read before citing. Fields from Crossref.
+% The closest fit of this group to Section 8's first paragraph: it concerns
+% model COMPARISON studies specifically, which is what that paragraph is about,
+% rather than seed sensitivity in general.
+@inproceedings{gundersen2023reporting,
+  author    = {Gundersen, Odd Erik and Shamsaliei, Saeid and
+               Kj{\ae}rnli, H{\aa}kon Sletten and Langseth, Helge},
+  title     = {On Reporting Robust and Trustworthy Conclusions from Model
+               Comparison Studies Involving Neural Networks and Randomness},
+  booktitle = {Proceedings of the 2023 ACM Conference on Reproducibility and
+               Replicability},
+  pages     = {37--61},
+  year      = {2023},
+  doi       = {10.1145/3589806.3600044},
+}
+
+% VERIFY: read before citing. Fields from Crossref.
+@article{akesson2024random,
+  author  = {{\AA}kesson, Julius and T{\"o}ger, Johannes and Heiberg, Einar},
+  title   = {Random effects during training: Implications for deep
+             learning-based medical image segmentation},
+  journal = {Computers in Biology and Medicine},
+  volume  = {180},
+  pages   = {108944},
+  year    = {2024},
+  doi     = {10.1016/j.compbiomed.2024.108944},
+}
+
+% VERIFY: read before citing. Title and authors from arXiv:2002.06305
+% (2020-02-15).
+% ADDED BUT NOT CITED. The author asked for this one only if a sentence
+% genuinely needed it, preferring three that fit to four that do not. No
+% sentence in Section 8 needed it: the seed-variance point is carried by
+% picard2021seed and gundersen2023reporting, and Dodge et al. concerns
+% fine-tuning language models, which is further from this study's setting than
+% either. Kept in the file so the option is one line away.
+@misc{dodge2020finetuning,
+  author       = {Dodge, Jesse and Ilharco, Gabriel and Schwartz, Roy and
+                  Farhadi, Ali and Hajishirzi, Hannaneh and Smith, Noah},
+  title        = {Fine-Tuning Pretrained Language Models: Weight
+                  Initializations, Data Orders, and Early Stopping},
+  year         = {2020},
+  eprint       = {2002.06305},
+  archivePrefix = {arXiv},
+  doi          = {10.48550/arXiv.2002.06305},
+  howpublished = {arXiv:2002.06305},
+}

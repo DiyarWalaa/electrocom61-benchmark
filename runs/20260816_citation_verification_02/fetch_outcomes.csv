@@ -1,0 +1,37 @@
+bib_key,tier,doi,arxiv,uses,abstract_chars,source,error
+kong2026edge,1,10.1038/s41598-026-36862-y,,3,0,,
+kapoor2023leakage,1,10.1016/j.patter.2023.100804,,2,0,,
+vasu2023mobileone,1,10.1109/CVPR52729.2023.00764,,2,0,,
+chen2023run,1,10.1109/CVPR52729.2023.01157,,2,0,,
+picard2021seed,1,10.48550/arXiv.2109.08203,2109.08203,2,0,,arxiv: URLError; crossref: HTTPError
+gundersen2023reporting,1,10.1145/3589806.3600044,,2,0,,
+akesson2024random,1,10.1016/j.compbiomed.2024.108944,,2,0,,
+rosenblatt2024leakage,1,10.1038/s41467-024-46150-w,,1,1119,Crossref 10.1038/s41467-024-46150-w,
+bernett2024guiding,1,10.1038/s41592-024-02362-y,,1,0,,
+joeres2025datasail,1,10.1038/s41467-025-58606-8,,2,950,Crossref 10.1038/s41467-025-58606-8,
+apicella2025leakage,2,10.1007/s10462-025-11326-3,,1,1580,Crossref 10.1007/s10462-025-11326-3,
+chen2025augmentation,2,10.3390/pr13123802,,1,1443,Crossref 10.3390/pr13123802,
+coco,2,10.1007/978-3-319-10602-1_48,,2,0,,
+detr,2,10.1007/978-3-030-58452-8_13,2005.12872,2,0,,arxiv: URLError
+dodge2020finetuning,2,10.48550/arXiv.2002.06305,2002.06305,0,0,,arxiv: URLError; crossref: HTTPError
+electrocom61,2,10.1016/j.dib.2025.111331,,10,0,,
+lu2022sorting,2,10.1016/j.wasman.2021.10.016,,2,0,,
+nguyen2025iotkits,2,10.1016/j.dib.2025.111650,,1,0,,
+puttero2024disassembly,2,10.1016/j.procir.2024.07.036,,1,0,,
+rajeev2025ewaste,2,10.1038/s41598-025-94772-x,,1,0,,
+sarswat2024realtime,2,10.1016/j.resconrec.2024.107651,,1,0,,
+sharma2024vision,2,10.1016/j.jenvman.2023.119779,,2,0,,
+sterkens2021xray,2,10.1016/j.resconrec.2020.105246,,1,0,,
+yolov10,2,10.48550/arXiv.2405.14458,2405.14458,2,0,,arxiv: URLError; crossref: HTTPError
+yolov12paper,2,10.1109/ICEEM66692.2025.11225036,,10,0,,
+yolov13paper,2,10.1109/3SCEA68071.2026.11602786,,9,0,,
+rtdetr,3,10.1109/CVPR52733.2024.01605,2304.08069,1,0,,arxiv: URLError
+ultralytics,3,,,2,0,,
+yolo11,3,10.48550/arXiv.2410.17725,2410.17725,1,0,,arxiv: URLError; crossref: HTTPError
+yolo26,3,10.48550/arXiv.2606.03748,2606.03748,1,0,,arxiv: URLError; crossref: HTTPError
+yolov12,3,10.48550/arXiv.2502.12524,2502.12524,1,0,,arxiv: URLError; crossref: HTTPError
+yolov13,3,10.48550/arXiv.2506.17733,2506.17733,2,0,,arxiv: URLError; crossref: HTTPError
+yolov13repo,3,,,2,0,,
+yolov9,3,10.48550/arXiv.2402.13616,2402.13616,1,0,,arxiv: URLError; crossref: HTTPError
+graber2025resolving,0,10.1038/s42256-025-01124-5,,2,0,,already verified
+graber2025addendum,0,10.1038/s42256-025-01174-9,,2,0,,already verified

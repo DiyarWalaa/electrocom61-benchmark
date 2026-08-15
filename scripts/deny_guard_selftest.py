@@ -65,10 +65,32 @@ MUST_BLOCK = [
     "wget https://example.com/x",
     "Invoke-WebRequest -Uri x",
     "git clone https://example.com/r.git",
+    # Every remote spelling git accepts. The rule narrowed on 2026-08-15 to
+    # allow local clones, and these are what must keep it honest: if any of
+    # them starts passing, the narrowing has gone too far.
+    "git clone http://example.com/r.git",
+    "git clone git@github.com:owner/repo.git",
+    "git clone ssh://git@example.com/r.git",
+    "git clone git://example.com/r.git",
+    "git clone example.com:owner/repo",
+    "git clone --depth 1 https://example.com/r.git dest",
     r"powershell -File scripts\build_paper.ps1 -AllowInstall -Clean",
 ]
 
 MUST_ALLOW = [
+    # --- regression: a local clone, blocked as a "network clone" -------------
+    # The clean-checkout verification on 2026-08-15 could not clone this
+    # repository into a fresh directory, because the rule matched `git clone`
+    # unconditionally. Cloning from a path reaches no network.
+    "git clone --no-hardlinks -q /c/research/electrocom61 /c/research/verify",
+    r"git clone C:\research\electrocom61 C:\research\verify",
+    "git clone ./repo copy",
+    "git clone ../repo copy",
+    "git clone file:///c/research/electrocom61 verify",
+    # Worktrees are the fallback that verification used instead, and removing
+    # one must stay possible or the fallback leaves litter it cannot clear.
+    "git worktree add --detach /c/research/verify HEAD",
+    "git worktree remove /c/research/verify",
     # --- regression: commands this guard wrongly blocked during real work -----
     # `rd=` matched the rmdir alias, because \b matches before "=".
     "python - <<'PY'\nrd=open('README.md').read()\nPY",

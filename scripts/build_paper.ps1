@@ -97,11 +97,27 @@ try {
     $texArgs = @('-interaction=nonstopmode', '-file-line-error')
     if (-not $AllowInstall) { $texArgs += '--disable-installer' }
 
+    # FOUR pdflatex passes, not three, since 2026-08-15.
+    #
+    # Three was the recipe and it worked -- here. The clean-checkout run showed
+    # why: in this working copy, main.aux from the previous build already holds
+    # every label and citation, so pass 1 starts with the cross-references
+    # resolved. A fresh checkout has no .aux, and there pass 1 discovers the
+    # labels, bibtex builds the bibliography from pass 1's .aux, pass 2 places
+    # the citations and moves the page breaks, and pass 3 was still settling
+    # them -- the "Rerun to get" loop below had to fire.
+    #
+    # A build script whose pass count depends on state left by the last build is
+    # depending on exactly the thing it exists to be independent of. Four passes
+    # is the cold-start cost, it is what a fresh checkout needs, and it costs one
+    # extra pass warm. The rerun loop below stays as the backstop it was meant to
+    # be rather than as a step the normal path relies on.
     $passes = @(
-        @{ Name = 'pdflatex (1/3)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
+        @{ Name = 'pdflatex (1/4)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
         @{ Name = 'bibtex';         Exe = $bibtex;   Args = @($jobName) },
-        @{ Name = 'pdflatex (2/3)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
-        @{ Name = 'pdflatex (3/3)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") }
+        @{ Name = 'pdflatex (2/4)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
+        @{ Name = 'pdflatex (3/4)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") },
+        @{ Name = 'pdflatex (4/4)'; Exe = $pdflatex; Args = ($texArgs + "$jobName.tex") }
     )
 
     Write-Host ''

@@ -161,6 +161,12 @@ def classify(scored, assignment, scoring, eps, excl_low_info):
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     run_dir = ec61.make_run_dir("duplicate_contamination")
 
     records = ec61.load_images()

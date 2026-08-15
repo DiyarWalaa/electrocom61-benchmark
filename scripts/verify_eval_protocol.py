@@ -134,7 +134,21 @@ def main():
             return 1
 
     run_dir = ec61.make_run_dir("verify_eval_protocol")
-    rows = read_csv(MASTER_CSV)
+
+    # THE BENCHMARK ROWS, NOT EVERY ROW. This read raw CSV until 2026-08-15 and
+    # counted 11 rows against an expectation of 10, then 22 evaluations against
+    # 20 -- so this script had been FAILING, here as well as in a clean
+    # checkout, and nobody had run it. The eleventh row is the diverged
+    # rtdetr_l_pub run, retained deliberately (Section 5.3) and marked
+    # inclusion=diverged. Every table and figure already reads the master table
+    # through load_benchmark_rows; this verifier now does too, which is also
+    # what makes its count an independent check of the same filter rather than
+    # of a different one.
+    try:
+        rows = ec61.load_benchmark_rows(MASTER_CSV)
+    except ValueError as exc:
+        sys.stderr.write("%s\n" % exc)
+        return 1
 
     # ---- claim 1: ten runs, twenty evaluations -----------------------------
     n_runs = len(rows)

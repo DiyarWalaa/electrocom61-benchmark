@@ -13,25 +13,39 @@
 % NO SEPARATE RESEARCH-QUESTIONS LIST, by decision. The contributions cover the
 % same ground, and at 33 pages two overlapping lists would be redundant.
 %
-% NOT WRITTEN -- THE CONCRETE DISAGREEMENT IN PARAGRAPH 2. It was to read: the
-% dataset paper reports YOLOv9s at 95.9% mAP@50 while the YOLOv12 paper's
-% comparison table gives 84.9% for the same architecture on the same dataset.
-% THREE COMPONENTS ARE UNVERIFIABLE FROM THIS REPOSITORY:
-%   - 84.9% appears NOWHERE in the repository -- not in README.md, notes/,
-%     data/, or any section. There is nothing to check it against.
-%   - Attributing 95.9% to YOLOv9s. README.md records that the archived
-%     notebook trains TWO models (gelan-c in cell 31, yolov9-e in cell 49) and
-%     that which of them produced the per-class dict is not stated.
-%   - Attributing 95.9% to mAP@50. README.md records the dict as unlabelled as
-%     to whether it is mAP@50, mAP@50-95, precision or recall. 2.1 says
-%     "a headline figure of 95.9%" with the metric unattributed for exactly
-%     this reason, and this sentence would contradict it.
-% The paper's own table may well state both attributions -- the README's
-% analysis is of the NOTEBOOK, not the PDF -- but nothing committed records
-% what the table says. TO RESTORE: record both figures, with the architecture
-% and metric each paper attributes them to and the table they come from, in a
-% committed file, the way data/published_complexity.csv holds the parameter
-% counts. Then this sentence is two lines.
+% THE CONCRETE DISAGREEMENT IN PARAGRAPH 2: WRITTEN 2026-08-15, having been
+% withheld until its two figures had a committed source. That source is now
+% data/published_accuracy.csv -- hand-transcribed from the PDFs, each row naming
+% its table, held to the same discipline as data/published_complexity.csv. The
+% 95.9% comes from the dataset paper's Table 3 and the 84.9% from Table I of
+% both benchmark studies.
+%
+% THE OBJECTION THAT HELD IT BACK IS RESOLVED, NOT OVERRIDDEN. It was that
+% README.md records the 95.9% as coming from an unlabelled per-class dict in an
+% archived notebook that trains two models. That analysis is of the NOTEBOOK.
+% This sentence quotes what the PAPER attributes -- YOLOv9s, mAP@50, stated in
+% its own text as well as its table -- which is a different object. 2.1's
+% metric-free "a headline figure of 95.9%" was adopted for the notebook and
+% still stands for it; the two do not contradict, because the weaker statement
+% is not a denial of the stronger one. The distinction is recorded in full in
+% .gitignore's block for data/published_accuracy.csv.
+%
+% THE BARE mAP@50 HERE IS DELIBERATE and is not a breach of the project rule.
+% The rule governs THIS study's results; these are quotations of prior work, and
+% no published mAP@50-95 value exists for any model on this dataset to pair them
+% with (2.1, 2.4). Section 6.3 quotes the same paper's 89.1% the same way.
+%
+% CONTRIBUTION 3 CARRIES THE DEVIATION, CHANGED 2026-08-15. It read "under one
+% configuration" flat, which flattened 5.3: RT-DETR-l needs a learning rate a
+% hundredfold lower and does not train at all without it. In a paper whose
+% argument is that experimental conditions go under-reported, that was the worst
+% possible thing to compress. The wording follows 5.2's own ("an identical
+% configuration, with one exception") and the paragraph after the list names the
+% deviation and forwards to 5.3. The same edit was made to the abstract and to
+% Section 9's first paragraph. NOTE THE SCOPE: the deviation is a CONFIGURATION
+% difference, the learning rate. RT-DETR-l also early-stopped at epochs 59 and
+% 73 while every YOLO ran the full 100, but that is an OUTCOME of a patience
+% setting shared by all ten runs, not a second deviation; Section 8 reports it.
 %
 % WORDING THAT MUST NOT DRIFT BACK. "None of the three prior studies tabulates"
 % is exact and was arrived at after a false claim reached the built PDF: both
@@ -56,10 +70,12 @@ component classes carrying 12{,}937 annotations, distributed with a fixed
 train/validation/test partition \citep{electrocom61}. Three published studies
 report detection results on it: the dataset paper's own technical validation and
 two subsequent benchmark studies \citep{yolov12paper,yolov13paper}. The figures
-they report do not agree with one another, and none of the three states the
-conditions a reader would need in order to reconcile them --- which version of
-the dataset was used, which partition the figures were computed on, what seed
-was drawn, or which release of the model library produced the architectures.
+they report do not agree with one another: the dataset paper reports YOLOv9s at
+95.9\% mAP@50, while both benchmark studies tabulate 84.9\% for the same
+architecture on the same dataset. None of the three states the conditions a
+reader would need in order to reconcile them --- which version of the dataset
+was used, which partition the figures were computed on, what seed was drawn, or
+which release of the model library produced the architectures.
 
 Underneath that disagreement is a defect in the published partition. Fifteen of
 the 61 classes have no instances in either the validation or the test set, so no
@@ -81,11 +97,16 @@ This paper makes three contributions.
     evaluable while the split sizes and the measured test--train contamination
     are held at their published values.
   \item A controlled benchmark of five detectors on both partitions under one
-    configuration, establishing that correcting the split raises every model's
-    score, and reporting mAP@50--95, per-class average precision, the number of
-    classes actually evaluated and inference latency --- none of which the three
-    prior studies tabulate.
+    configuration, with a single documented deviation, establishing that
+    correcting the split raises every model's score, and reporting mAP@50--95,
+    per-class average precision, the number of classes actually evaluated and
+    inference latency --- none of which the three prior studies tabulate.
 \end{enumerate}
+
+The deviation is the transformer detector's learning rate. It does not train at
+the value that trains the four convolutional detectors, and the figures reported
+for it use one a hundredfold lower. Section~\ref{sec:rtdetr-lr} gives the
+evidence and what follows from it for comparisons across architecture families.
 
 Two of these results run against expectation. The defect had been understating
 reported performance rather than inflating it, which is the reverse of what a

@@ -134,6 +134,12 @@ def cross_split(pairs, assign):
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     records = ec61.load_images()
     # load_metadata returns (rows_by_key, duplicate_keys, n_data_rows); only the
     # first is the join table.

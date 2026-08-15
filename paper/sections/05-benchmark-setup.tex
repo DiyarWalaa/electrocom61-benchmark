@@ -134,10 +134,15 @@ loss function and augmentation defaults of every model it provides, so two
 studies may both report results for ``YOLOv9s'' while training architectures
 that differ.
 
+% The \texttt token below is unbreakable and ran the line 40.8 pt over. Two
+% changes clear it without touching the claim: "default of X" became the
+% appositive "default, X," which adds a break opportunity before the token, and
+% \allowbreak after the "=" lets the token itself divide at its key/value
+% boundary if a line still needs it.
 The optimiser was specified explicitly rather than left at the Ultralytics
-default of \texttt{optimizer="auto"}, which selects an optimiser and silently
-overrides the initial learning rate supplied by the user. A configuration that
-appears to specify a learning rate may therefore not use it.
+default, \texttt{optimizer=\allowbreak"auto"}, which selects an optimiser and
+silently overrides the initial learning rate supplied by the user. A
+configuration that appears to specify a learning rate may therefore not use it.
 
 \subsection{A configuration that is uniform but not neutral}
 \label{sec:rtdetr-lr}

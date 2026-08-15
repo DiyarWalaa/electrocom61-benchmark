@@ -155,6 +155,12 @@ def compare(boxes_a, boxes_b, align):
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     run_dir = ec61.make_run_dir("scene_signature")
 
     records = ec61.load_images()
@@ -364,4 +370,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main())

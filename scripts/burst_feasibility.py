@@ -108,6 +108,12 @@ def read_class_names(data_yaml):
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     run_dir = ec61.make_run_dir("burst_feasibility")
     names, nc = read_class_names(os.path.join(ec61.DATASET_DIR, "data.yaml"))
 

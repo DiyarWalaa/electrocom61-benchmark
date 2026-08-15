@@ -1,0 +1,6 @@
+run,n_val,n_test,test_not_val,val_not_test
+rtdetr_l_pub_lr1e4,45,46,ESP32,
+yolo11s_pub,45,46,ESP32,
+yolo12s_pub,45,46,ESP32,
+yolo26s_pub,45,46,ESP32,
+yolov9s_pub,45,46,ESP32,

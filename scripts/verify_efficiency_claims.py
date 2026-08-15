@@ -73,7 +73,17 @@ def main():
             return 1
 
     run_dir = ec61.make_run_dir("verify_efficiency_claims")
-    rows = read_csv(MASTER_CSV)
+
+    # THE BENCHMARK ROWS, NOT EVERY ROW. This read raw CSV until 2026-08-15,
+    # which gave rtdetr-l three per-session measurements instead of two and
+    # failed check 4 -- here as well as in a clean checkout. The third is the
+    # diverged rtdetr_l_pub run, marked inclusion=diverged and excluded from
+    # every aggregate in the paper by the same loader now used here.
+    try:
+        rows = ec61.load_benchmark_rows(MASTER_CSV)
+    except ValueError as exc:
+        sys.stderr.write("%s\n" % exc)
+        return 1
 
     # ---- 1. complexity and fusion ------------------------------------------
     # One entry per architecture. Both runs of an architecture share weights,

@@ -87,8 +87,70 @@
 \begin{document}
 \maketitle
 
+% ---------------------------------------------------------------------------
+% ABSTRACT. Written last, 2026-08-15. It lives here rather than in a section
+% file because \begin{abstract} is class-specific: it is one of the few things
+% a venue template can change, so it stays in the preamble file with the rest of
+% the class-dependent material.
+%
+% CONSTRAINTS, each checked after drafting:
+%   - 200-250 words.
+%   - No citation. \citep here would typeset a reference before the
+%     bibliography is introduced, and the abstract makes no claim the body does
+%     not already carry with its own citations.
+%   - No undefined abbreviation. mAP@50 and mAP@50--95 are both expanded on
+%     first use; no model name appears, so YOLO and RT-DETR never need
+%     expanding, and none of the ranking claims needs one.
+%   - Every numeral appears in the body: 2,121 / 12,937 / 61 / 15 / eight of the
+%     ten / 1478/438/205 / five / the 0.5 and 0.95 of the metric definitions.
+%
+% TWO PIECES OF WORDING THAT MUST NOT DRIFT:
+%   - "none of the three prior studies reports a timing measurement" is bounded
+%     to TIMING. Do NOT extend the form to mAP@50-95 or to variance: both
+%     benchmark studies PLOT mAP@50-95 and one DOES report confidence intervals
+%     and paired t-tests. A version of that false claim reached a built PDF on
+%     2026-08-15. See the headers of 02-related-work.tex and 01-introduction.tex.
+%   - The detector leading mAP@50 is NOT called "the most accurate". It places
+%     fourth of five on mAP@50-95 (6.5), so the abstract says it leads neither
+%     the strict metric nor latency, which is what the results support.
+%   - "under one configuration, with a single documented deviation" is exact and
+%     REPLACED a bare "under a single configuration" on 2026-08-15. The bare
+%     form flattened 5.3, which is the worst thing this paper could do: its own
+%     argument is that conditions go under-reported. 5.2 says "an identical
+%     configuration, with one exception" and 5.3 says "the single respect in
+%     which the ten runs differ"; this wording is theirs. The same edit was made
+%     to Section 1's third contribution and to Section 9's first paragraph.
+%     Do not compress it back.
+%
+% THE CLOSING SENTENCE DEPENDS ON SECTION 10. "are released" has somewhere to
+% point only because sections/10-availability.tex exists and names a repository
+% and an archived identifier. That section's DOI is a PLACEHOLDER as of
+% 2026-08-15. If it is never minted, this sentence and Section 9's last
+% paragraph both have to be softened -- they are the two places that promise it.
+% ---------------------------------------------------------------------------
 \begin{abstract}
-% TODO: abstract. Write last.
+ElectroCom61 is a public object detection dataset for recovering reusable
+components from discarded electronic equipment, containing 2{,}121 images of 61
+component classes carrying 12{,}937 annotations. Its published
+train/validation/test partition cannot evaluate 15 of those 61 classes: they
+hold no instances in either the validation or the test set. They are not the
+rare classes. Eight of the ten most
+heavily annotated classes are among them, and what decides whether a class is
+evaluable is which capture session photographed it. We audit the dataset from
+its released files alone, release a corrected partition as a manifest that holds
+the published split sizes of 1478/438/205 images, and train five detectors on
+both partitions under one configuration, with a single documented deviation: the
+transformer detector needs a learning rate a hundredfold lower to train at all.
+Correcting the partition raises every model's score on both accuracy metrics ---
+mean average precision at an intersection-over-union threshold of 0.5 (mAP@50)
+and averaged over ten thresholds to 0.95 (mAP@50--95) --- on both evaluation
+partitions and without exception. The defect had been understating reported
+performance rather than inflating it, the reverse of what a defective partition
+is normally taken to do. The detector recording the highest mAP@50 leads on
+neither mAP@50--95 nor inference latency and is not the one this application
+should deploy, a distinction no prior study on this dataset could have drawn:
+none of the three reports a timing measurement. The corrected manifest, the
+training configurations and the run records behind every figure are released.
 \end{abstract}
 
 \input{sections/01-introduction}
@@ -100,6 +162,7 @@
 \input{sections/07-discussion}
 \input{sections/08-limitations}
 \input{sections/09-conclusion}
+\input{sections/10-availability}
 
 \bibliographystyle{plainnat}
 \bibliography{references}

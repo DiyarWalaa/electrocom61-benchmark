@@ -1,0 +1,5 @@
+model,run_a,p50_a,run_b,p50_b,gap_ms,gap_pct_of_min,gap_pct_of_max,gap_pct_of_mean
+yolo11s,yolo11s_corr,10.83,yolo11s_pub,12.08,1.25,11.542,10.3477,10.9123
+yolo12s,yolo12s_corr,15.81,yolo12s_pub,16.14,0.33,2.0873,2.0446,2.0657
+yolo26s,yolo26s_corr,12.89,yolo26s_pub,12.6,0.29,2.3016,2.2498,2.2754
+yolov9s,yolov9s_corr,18.58,yolov9s_pub,24.23,5.65,30.409,23.3182,26.3957

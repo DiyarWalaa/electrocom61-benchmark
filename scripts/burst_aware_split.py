@@ -298,6 +298,12 @@ def allocate(units, img_classes, published, nc, seed, min_per_split=MIN_PER_SPLI
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     run_dir = ec61.make_run_dir("burst_aware_split")
     rng = random.Random(SEED)
     names, nc = read_class_names(os.path.join(ec61.DATASET_DIR, "data.yaml"))

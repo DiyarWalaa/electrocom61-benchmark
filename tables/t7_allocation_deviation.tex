@@ -1,0 +1,17 @@
+\begin{table}[t]
+  \centering
+  \caption{How the per-group deviations cancel. Each figure is the number of images by which a partition departs from what a uniform 70/20/10 draw over that group would have produced; negative is fewer than nominal. The 3 train-only groups withhold 155.0 validation and 77.5 test images, and two skewed groups return most of that on opposite sides. What survives across all 2,121 images is under one percentage point on either partition, which is why the aggregate reads as a textbook split.}
+  \label{tab:allocation-deviation}
+  \begin{tabular}{lrrr}
+    \toprule
+    Groups contributing & $n$ & Validation & Test \\
+    \midrule
+    Train-only groups & 3 & $-155.0$ & $-77.5$ \\
+    28 Feb 2024 & 1 & $+169.6$ & $-5.2$ \\
+    3 Mar 2024 & 1 & $+0.4$ & $+76.2$ \\
+    Near-nominal groups & 4 & $-1.2$ & $-0.6$ \\
+    \midrule
+    Aggregate residual & 9 & $+13.8$ & $-7.1$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}

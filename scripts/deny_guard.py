@@ -71,8 +71,9 @@ RULES = [
     # then any force spelling anywhere in it -- including a `+refspec`.
     (r"^git\s+push\b.*(--force|--force-with-lease|\s-f\b|\s\+\S)",
      "force push"),
-    (r"^git\s+clone\b",
-     "network clone"),
+    # `git clone` is handled by clone_verdict(), not here. A blanket pattern
+    # blocked a local clone during the clean-checkout verification on
+    # 2026-08-15 and reported it as a "network clone", which it was not.
     (r"^(pip|pip3|conda|npm|npx|winget|choco|mpm|miktex)(?=\s|$)",
      "package installation"),
     (r"^python\s+-m\s+pip(?=\s|$)",
@@ -88,6 +89,41 @@ RULES = [
 ]
 
 COMPILED = [(re.compile(p, re.IGNORECASE), why) for p, why in RULES]
+
+IS_CLONE = re.compile(r"^git\s+clone(?=\s|$)", re.IGNORECASE)
+
+# What makes a clone a NETWORK clone. Anything else -- a relative path, an
+# absolute POSIX path, a Windows drive path, a file:// URL -- is local, costs
+# nothing and is how this repository gets verified against a clean checkout.
+REMOTE_FORMS = (
+    # An explicit remote scheme. file:// is deliberately NOT here.
+    (re.compile(r"^(https?|ssh|git|ftps?)://", re.IGNORECASE), "remote URL"),
+    # scp-like with an explicit user: git@github.com:owner/repo.
+    (re.compile(r"^[^/\\@]+@[^/\\:]+:"), "scp-style remote"),
+    # scp-like without a user: host.tld:path. The negative lookahead keeps a
+    # Windows drive path (C:\..., D:/...) out, since it has the same shape.
+    (re.compile(r"^(?![A-Za-z]:[\\/])[A-Za-z0-9._-]+\.[A-Za-z]{2,}:"),
+     "scp-style remote"),
+)
+
+
+def clone_verdict(segment):
+    """None if this is not a clone or is a local one; a reason if it is remote.
+
+    Erring toward ALLOW here is deliberate and narrow: the rule exists to stop
+    a clone from reaching the network, and every remote spelling git accepts is
+    covered above. A path that matches none of them cannot reach a network.
+    """
+    if not IS_CLONE.match(segment):
+        return None
+    for token in segment.split()[2:]:
+        if token.startswith("-"):
+            continue                      # a flag, not a source or destination
+        for pattern, why in REMOTE_FORMS:
+            if pattern.match(token):
+                return "network clone (%s: %s)" % (why, token)
+    return None
+
 
 IS_CHECKOUT = re.compile(r"^git\s+checkout\b", re.IGNORECASE)
 CREATES_BRANCH = re.compile(r"\s-[bB]\b")
@@ -129,10 +165,11 @@ def verdict(command):
         segment = segment.strip()
         if not segment:
             continue
-        why = checkout_verdict(segment)
-        if why:
-            return "%s -- blocked by scripts/deny_guard.py (segment: %r)" % (
-                why, segment[:120])
+        for special in (checkout_verdict, clone_verdict):
+            why = special(segment)
+            if why:
+                return "%s -- blocked by scripts/deny_guard.py (segment: %r)" % (
+                    why, segment[:120])
         for pattern, why in COMPILED:
             if pattern.search(segment):
                 return "%s -- blocked by scripts/deny_guard.py (segment: %r)" % (

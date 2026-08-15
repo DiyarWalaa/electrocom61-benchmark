@@ -1,0 +1,34 @@
+# ---------------------------------------------------------------------------
+# Line endings.
+#
+# WHY THIS FILE EXISTS. Every generator in scripts/ writes with newline="\n",
+# deliberately, so its output is byte-identical on any platform. Without this
+# file, `core.autocrlf=true` (the Windows default, and what is set here)
+# materialises those same files as CRLF on checkout. Regenerating one then
+# rewrites it as LF, and `git status` reports a modification whose content is
+# identical to HEAD.
+#
+# That is not cosmetic. The clean-checkout run on 2026-08-15 regenerated all six
+# tables and both CSVs; every one matched its committed blob byte for byte, and
+# git listed all six tables as modified anyway. A REAL change would have looked
+# exactly the same, so the noise was hiding the signal in the one check that
+# exists to detect drift.
+#
+# Pinning eol=lf makes the checkout match what the generators write, so a
+# modification shown by git is a modification in fact.
+# ---------------------------------------------------------------------------
+
+# Generated and hand-maintained text. The four extensions cover every generated
+# output in the repository: tables/*.tex, notes/*.md and figures/README.md,
+# data/*.csv, and every runs/*/config.json.
+*.tex   text eol=lf
+*.md    text eol=lf
+*.csv   text eol=lf
+*.json  text eol=lf
+
+# Not listed above and deliberately so: *.py and *.ps1 are not generated, and
+# *.pdf / *.png are binary and must never be touched by an eol filter.
+*.pdf   binary
+*.png   binary
+*.jpg   binary
+*.zip   binary

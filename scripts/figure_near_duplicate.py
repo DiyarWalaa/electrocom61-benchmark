@@ -252,11 +252,11 @@ def draw_panel(ax, img_path, boxes, names, colors, size):
 
 
 def main():
-    if not os.path.isdir(DATASET):
-        sys.stderr.write(
-            "corrected dataset not found: %s\n"
-            "Build it first: python scripts/build_corrected_dataset.py\n" % DATASET)
-        return 1
+    # Was a hand-rolled check with its own wording. Routed through ec61 on
+    # 2026-08-15 so the corrected tree has one message, not three.
+    rc = ec61.require_inputs("corrected")
+    if rc:
+        return rc
 
     run_dir = ec61.make_run_dir("figure_near_duplicate")
     names = read_class_names(os.path.join(DATASET, "data.yaml"))

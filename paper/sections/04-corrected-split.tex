@@ -246,8 +246,13 @@ evidence that the sequence above took place.
 \begin{figure}[tp]
   \centering
   \includegraphics[width=\textwidth]{near_duplicate_pair.pdf}
+  % \allowbreak after each escaped underscore: without a break opportunity
+  % inside these two filenames the caption's first line stretches to badness
+  % 3219 (an underfull \hbox) because the second one cannot be split. A break
+  % after an underscore is the conventional place to divide a filename.
   \caption{The pair that decided the grouping rule.
-  \texttt{IMG\_20240220\_115315} and \texttt{IMG\_20240220\_115316}, captured
+  \texttt{IMG\_\allowbreak 20240220\_\allowbreak 115315} and
+  \texttt{IMG\_\allowbreak 20240220\_\allowbreak 115316}, captured
   one second apart, with their annotation boxes drawn and named. Across the five
   shared components the box centres differ by at most 9.01 pixels on the
   640-pixel canvas. The first allocator placed the left frame in test and left
@@ -334,17 +339,20 @@ extra being an Arduino-Uno, and the two shared single-instance components sit
 scene is rearranged rather than re-photographed. That pair was never scored, and
 never scored is not the same as scored and cleared.
 
-Two further quantities behind the negative result are worth stating rather than
-leaving in a run directory, and both are visible in
-Appendix~\ref{sec:appendix-verification-sheet}. The closest test--train pair
-scores 0.0515 against a loosest threshold of 0.05, clearing it by 3\%: the
-result is real but the margin is thin, and a threshold chosen slightly more
-conservatively would have returned a non-zero count. And 95 cross-split pairs
-carrying two annotated boxes or fewer are excluded from the ranking, 23 of them
-test--train, because a match between box centres is cheap to achieve by chance
-when there are few boxes to match. Excluding them is the conservative direction
-for a ranking and the permissive one for a zero, which is why the count is
-stated here rather than folded silently into the totals.
+% POINTER ONLY, 2026-08-15. This paragraph restated 3.7's 0.0515 margin and its
+% 95 excluded pairs in near-identical words; 3.7 is now their single home and
+% this points there. NOTHING IS ASSERTED HERE ABOUT WHETHER THOSE TWO FIGURES
+% CARRY OVER TO THE CORRECTED SPLIT. A draft of this sentence said they do. They
+% may, but no committed file measures them on the released split: 95 and 23 come
+% from runs/20260805_figure_verification_sheet_02/, and cross-split membership
+% is by construction a property of the allocation. The test<->train pair COUNT
+% is verified unchanged at 0/0 -- that is Table 2's row and 4.7's opening
+% paragraph -- but a pair count and an exclusion count are different quantities.
+Two quantities behind that negative result are stated where the result itself
+is: the thin margin by which the closest test--train pair clears the loosest
+threshold, and the low-information pairs excluded from the ranking
+(Section~\ref{sec:duplicate-contamination}).
+Appendix~\ref{sec:appendix-verification-sheet} shows both per pair.
 
 Partial overlap between images is pervasive and no split removes it. Every image
 in a capture session shares a background and draws from the same pool of

@@ -189,6 +189,12 @@ def deficits_of(counts, nc):
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     run_dir = ec61.make_run_dir("corrected_split")
     rng = random.Random(SEED)
 

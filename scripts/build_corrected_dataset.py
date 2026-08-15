@@ -153,6 +153,12 @@ def read_class_names(data_yaml):
 
 
 def main():
+    # A fresh checkout does not have the dataset -- it is git-ignored and
+    # downloaded, not committed. Exit with the remedy rather than a traceback.
+    rc = ec61.require_inputs("dataset_v2")
+    if rc:
+        return rc
+
     # --- Refuse to overwrite ------------------------------------------------
     if os.path.exists(DEST_DIR):
         sys.stderr.write(

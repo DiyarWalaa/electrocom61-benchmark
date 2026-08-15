@@ -158,11 +158,11 @@ def draw_thumb(fig, rect_in, fig_w, fig_h, info, size):
 
 
 def main():
-    if not os.path.isdir(DATASET):
-        sys.stderr.write("released tree not found: %s\n"
-                         "Build it: python scripts/build_corrected_dataset.py\n"
-                         % DATASET)
-        return 1
+    # Was a hand-rolled check with its own wording. Routed through ec61 on
+    # 2026-08-15 so the corrected tree has one message, not three.
+    rc = ec61.require_inputs("corrected")
+    if rc:
+        return rc
 
     run_dir = ec61.make_run_dir("figure_verification_sheet")
     tree = load_tree()

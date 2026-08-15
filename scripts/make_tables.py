@@ -76,10 +76,15 @@ S_CONTAM = os.path.join(S_RELEASED, "contamination_comparison.csv")
 S_PROVENANCE = os.path.join(ec61.DATA_DIR, "config_provenance.csv")
 S_MASTER = os.path.join(ec61.DATA_DIR, "master_results.csv")
 S_LATENCY = os.path.join(ec61.DATA_DIR, "latency_by_arch.csv")
+# _03 is bound deliberately rather than globbing the newest: _02 and _03 are
+# byte-identical and _01 predates them, so the choice is stable, and a glob
+# would silently re-point this table if another run were ever added.
+S_GROUP_RATIO = os.path.join(ec61.RUNS_DIR, "20260809_split_ratio_by_group_03",
+                             "split_ratio_by_group.csv")
 
 ALL_SOURCES = [S_NEVER_EVAL, S_CLASS_SPLIT, S_DATE_SPLIT, S_BUILT, S_BUILD_CFG,
                S_RELEASED_MANIFEST, S_RELEASED_CFG, S_RELEASED_MOVES, S_CONTAM,
-               S_PROVENANCE, S_MASTER, S_LATENCY]
+               S_PROVENANCE, S_MASTER, S_LATENCY, S_GROUP_RATIO]
 
 MIN_PER_SPLIT = 5
 EPS = "0.05"
@@ -478,6 +483,84 @@ def t6():
 
 
 # ---------------------------------------------------------------- main
+# ---------------------------------------------------------------- T7
+def signed(x):
+    """A deviation, in math mode so the minus is a minus and not a hyphen."""
+    return "$%s%.1f$" % ("+" if x >= 0 else "-", abs(x))
+
+
+def t7():
+    """Section 3.3's arithmetic: how the per-group deviations cancel.
+
+    The point of this table is that the aggregate 69.7/20.7/9.7 is an accident.
+    Every figure is summed from split_ratio_by_group.csv's dev_*_imgs columns;
+    nothing is typed here, and the totals are ASSERTED against an independent
+    sum over all nine rows rather than trusted from the grouping above.
+    """
+    rows = read_csv(S_GROUP_RATIO)
+
+    train_only = [r for r in rows if r["shape"] == "train-only"]
+    near_nom = [r for r in rows if r["shape"] == "near-nominal"]
+    skewed = [r for r in rows if r["shape"] == "skewed"]
+
+    # The prose names two skewed groups pulling in opposite directions. If a
+    # re-run ever produced a third, the sentence in 3.3 would be wrong and this
+    # table would quietly absorb it.
+    if len(skewed) != 2:
+        raise ValueError("expected 2 skewed groups, found %d: %s"
+                         % (len(skewed), [r["label"] for r in skewed]))
+    if len(train_only) + len(near_nom) + len(skewed) != len(rows):
+        raise ValueError("a group carries a shape outside the three known ones")
+
+    def dev(group, col):
+        return sum(float(r[col]) for r in group)
+
+    # Skewed groups are listed individually, because the whole argument is that
+    # they pull in OPPOSITE directions -- summing them would hide it.
+    body_src = [("Train-only groups", train_only)]
+    body_src += [(r["label"], [r]) for r in skewed]
+    body_src += [("Near-nominal groups", near_nom)]
+
+    body, plain = [], []
+    for label, group in body_src:
+        dv, dt = dev(group, "dev_valid_imgs"), dev(group, "dev_test_imgs")
+        body.append([tex(label), str(len(group)), signed(dv), signed(dt)])
+        plain.append([label, len(group), "%+.1f" % dv, "%+.1f" % dt])
+
+    tot_v, tot_t = dev(rows, "dev_valid_imgs"), dev(rows, "dev_test_imgs")
+    # Independent check: the four grouped rows must reproduce the nine-row sum.
+    grouped_v = sum(dev(g, "dev_valid_imgs") for _, g in body_src)
+    grouped_t = sum(dev(g, "dev_test_imgs") for _, g in body_src)
+    if abs(grouped_v - tot_v) > 1e-6 or abs(grouped_t - tot_t) > 1e-6:
+        raise ValueError("grouped rows do not reproduce the total: "
+                         "%r vs %r" % ((grouped_v, grouped_t), (tot_v, tot_t)))
+
+    n_imgs = sum(int(r["imgs_total"]) for r in rows)
+    body.append(MIDRULE)
+    body.append(["Aggregate residual", str(len(rows)),
+                 signed(tot_v), signed(tot_t)])
+    plain.append(["AGGREGATE", len(rows), "%+.1f" % tot_v, "%+.1f" % tot_t])
+
+    header = ["Groups contributing", "$n$", "Validation", "Test"]
+    caption = ("How the per-group deviations cancel. Each figure is the number "
+               "of images by which a partition departs from what a uniform "
+               "70/20/10 draw over that group would have produced; negative is "
+               "fewer than nominal. The %d train-only groups withhold %.1f "
+               "validation and %.1f test images, and two skewed groups return "
+               "most of that on opposite sides. What survives across all "
+               "%s images is under one percentage point on either partition, "
+               "which is why the aggregate reads as a textbook split."
+               % (len(train_only), abs(dev(train_only, "dev_valid_imgs")),
+                  abs(dev(train_only, "dev_test_imgs")), commas(n_imgs)))
+    latex = booktabs("tab:allocation-deviation", caption, "lrrr", header, body)
+
+    return latex, ("T7  allocation deviation, images vs a uniform draw",
+                   ["Groups contributing", "n", "Validation", "Test"], plain,
+                   "residual is %.2f%% / %.2f%% of %s images"
+                   % (100.0 * abs(tot_v) / n_imgs, 100.0 * abs(tot_t) / n_imgs,
+                      commas(n_imgs)))
+
+
 def main():
     missing = [p for p in ALL_SOURCES if not os.path.isfile(p)]
     if missing:
@@ -491,7 +574,11 @@ def main():
     run_dir = ec61.make_run_dir("make_tables")
     builders = [("t1_unevaluable_classes", t1), ("t2_split_properties", t2),
                 ("t3_training_config", t3), ("t4_main_results", t4),
-                ("t5_efficiency", t5), ("t6_latency_breakdown", t6)]
+                ("t5_efficiency", t5), ("t6_latency_breakdown", t6),
+                # The tN prefix is CREATION order, not print order. T7 is
+                # \input in Section 3.3 and therefore prints as Table 2.
+                # Nothing types a table number, so the two need not agree.
+                ("t7_allocation_deviation", t7)]
 
     written = []
     for name, fn in builders:
@@ -523,8 +610,8 @@ def main():
     unclassified = sum(1 for r in prov if not r["source"].strip())
 
     lines = ["# Tables", "", "Run directory: `%s`" % os.path.basename(run_dir),
-             "", "Six LaTeX booktabs tables under `tables/`, one file each.",
-             ""]
+             "", "%d LaTeX booktabs tables under `tables/`, one file each."
+             % len(builders), ""]
     for name, _ in builders:
         lines.append("- `tables/%s.tex`" % name)
     lines.append("")
@@ -551,6 +638,12 @@ def main():
     lines.append("- T1 counts annotation instances, not images. Both columns "
                  "are given because a class with many instances in few images "
                  "is less diverse than its instance count suggests.")
+    lines.append("- T7's nominal 70/20/10 is inferred from the aggregate, not "
+                 "documented by the dataset authors. If they intended another "
+                 "ratio every deviation in it shifts. The deviations are also "
+                 "real-valued rather than rounded to whole images, so a row "
+                 "can read $-0.8$ for an allocation no integer split could "
+                 "have improved on.")
     lines.append("")
     with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
         fh.write("\n".join(lines) + "\n")

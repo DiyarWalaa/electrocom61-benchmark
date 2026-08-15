@@ -1,0 +1,13 @@
+model,source,metric,value,plus_minus,interval_low,interval_high,table_location,notes
+YOLOv9s,electrocom61,mAP@50,95.9,,,,Table 3,"Attributed to YOLOv9s at mAP@50 by the dataset paper's own text as well as its table. This is a reading of the PAPER, not of the archived notebook; see the note in .gitignore."
+YOLOv9s,electrocom61,precision,92.4,,,,Table 3,
+YOLOv9s,electrocom61,recall,94.9,,,,Table 3,
+YOLOv9s,electrocom61,F1,93.63,,,,Table 3,
+YOLOv9s,electrocom61,total_loss,0.5795,,,,Table 3,Unitless; the other four rows for this model are percentages.
+EfficientDetV2,electrocom61,mAP@50,95.6,,,,Table 3,
+EfficientDetV2,electrocom61,precision,95.6,,,,Table 3,
+EfficientDetV2,electrocom61,recall,99.7,,,,Table 3,
+EfficientDetV2,electrocom61,F1,97.6,,,,Table 3,
+EfficientDetV2,electrocom61,total_loss,0.40146,,,,Table 3,Unitless; the other four rows for this model are percentages.
+YOLOv9s,yolov12paper,mAP@50,84.9,0.3,84.6,85.2,Table I,"Printed as 84.9 +/- 0.3 (84.6-85.2). Section 2.4 records this paper as giving each cell as a mean and standard deviation with a 95% confidence interval; it states neither the number of runs nor the procedure, so plus_minus and the interval are transcribed as printed rather than interpreted here."
+YOLOv9s,yolov13paper,mAP@50,84.9,,,,Table I,"Same value as the yolov12paper row and no interval. Section 2.4 records the later study as reproducing the earlier table without its variance estimates."

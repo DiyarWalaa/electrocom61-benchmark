@@ -62,16 +62,33 @@ def main():
         sys.stderr.write("not found: %s\n" % README)
         return 1
 
+    # READ RAW, CHECK STRUCTURE ON NORMALISED TEXT. newline="" is required for
+    # check 1: a stray control character is exactly what this script exists to
+    # find, so that check must see the bytes as they are on disk. But checks 2
+    # and 3 anchor on "\n", and until 2026-08-15 they ran on the raw text too.
+    # With core.autocrlf a fresh checkout materialises this file as CRLF, every
+    # "\n"-anchored pattern missed, and the script reported "5 fences opened but
+    # 0 closed" -- indistinguishable from the corruption it guards against. It
+    # failed on every clean checkout and passed only here, where the generator
+    # had rewritten the file as LF.
+    #
+    # Normalising CRLF to LF for the structural checks does NOT weaken check 1:
+    # that still runs on `raw`, and the corruption this script was written for
+    # (a backspace, U+0008, where "\\b" had been collapsed) is untouched by a
+    # line-ending normalisation.
     with open(README, "r", encoding="utf-8", newline="") as fh:
-        text = fh.read()
+        raw = fh.read()
+    text = raw.replace("\r\n", "\n").replace("\r", "\n")
 
     failures = []
 
-    # --- 1. control characters --------------------------------------------
-    for i, ch in enumerate(text):
+    # --- 1. control characters -- ON THE RAW BYTES ------------------------
+    for i, ch in enumerate(raw):
         if ord(ch) < 32 and ch not in ALLOWED_CONTROL:
-            line = text.count("\n", 0, i) + 1
-            ctx = text[max(0, i - 30):i + 30].replace("\n", " ")
+            # Index into `raw`, not `text`: normalising CRLF shortens the
+            # string, so an offset from one does not address the other.
+            line = raw.count("\n", 0, i) + 1
+            ctx = raw[max(0, i - 30):i + 30].replace("\n", " ")
             failures.append(
                 "control character U+%04X at line %d -- context: %r"
                 % (ord(ch), line, ctx))

@@ -30,9 +30,93 @@ DATASET_DIR = os.path.join(DATA_DIR, "ElectroCom-61_v2")
 METADATA_CSV = os.path.join(DATA_DIR, "Metadata_ElectroCom61.csv")
 RUNS_DIR = os.path.join(REPO_ROOT, "runs")
 
+# Built by scripts/build_corrected_dataset.py from the released manifest. Like
+# DATASET_DIR it is git-ignored, so a fresh checkout does not have it.
+CORRECTED_DIR = os.path.join(DATA_DIR, "ElectroCom-61_corrected")
+
 # Directory names on disk. Kept as a tuple so iteration order is fixed and
 # every output table has columns in the same order across every run.
 SPLITS = ("train", "valid", "test")
+
+# --------------------------------------------------------------------------
+# Required inputs that are NOT in the repository
+# --------------------------------------------------------------------------
+#
+# WHY THIS EXISTS. The datasets are git-ignored on purpose -- they are inputs to
+# this study, not products of it, and they are reproduced by download
+# instruction. So a fresh checkout legitimately cannot run every script. What is
+# NOT legitimate is how that used to look: a clean-checkout run on 2026-08-15
+# found fifteen scripts crashing with an unhandled traceback on the missing
+# tree, among them build_corrected_dataset.py -- the script the well-behaved
+# ones tell the reader to run next. Following the repository's own instructions
+# produced a stack trace.
+#
+# Every script that needs one of these now calls require_inputs() first and
+# exits non-zero with a message naming the tree and how to obtain it. The check
+# lives here so there is one message per input rather than fifteen.
+
+DATASET_V2_DOI = "10.17632/6scy6h8sjz.2"
+DATASET_V2_URL = "https://data.mendeley.com/datasets/6scy6h8sjz/2"
+
+# name -> (path, what it is, how to obtain it)
+_REQUIRED_INPUTS = {
+    "dataset_v2": (
+        DATASET_DIR,
+        "the ElectroCom61 v2 dataset tree",
+        "Download doi:%s from %s and unpack it there. README.md, section "
+        "'Getting the data', gives the exact layout expected."
+        % (DATASET_V2_DOI, DATASET_V2_URL)),
+    "corrected": (
+        CORRECTED_DIR,
+        "the corrected-split dataset tree",
+        "Build it: python scripts/build_corrected_dataset.py"),
+    "metadata": (
+        METADATA_CSV,
+        "the metadata CSV shipped inside the v2 archive",
+        "It ships with doi:%s; unpack the archive so the CSV lands in data/."
+        % DATASET_V2_DOI),
+}
+
+
+def require_inputs(*names, **kwargs):
+    """Return an exit code: 0 if every named input is present, 1 if not.
+
+    On failure the message is already on stderr, naming each missing path and
+    the command or download that produces it. Callers do:
+
+        rc = ec61.require_inputs("dataset_v2")
+        if rc:
+            return rc
+
+    Nothing is raised: a missing dataset is an ordinary, expected condition in
+    a fresh checkout, not a bug to be traced.
+    """
+    stream = kwargs.pop("stream", None) or sys.stderr
+    if kwargs:
+        raise TypeError("unexpected keyword arguments: %s" % sorted(kwargs))
+
+    missing = []
+    for name in names:
+        try:
+            path, what, how = _REQUIRED_INPUTS[name]
+        except KeyError:
+            raise KeyError("unknown required input %r; known: %s"
+                           % (name, sorted(_REQUIRED_INPUTS)))
+        # A file requirement needs isfile; a tree needs isdir. Checking for
+        # mere existence would let a stray file named like the tree through.
+        ok = os.path.isfile(path) if os.path.splitext(path)[1] else \
+            os.path.isdir(path)
+        if not ok:
+            missing.append((path, what, how))
+
+    if not missing:
+        return 0
+
+    for path, what, how in missing:
+        stream.write("missing input: %s\n" % path)
+        stream.write("  this is %s.\n" % what)
+        stream.write("  %s\n" % how)
+    return 1
 
 # --------------------------------------------------------------------------
 # Filename parsing
@@ -218,7 +302,13 @@ def load_images(dataset_dir=DATASET_DIR, splits=SPLITS):
         img_dir = os.path.join(dataset_dir, split, "images")
         lbl_dir = os.path.join(dataset_dir, split, "labels")
         if not os.path.isdir(img_dir):
-            raise IOError("missing image directory: %s" % img_dir)
+            # A backstop, not the primary check. Scripts call require_inputs()
+            # first and exit cleanly; this fires only for a caller that did
+            # not, so it repeats the remedy rather than just the path.
+            raise IOError(
+                "missing image directory: %s\nThis is part of %s. %s"
+                % (img_dir, _REQUIRED_INPUTS["dataset_v2"][1],
+                   _REQUIRED_INPUTS["dataset_v2"][2]))
         for filename in sorted(os.listdir(img_dir)):
             if not filename.lower().endswith((".jpg", ".jpeg", ".png")):
                 continue

@@ -67,8 +67,23 @@
 %     (reference/electrocom61-yolov9.ipynb) is that the 95.9% figure comes from
 %     an unlabelled per-class dictionary -- unlabelled as to whether it is
 %     mAP@50, mAP@50-95, precision or recall -- so attaching "mAP@50" to it
-%     asserts more than the source supports. The weaker form is written: a
+%     asserts more than the source supports. The weaker form was written: a
 %     headline figure of 95.9%, metric unattributed.
+%
+% THAT HEDGE IS RESOLVED, 2026-08-15, AND 2.1 NOW ATTRIBUTES THE FIGURE. It was
+% right while the source was uncommitted; once Section 1 attributed the figure
+% precisely from data/published_accuracy.csv, 2.1's silence read as though this
+% section knew less than the introduction, which is worse than either statement
+% alone. 2.1 now says "95.9% mAP@50 for YOLOv9s" and adds the 84.9% both
+% benchmark studies tabulate for the same architecture, which is the
+% disagreement this section exists to establish.
+%
+% THE HEDGE APPLIED TO THE NOTEBOOK AND THE NOTEBOOK-LEVEL POINT IS UNTOUCHED.
+% 2.1 never made it -- it does not mention the notebook. That analysis lives in
+% 7.1, which still says the archived notebook producing the dataset paper's
+% headline figure downloads Roboflow export version 5 and never evaluates a test
+% split. Two objects: what the PAPER attributes (this section, quotable) and
+% what the NOTEBOOK evidences (7.1, hedged). Do not merge them.
 
 Work bearing on this study falls into four groups: what has been reported on
 ElectroCom61 itself, the application area it serves, the literature on split
@@ -84,8 +99,9 @@ under CC BY 4.0 with a published partition of 1478/438/205 images
 \citep{electrocom61}.
 
 Three published studies report detection results on it. The dataset paper's own
-technical validation reports a headline figure of 95.9\% \citep{electrocom61};
-the two benchmark studies each compare several detectors and report mAP@50
+technical validation reports 95.9\% mAP@50 for YOLOv9s \citep{electrocom61}; the
+two benchmark studies each compare several detectors and report mAP@50, both
+tabulating 84.9\% for that same architecture
 \citep{yolov12paper,yolov13paper}. That set was established by citation search
 on Google Scholar in August 2026: of the works citing the dataset paper, two are
 those benchmark studies and two cite the dataset as related work without

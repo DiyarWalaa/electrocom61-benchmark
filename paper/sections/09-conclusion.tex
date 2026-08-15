@@ -11,6 +11,20 @@
 %   - No verbatim overlap with Section 7. Checked mechanically, the same way
 %     Section 2 was: no sentence over 60 characters is shared between them.
 %
+% THE FIRST PARAGRAPH CARRIES THE DEVIATION, CHANGED 2026-08-15. It read "under
+% a single configuration" and then "the benchmark holds every setting but the
+% architecture fixed" -- two flattenings of 5.3 in consecutive sentences, the
+% second flatly contradicted by it. RT-DETR-l needs a learning rate a
+% hundredfold lower and does not train at all without it. Both now carry the
+% exception, and "otherwise" is load-bearing in the second. Matched to 5.2's own
+% wording and to the same edit in the abstract and Section 1's contribution 3.
+%
+% THE LAST PARAGRAPH DEPENDS ON SECTION 10. "released as a manifest, with the
+% scripts and run records" has somewhere to point only because
+% sections/10-availability.tex names a repository and an archived identifier.
+% That DOI is a PLACEHOLDER as of 2026-08-15; if it is never minted, this
+% paragraph and the abstract's closing sentence both need softening.
+%
 % The paragraph most at risk is the fourth. Section 7.2 lists three checks that
 % would have CAUGHT the defect; this lists four things a study can REPORT. The
 % overlap is real and deliberate -- they are the same underlying quantities --
@@ -19,9 +33,11 @@
 
 This paper audited ElectroCom61 from its released files alone, constructed and
 released a corrected split, and trained five detectors on both the published and
-the corrected partition under a single configuration. The audit needed no model
-and no pixels; the benchmark holds every setting but the architecture fixed, so
-that differences between the two splits are attributable to the split.
+the corrected partition under one configuration, with a single documented
+deviation: the transformer detector will not train at the learning rate the four
+convolutional ones are trained at. The audit needed no model and no pixels; the
+benchmark otherwise holds every setting but the architecture fixed, so that
+differences between the two splits are attributable to the split.
 
 The audit found that the published partition cannot evaluate 15 of the 61
 classes at all, because they hold no instances in either the validation or the

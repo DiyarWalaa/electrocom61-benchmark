@@ -7,7 +7,28 @@
 %        Sections 3.1, 5.1, 5.5
 %   7.2  Sections 3.1, 3.3, 5.4
 %   7.3  Sections 3.2, 6.1
-%   7.4  Sections 6.2, 6.4, 5.5; data/latency_by_arch.csv
+%   7.4  Sections 6.4, 6.5; vasu2023mobileone, chen2023run, kong2026edge
+%
+% 7.4 CUT TO ONE PARAGRAPH, 2026-08-15. It ran to four and three of them
+% restated 6.2, 6.4 and 6.5 rather than interpreting them: the 0.0023 middle-of-
+% the-field spread, the 0.24 ms repeatability figure, and a closing that shared
+% its construction with 6.5's. Section 7 argues; it does not recap.
+%
+% WHAT WAS KEPT is the only material here that Section 6 does not carry: the
+% proxy-failure literature, which places 6.4's local finding in a documented
+% pattern. WHAT WAS DROPPED, so it is not mistaken for a loss: the 0.0023 and
+% 33.53 ms figures (6.2 and 6.4 state them), the 0.24 ms restatement (5.5 is now
+% the single prose statement of it) and the 0.0001-mAP-against-7.37-ms
+% construction, which stays in 6.5 alone.
+%
+% NOT FOLDED INTO 7.1, deliberately. 7.1's claim is that the three published
+% ACCURACY figures are not comparable with one another -- a claim about
+% reconciling a record. This is a different claim: that an accuracy-only
+% comparison structurally cannot express deployment cost, whatever its
+% reporting quality. Merging them would give 7.1 two claims and make both harder
+% to check, and 8's and 9's closing arguments both lean on this one standing
+% separately. The label is unreferenced, so keeping the subsection costs
+% nothing.
 %
 % PENDING AUTHOR VERIFICATION AGAINST THE PRIOR-WORK PDFs. Three claims in 7.1
 % rest on readings of papers that are NOT in this repository. Nothing in the
@@ -190,40 +211,20 @@ inflated results'' is a useful heuristic and not a rule. A defect that
 understates is the harder one to notice, because nobody audits a result for
 being too low.
 
-\subsection{Reporting speed changes the answer}
+\subsection{What accuracy alone cannot express}
 \label{sec:speed-changes-the-answer}
 
-On accuracy alone, these five architectures are close enough that the choice
-between the three occupying the middle of the field is not resolvable at a
-single seed: they are separated by 0.0023 mAP@50--95 on the corrected split
-(Section~\ref{sec:metric-choice}). Adding latency resolves it immediately, and
-not by a small margin --- the same three span 33.53~ms, roughly 140 times the
-measurement's own spread.
-
-The complexity proxy most often reported in its place would have misled, and the
-failure is a documented one rather than a local accident: parameter counts and
-FLOPs are both reported to correlate poorly with measured on-device latency
+An accuracy-only comparison has no way to state deployment cost, and the
+complexity figures usually offered in its place do not recover it. Whether a
+model keeps up with a conveyor that does not stop for it is the question that
+decides deployment, and no accuracy metric encodes it; the three prior studies
+could not answer it because they measured a different thing
+(Section~\ref{sec:deployment}). Substituting a proxy is not a repair, and its
+failure is documented rather than local: parameter counts and FLOPs both
+correlate poorly with measured on-device latency
 \citep{vasu2023mobileone,chen2023run}, and a benchmark of nine YOLO variants
-across three edge systems-on-chip reports latency tracking accuracy more closely
-than either \citep{kong2026edge}. The measurements here agree on parameter count
-and only partly on FLOPs. Ordered by parameter count, these architectures fall
-in an order almost unrelated to their measured speed --- the one with the fewest
-parameters is the second slowest of the five --- while GFLOPs reproduces the
-latency order except for its leading pair (Section~\ref{sec:efficiency}). A
-study offering parameter counts as a stand-in for deployment cost would have
-handed a reader the wrong ordering, and nothing in such a study would reveal
-that.
-
-A speed ranking is also uninterpretable without a repeatability figure beside
-it. The 0.96~ms separating the two fastest architectures here means something
-only because the same architecture measured twice varies by 0.24~ms
-(Section~\ref{sec:efficiency-measurement}); with the first number alone a reader
-cannot tell a real ordering from measurement noise, and the two smallest
-differences in Table~\ref{tab:efficiency} are of the same order as the noise.
-
-The application that motivates this dataset is a conveyor belt that does not
-stop for the detector. Whether a model keeps up is the question that decides
-deployment, and it is not expressible in any accuracy metric. None of the three
-prior studies measured inference speed, so none could answer it ---
-not because their measurements were poor, but because they measured a different
-thing.
+across three edge systems-on-chip finds latency tracking accuracy more closely
+than either \citep{kong2026edge}. Section~\ref{sec:efficiency} finds the same
+here. What a deployment decision needs is therefore a measurement, not an
+inference from architecture --- which is the one thing on this list that no
+amount of care in reporting accuracy can supply.

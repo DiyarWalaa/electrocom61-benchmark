@@ -1,4 +1,171 @@
 \section{Related Work}
 \label{sec:related-work}
 
-% TODO: Prior work on ElectroCom61, and on the detector families evaluated.
+% THIS SECTION DESCRIBES; SECTION 7 ARGUES. Nothing here should draw a
+% consequence from the properties it lists. Where a fact appears in both, this
+% section states it and Section 7 says what follows from it.
+%
+% VERIFICATION STATUS OF THE WHOLE SECTION. No paper cited here has been read
+% from within this repository. Bibliographic fields are registry-resolved
+% (Crossref or arXiv); every CHARACTERISATION of what a paper found or argued
+% comes from the author's reading. Section 8's last paragraph states this
+% limitation for the paper as a whole and it applies with full force here, where
+% almost every sentence is about someone else's work.
+%
+% What IS traceable to this repository, and where:
+%   dataset size, class count, annotation count, split sizes, licence
+%       -> README.md; runs/20260802_class_date_provenance/
+%   "none states a seed or an Ultralytics version"
+%       -> data/config_provenance.csv, rows marked `added` (= stated by
+%          neither paper) and the `ultralytics` row's citation column,
+%          "stated by neither paper"
+%   "none reports mAP@50-95, per-class AP, or classes evaluated"
+%       -> Section 5.4, which makes the same claim
+%   "none measures inference speed" -> Sections 6.5 and 7.4
+%
+% ---------------------------------------------------------------------------
+% 2.2 IS WRITTEN IN A WEAKER FORM THAN BRIEFED, AND THIS IS THE ONE REAL GAP.
+%
+% The brief asked for six prior systems: an on-line sorting system for
+% components detached from waste PCBs; real-time component identification from
+% waste PCBs; e-waste classification with YOLOv5 and v7; a comparison of YOLOv5,
+% v7 and v8; battery detection in waste equipment by X-ray; and board-component
+% disassembly. NONE OF THESE HAS A BIBLIOGRAPHY ENTRY. references.bib holds 28
+% entries and not one of them is any of those six works.
+%
+% They were NOT guessed at. The brief gave descriptions rather than titles or
+% authors, so resolving them would have meant choosing which published paper
+% each description refers to -- an editorial judgement, not a lookup, and one
+% that would put unverifiable citations behind sentences about other people's
+% systems. The subsection is therefore written from the three studies on this
+% dataset, which ARE cited, and the survey paragraph is omitted rather than
+% written without sources.
+%
+% To restore it: supply titles or DOIs for the six and the paragraph is short.
+% ---------------------------------------------------------------------------
+%
+% TWO CLAIMS FROM THE BRIEF NOT WRITTEN, both in 2.1:
+%   - "three backgrounds". Nothing in this repository records a background
+%     count. The README mentions a shared background only in the contamination
+%     context, where it means images within one session share one.
+%   - "its technical validation reports two detectors, both above 95% mAP@50".
+%     Two separate problems. The count of detectors in the paper's own table is
+%     not recorded here. And the README's reading of the archived notebook
+%     (reference/electrocom61-yolov9.ipynb) is that the 95.9% figure comes from
+%     an unlabelled per-class dictionary -- unlabelled as to whether it is
+%     mAP@50, mAP@50-95, precision or recall -- so attaching "mAP@50" to it
+%     asserts more than the source supports. The weaker form is written: a
+%     headline figure of 95.9%, metric unattributed.
+
+Work bearing on this study falls into four groups: what has been reported on
+ElectroCom61 itself, the application area it serves, the literature on split
+construction and evaluation validity, and the reporting conventions this
+benchmark adopts.
+
+\subsection{ElectroCom61 and the results reported on it}
+\label{sec:related-electrocom61}
+
+ElectroCom61 contains 2{,}121 images of 61 electronic component classes carrying
+12{,}937 annotations, photographed with several smartphones and distributed
+under CC BY 4.0 with a published partition of 1478/438/205 images
+\citep{electrocom61}. It is the only public dataset of its kind at this class
+count, which is what makes the results reported on it worth reconciling.
+
+Three published studies report detection results on it. The dataset paper's own
+technical validation reports a headline figure of 95.9\% \citep{electrocom61};
+the two benchmark studies each compare several detectors and report mAP@50
+\citep{yolov12paper,yolov13paper}.
+
+Four properties of the experimental setup are not stated by any of the three:
+which version of the dataset was used, which evaluation partition the reported
+figures come from, what random seed was drawn, and which release of the model
+library produced the architectures. The last two are recorded in this study's
+own configuration table as settings neither prior paper states.
+
+Four quantities are reported by none of them either: mAP@50--95, per-class
+average precision, the number of classes on which the evaluation was actually
+computed, and any measurement of inference speed. These are properties of the
+published record rather than of the models, and what follows from them is taken
+up in Section~\ref{sec:disagreement}.
+
+\subsection{Electronic component detection and e-waste sorting}
+\label{sec:related-ewaste}
+
+The application is the recovery of reusable components from discarded circuit
+boards. Sorting them by hand is slow and brings workers into contact with
+hazardous material, which is the standing motivation for automating the
+recognition step; the dataset was assembled for that purpose
+\citep{electrocom61}.
+
+Both benchmark studies on this dataset are themselves e-waste detection systems,
+and both build on the YOLO family \citep{yolov12paper,yolov13paper}. That family
+dominates the work reported on ElectroCom61: every published detection result on
+the dataset, including its own technical validation, comes from a YOLO variant.
+Real-time operation is the reason usually given for that choice, and it is worth
+being precise about the evidence: no study on ElectroCom61 reports a speed
+measurement of any kind, so the preference for real-time architectures is stated
+in these studies rather than demonstrated by them.
+
+\subsection{Dataset splits, leakage and evaluation validity}
+\label{sec:related-leakage}
+
+Defects in how data is partitioned are documented across many scientific fields
+and have been identified as a contributor to irreproducible machine-learning
+results \citep{kapoor2023leakage}, and the ways they arise have been organised
+into taxonomies covering both conventional and transfer-learning settings
+\citep{apicella2025leakage}.
+
+Group structure is the recurring mechanism. Where observations are not
+independent --- repeated measurements of the same subject, samples from the same
+source --- a split that ignores the grouping places related items on both sides
+of the boundary and inflates measured performance; this has been shown directly
+for connectome-based models \citep{rosenblatt2024leakage}, and checklists exist
+for detecting the condition before a model is trained
+\citep{bernett2024guiding}.
+
+The problem has also been given tooling. Leakage-reduced splitting has been
+formalised as a combinatorial optimisation over similarity between items and
+solved with clustering heuristics, so that group-aware partitions can be
+produced automatically rather than by hand \citep{joeres2025datasail}.
+
+Established benchmarks have been corrected on these grounds, and the corrections
+moved the numbers: on a binding-affinity benchmark, two groups independently
+produced improved splits and previously reported performance fell against them
+\citep{graber2025resolving,graber2025addendum}.
+
+Every case documented in this literature is contamination --- material that
+should have been held out was not, and the measured score was too high. The
+complement, in which material that should have been evaluated was never
+evaluated at all and the measured score is too low, is what this paper
+describes, and we are not aware of it having been characterised. Its consequences
+are taken up in Section~\ref{sec:generalisation}.
+
+\subsection{Metrics and efficiency reporting}
+\label{sec:related-metrics}
+
+The COCO benchmark established mAP averaged over ten intersection-over-union
+thresholds from 0.5 to 0.95 as the standard detection metric, alongside the
+single-threshold mAP@50 that preceded it \citep{coco}.
+
+The complexity figures most often reported in place of a timing measurement are
+known to mislead. Parameter counts and FLOPs both correlate poorly with measured
+on-device latency \citep{vasu2023mobileone,chen2023run}, and on low-compute edge
+hardware latency has been reported to track detection accuracy more closely than
+either \citep{kong2026edge}.
+
+Single-run results carry a similar hazard. The random seed alone moves accuracy
+by a margin large enough to reorder architectures \citep{picard2021seed}, and
+conclusions drawn from model comparisons with small effect sizes have been shown
+to be unreliable without repeated runs \citep{gundersen2023reporting}; where
+random effects during training have been studied directly, a statistically
+significant difference was found to be a weak indicator of a true one
+\citep{akesson2024random}.
+
+Non-maximum suppression is a recognised postprocessing cost, and removing it is
+an explicit design goal in recent detectors --- in the transformer line since
+DETR \citep{detr}, and within the YOLO family in architectures trained to
+produce a single prediction per object \citep{yolov10}.
+
+None of these conventions appears in any study reported on ElectroCom61. No
+study on the dataset reports mAP@50--95, a repeatability estimate, or a timing
+measurement.

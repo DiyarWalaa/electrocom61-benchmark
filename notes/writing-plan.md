@@ -19,19 +19,17 @@ their claims are settled.
 | 4 | **6 — Results** | **complete** (6.1–6.5 drafted, fact-checked) |
 | 5 | **7 — Discussion** | **complete** (7.1–7.4 drafted, fact-checked) |
 | 6 | **8 — Limitations** | **complete** (drafted, fact-checked) |
-| 7 | 2 — Related Work | stub — **blocked**, see below |
+| 7 | **2 — Related Work** | **complete** (2.1–2.4 drafted, fact-checked) |
 | 8 | 9 — Conclusion | stub |
 | 9 | 1 — Introduction | stub |
 | 10 | Abstract | not started |
 
-**Sections 3 through 8 are complete and fact-checked.** They are the model for
+**Sections 2 through 8 are complete and fact-checked.** They are the model for
 the rest: every number in them traces to a committed file, and anything that does
 not is marked in the section file's own header comment rather than left silent.
 
-**Remaining: 2, 9, 1 and the abstract.** Section 2 is blocked on a literature
-search that has not started (see its entry below). Sections 9, 1 and the abstract
-are not blocked --- they are written last by design, from the settled claims of
-3 through 8, and those claims are now settled.
+**Remaining: 9, 1 and the abstract.** None is blocked. They are written last by
+design, from the settled claims of 2 through 8, and those claims are settled.
 
 ## Writing rules
 
@@ -181,33 +179,33 @@ Evidence used: single seed, one GPU, no variance estimate; the augmentation
 confound; the scope limit on the contamination figures; RT-DETR-l evaluated at
 `l` scale against YOLO `s` scale.
 
-### Section 2 — Related Work
+### Section 2 — Related Work — DRAFTED
 
-Claims: _to be supplied._
+Four subsections: results reported on ElectroCom61; the e-waste application;
+splits, leakage and evaluation validity; metrics and efficiency reporting. It
+DESCRIBES; Section 7 argues. Checked mechanically: no sentence over 60
+characters is shared verbatim between the two.
 
-**BLOCKED on a literature search that has not started.** `references.bib` holds
-three entries — `yolov12paper`, `yolov13paper` and `electrocom61` — and all three
-are already cited elsewhere in the paper. A Related Work section needs more than
-the three papers this study argues with: the detector families evaluated, prior
-work on electronic-component and e-waste detection generally, and whatever else
-the search turns up. None of that has been gathered.
+The literature search is done. 19 of the bibliography's 28 entries are cited
+here, including the three that were waiting for it — `apicella2025leakage`,
+`bernett2024guiding` and `rosenblatt2024leakage`.
 
-No search items outstanding.
+**One gap, and it is a real one.** 2.2 was briefed to survey six prior systems:
+an on-line sorting system for components detached from waste PCBs; real-time
+component identification from waste PCBs; e-waste classification with YOLOv5 and
+v7; a comparison of YOLOv5, v7 and v8; battery detection in waste equipment by
+X-ray; board-component disassembly. **None has a bibliography entry**, and the
+brief gave descriptions rather than titles or DOIs, so resolving them would have
+meant choosing which paper each description refers to. That is an editorial
+judgement rather than a lookup, so the survey paragraph was omitted rather than
+written on guessed citations. Supply titles or DOIs and it is a short addition.
 
-**Closed 2026-08-15:** whether YOLOv13 is distributed outside the Ultralytics
-package. Three sources, all checked: the iMoonLab/yolov13 repository, whose
-README states "The code is based on [Ultralytics]"; Ultralytics issues 21181 and
-21243, both requesting integration and both closed as not planned; and the
-architecture paper. The claim is grounded in 5.1 and 7.1 and the repository is
-cited as `yolov13repo`. It has no CITATION.cff and no Zenodo DOI, so it is cited
-as software with a URL and an access date.
-
-**Closed 2026-08-15:** `yolov13paper`'s venue, pages and DOI. It was indexed
-after all — IEEE Xplore document 11602786, 2026 IEEE International Conference on
-Smart Sustainable Systems for Computer and Engineering Applications (3SCEA),
-Cairo, 19–21 April 2026, doi `10.1109/3SCEA68071.2026.11602786`. The entry is no
-longer in press and no longer carries its ISBN. Xplore shows no page range, so
-the field is omitted rather than guessed.
+**Two claims from the brief were written weaker,** both in 2.1 and both recorded
+in the section header: "three backgrounds" (no background count is recorded
+anywhere in this repository) and "two detectors, both above 95% mAP@50" (the
+detector count is not recorded, and the README's reading of the archived
+notebook is that the 95.9% figure comes from a dictionary unlabelled as to which
+metric it is, so attaching "mAP@50" to it asserts more than the source supports).
 
 ### Section 9 — Conclusion, Section 1 — Introduction, Abstract
 

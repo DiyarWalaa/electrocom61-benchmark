@@ -301,7 +301,7 @@ def main():
                      "from the contiguity table above." % (n_cell_no_ts, len(cell)))
     lines.append("")
 
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("wrote %s" % run_dir)

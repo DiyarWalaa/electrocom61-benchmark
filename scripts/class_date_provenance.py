@@ -557,7 +557,7 @@ def main():
                  "whether a non-train-only date exists for it.")
     lines.append("")
 
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     # Console output mirrors the headline numbers so a run is legible without

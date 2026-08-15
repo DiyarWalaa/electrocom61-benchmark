@@ -331,7 +331,7 @@ def main():
     lines.append("- Shape is a label applied at one tolerance, not a test. "
                  "`near-nominal` at 1.0 pp would admit more groups at 2.0.")
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     return 0

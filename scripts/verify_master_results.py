@@ -235,7 +235,7 @@ def main():
                      % ("PASS" if ok else "**FAIL**", label, _fmt(expected),
                         _fmt(actual) if actual is not None else "-", note))
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("record: %s" % run_dir)

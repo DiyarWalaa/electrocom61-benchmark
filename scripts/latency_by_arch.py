@@ -206,7 +206,7 @@ def main():
     lines.append("- `fps_p50` is derived from the p50 latency, so its gap is "
                  "not independent evidence.")
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     return 0

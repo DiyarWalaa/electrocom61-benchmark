@@ -1,0 +1,51 @@
+{
+  "complexity_conflicts": [],
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "inputs": {
+    "results_rtdetr_l_corr.json": "f58caeb78eb947fd50c53cbe559e14c79593e173ccff4ae5532339261189580e",
+    "results_rtdetr_l_pub.json": "685de5e35c7cf24300c37245cbe552bf85a2a6f45d0d73a4acab5fa6b5d3832b",
+    "results_rtdetr_l_pub_lr1e4.json": "529345cc884b3bae8abd06fe5773194f3cfb890d135636252efe8bce0a575458",
+    "results_yolo11s_corr.json": "4538a81a5eea03ae70ecff6d127f5bab3f8f8da030f2480194d407caa0e21ab5",
+    "results_yolo11s_pub.json": "59a7b0b8085b42476fe209fd9f1a86bc2c5aa20814f6b584f56edcd729688c41",
+    "results_yolo12s_corr.json": "82e2ddca3174b6d645c0dcde21c46f37bd6dc0fdeb96f474e429f11fec0340a8",
+    "results_yolo12s_pub.json": "569a1ad64d503348cf51a42b9bc0eac62a9039c53a864070019dfe2ee31a25d8",
+    "results_yolo26s_corr.json": "f9099edaaf7b320a5bd5ba09dfb34d3013ad8ccba3074de8d561d78321457c9c",
+    "results_yolo26s_pub.json": "110f152820b9f81d18247470db9c6e87bcf3acf1d57665f601ba2529225e4cb5",
+    "results_yolov9s_corr.json": "ea02ff7e8c05b8f16ed431706720ba7b75643ac11c62a9e6f5d54a327c4a41b1",
+    "results_yolov9s_pub.json": "16c2bc9b5949d4a93bf5f3df68ccf2b7e2b98cad78db93ecf9eb156e768d805b"
+  },
+  "latency_environment": {
+    "gpu": "Tesla P100-PCIE-16GB",
+    "torch": "2.5.1+cu121",
+    "ultralytics": "8.4.115"
+  },
+  "latency_input_sha256": "23dd0d96309f696f40bd72b7aa75da8540983bad789355a8d4ee075b520baf97",
+  "latency_protocol": {
+    "batch": 1,
+    "burn_in": "30 images on one model before the loop, discarded",
+    "complexity": "params, GFLOPs and layers before and after model.fuse(), imgsz=640",
+    "file_cache": "all 205 images read once before any timing",
+    "imgsz": 640,
+    "timer": "perf_counter + cuda.synchronize, p50/p95 per-image end-to-end predict()",
+    "warmup": 20
+  },
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "missing_fields": [],
+  "module_sha256": "737cf6ba184aa6e97aed40933b2194d3aa4d5675621fb1de683ea7640eb58eca",
+  "params": {
+    "gflops_tolerance": 0.01,
+    "input_dir": "C:\\research\\electrocom61\\data\\kaggle",
+    "join_key": "run slug",
+    "latency_json": "C:\\research\\electrocom61\\data\\kaggle\\results_latency_unified.json",
+    "latency_source_value": "unified_pass_v3_single_P100_session_committed",
+    "n_runs": 11,
+    "output": "C:\\research\\electrocom61\\data\\master_results.csv"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-15T21:58:48.446572Z",
+  "script": "collect_results.py",
+  "script_sha256": "3db8d165a1a4bf986b6a41fb2bb090d982e09890dbabc4c0f0261bb8cdfecc89",
+  "unjoined_runs": []
+}

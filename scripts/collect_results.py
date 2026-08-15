@@ -382,7 +382,7 @@ def main():
                  "hold on other hardware, and transformer and CNN detectors do "
                  "not scale alike across GPUs.")
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     return 0

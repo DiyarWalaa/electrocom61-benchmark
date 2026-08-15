@@ -405,7 +405,7 @@ def main():
           "- The pair gap is a resolution floor for THIS hardware and session. "
           "It does not bound run-to-run variation on other hardware.", ""]
     with io.open(os.path.join(run_dir, "summary.md"), "w",
-                 encoding="utf-8") as fh:
+                 encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(L) + "\n")
 
     return 1 if problems else 0

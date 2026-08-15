@@ -204,7 +204,7 @@ def main():
     lines.append("- Only `%s` was changed. If the same session mislabelled "
                  "anything else, this script neither detects nor fixes it." % FIELD)
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("fixed %s" % TARGET)

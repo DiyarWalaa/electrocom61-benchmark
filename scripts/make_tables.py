@@ -645,7 +645,7 @@ def main():
                  "can read $-0.8$ for an allocation no integer split could "
                  "have improved on.")
     lines.append("")
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("wrote %d tables to %s" % (len(written), "tables/"))

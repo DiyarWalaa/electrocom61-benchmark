@@ -557,7 +557,7 @@ def main():
                  "on class coverage, with images-moved as context.")
     lines.append("")
 
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("wrote %s" % run_dir)

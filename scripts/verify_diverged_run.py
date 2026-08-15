@@ -299,7 +299,7 @@ def main():
           "- Latency and complexity columns are empty for this run because the "
           "unified timing pass covered the ten benchmark checkpoints only.", ""]
     with io.open(os.path.join(run_dir, "summary.md"), "w",
-                 encoding="utf-8") as fh:
+                 encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(L) + "\n")
 
     return 1 if problems else 0

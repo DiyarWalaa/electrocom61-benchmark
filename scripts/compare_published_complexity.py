@@ -152,7 +152,7 @@ def main():
         "evidence than a parameter-count difference.",
     ]
 
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("\n".join(lines))

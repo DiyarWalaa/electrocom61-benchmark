@@ -361,7 +361,7 @@ def main():
     lines.append("effective size of the training set relative to its nominal count.")
     lines.append("")
 
-    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "summary.md"), "w", encoding="utf-8", newline="\n") as fh:
         fh.write("\n".join(lines) + "\n")
 
     print("wrote %s" % run_dir)

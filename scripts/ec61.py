@@ -467,15 +467,31 @@ def write_config(run_dir, script_path, params, extra=None):
     }
     if extra:
         cfg.update(extra)
-    with open(os.path.join(run_dir, "config.json"), "w", encoding="utf-8") as fh:
+    with open(os.path.join(run_dir, "config.json"), "w", encoding="utf-8", newline="\n") as fh:
         json.dump(cfg, fh, indent=2, sort_keys=True)
     return cfg
 
 
 def write_csv(path, header, rows):
-    """Write a CSV with a fixed header. Rows are written exactly as given."""
+    """Write a CSV with a fixed header. Rows are written exactly as given.
+
+    TWO SEPARATE NEWLINE SETTINGS, AND BOTH ARE LOAD-BEARING.
+
+    `newline=""` on the file is what the csv module requires: without it, the
+    terminator csv writes would be translated a SECOND time by the text layer
+    and every row would end "\r\r\n" on Windows.
+
+    `lineterminator="\n"` on the writer is what makes the output LF. The csv
+    module's default is "\r\n" on every platform, independently of how the file
+    was opened, so `newline=""` alone yields CRLF. That went unnoticed until
+    2026-08-16 because core.autocrlf checked these files out as CRLF too, so
+    regenerating one matched what was on disk. Pinning *.csv to eol=lf in
+    .gitattributes removed that coincidence and left master_results.csv
+    differing from HEAD in 1904 of its 2351 bytes -- every line, none of the
+    content.
+    """
     with open(path, "w", newline="", encoding="utf-8") as fh:
-        w = csv.writer(fh)
+        w = csv.writer(fh, lineterminator="\n")
         w.writerow(header)
         for row in rows:
             w.writerow(row)

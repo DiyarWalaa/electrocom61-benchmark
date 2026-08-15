@@ -306,11 +306,25 @@
   doi     = {10.1007/s10462-025-11326-3},
 }
 
-% VERIFY -- AND READ THE ADDENDUM FIRST. Fields from Crossref.
-% An addendum was published at 10.1038/s42256-025-01174-9 (Nature Machine
-% Intelligence 8(2):292, 2026). This paper is intended to carry the strongest
-% comparative claim in Section 7.3, so what the addendum changes matters more
-% here than for any other entry in this file.
+% ADDENDUM READ AND CLEARED, 2026-08-15 (by the author, not from within this
+% repository). It is housekeeping: NO result, claim or conclusion changes. What
+% it does is acknowledge a related preprint, "Leak Proof PDBBind" (arXiv, 2023),
+% which independently proposed an improved PDBbind split using extra curation
+% and leave-cluster-out splitting; the authors frame the two as complementary.
+%
+% WHAT THAT LICENSES, PRECISELY:
+%   SAFE   -- citing this paper for the result that cleaning a split LOWERED
+%             previously reported scores. That is the use Section 7.3 needs, and
+%             the addendum does not touch it.
+%   UNSAFE -- citing it as the FIRST corrected split for that benchmark. It is
+%             not, and the addendum exists to say so. We make no such claim.
+%
+% STANDING RULE: cite graber2025addendum alongside graber2025resolving wherever
+% the latter appears. A reader who follows the DOI will meet the addendum
+% anyway; citing only the original would look like we had not seen it.
+%
+% VERIFY: the paper itself has still not been read from within this repository.
+% Fields from Crossref.
 @article{graber2025resolving,
   author  = {Graber, David and Stockinger, Peter and Meyer, Fabian and
              Mishra, Siddhartha and Horn, Claus and Buller, Rebecca},
@@ -322,4 +336,19 @@
   pages   = {1713--1725},
   year    = {2025},
   doi     = {10.1038/s42256-025-01124-5},
+}
+
+% The addendum to graber2025resolving. Fields from Crossref. Cite the two
+% together -- see the standing rule above.
+@article{graber2025addendum,
+  author  = {Graber, David and Stockinger, Peter and Meyer, Fabian and
+             Mishra, Siddhartha and Horn, Claus and Buller, Rebecca},
+  title   = {Addendum: Resolving data bias improves generalization in binding
+             affinity prediction},
+  journal = {Nature Machine Intelligence},
+  volume  = {8},
+  number  = {2},
+  pages   = {292},
+  year    = {2026},
+  doi     = {10.1038/s42256-025-01174-9},
 }

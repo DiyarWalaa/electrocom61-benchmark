@@ -87,8 +87,8 @@ clear the first bar comfortably and the second less so. Detecting them accounts
 for most of the gain; localising them precisely does not.
 
 The consequence for the literature is a plain one. Reported performance on
-ElectroCom61 has been understated rather than overstated. Every published mAP on
-this dataset was computed over roughly 46 of the 61 classes
+ElectroCom61 has been understated rather than overstated. Every mAP reported in
+those three studies was computed over roughly 46 of the 61 classes
 (Section~\ref{sec:class-coverage}), and the fifteen missing from that average
 are the ones these models handle best. This is the opposite of the correction
 one expects to have to make to a benchmark with a split defect, and it is worth
@@ -246,8 +246,9 @@ within a millisecond of the fastest architecture measured. It is not the fastest
 and it does not lead on mAP@50; it is the architecture that gives up least on
 any of the three axes that a conveyor-belt deployment cares about.
 
-No prior study of this dataset could have reached that conclusion, for a reason
-that has nothing to do with the models. None of them measured inference speed.
+None of the three prior studies could have reached that conclusion, for a reason
+that has nothing to do with the models. None of the three measured inference
+speed.
 A comparison conducted on accuracy alone cannot distinguish between two
 architectures that differ by 0.0001 mAP and 7.37~ms, and it has no way to
 express that the difference which matters for deployment is the second one.

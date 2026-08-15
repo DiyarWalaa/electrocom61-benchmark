@@ -77,8 +77,8 @@ benchmark can be placed alongside theirs. The remaining two have not previously
 been applied to this dataset: YOLO26s, released in January 2026, is the most
 recent member of the YOLO family and removes non-maximum suppression from its
 detection head; RT-DETR-l is a transformer-based detector, included to test
-whether the convolutional family adopted by all prior work on this dataset is
-the appropriate choice or merely the familiar one.
+whether the convolutional family adopted by all three prior studies of this
+dataset is the appropriate choice or merely the familiar one.
 
 All YOLO variants were used at the ``s'' (small) scale, matching prior work and
 reflecting the deployment constraint that motivates the application: a
@@ -187,10 +187,10 @@ Four accuracy quantities are reported. mAP@50 is included because it is the only
 accuracy metric prior work on this dataset reports, and comparability requires
 it. mAP@50--95, the COCO standard \citep{coco}, averages precision over ten
 intersection-over-union thresholds rather than one and is therefore sensitive to
-localisation quality as well as to detection; no published study on this dataset
-reports it. Precision and recall are reported for completeness, and per-class
-average precision is reported for all classes, which no published study on this
-dataset provides.
+localisation quality as well as to detection; none of the three published
+studies on this dataset reports it. Precision and recall are reported for completeness, and per-class
+average precision is reported for all classes, which none of the three
+published studies on this dataset provides.
 
 A fifth quantity is reported that is not a performance measure: the number of
 classes on which the evaluation was actually computed. The framework reports

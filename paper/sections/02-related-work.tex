@@ -72,7 +72,12 @@ under CC BY 4.0 with a published partition of 1478/438/205 images
 Three published studies report detection results on it. The dataset paper's own
 technical validation reports a headline figure of 95.9\% \citep{electrocom61};
 the two benchmark studies each compare several detectors and report mAP@50
-\citep{yolov12paper,yolov13paper}.
+\citep{yolov12paper,yolov13paper}. That set was established by citation search
+on Google Scholar in August 2026: of the works citing the dataset paper, two are
+those benchmark studies and two cite the dataset as related work without
+training on it \citep{nguyen2025iotkits,chen2025augmentation}. Every statement
+below about what no study on this dataset reports is bounded by that search, in
+the sense set out in Section~\ref{sec:limitations}.
 
 Four properties of the experimental setup are not stated by any of the three:
 which version of the dataset was used, which evaluation partition the reported
@@ -110,13 +115,13 @@ than classification is required.
 
 Both benchmark studies on this dataset are themselves e-waste detection systems,
 and both build on that family \citep{yolov12paper,yolov13paper}. It dominates
-the work reported on ElectroCom61 in particular: every published detection
-result on the dataset, including its own technical validation, comes from a YOLO
+the work reported on ElectroCom61 in particular: in all three studies,
+including the dataset paper's own technical validation, the detector is a YOLO
 variant.
 Real-time operation is the reason usually given for that choice, and it is worth
-being precise about the evidence: no study on ElectroCom61 reports a speed
-measurement of any kind, so the preference for real-time architectures is stated
-in these studies rather than demonstrated by them.
+being precise about the evidence: none of the three reports a speed measurement
+of any kind, so the preference for real-time architectures is stated in them
+rather than demonstrated by them.
 
 \subsection{Dataset splits, leakage and evaluation validity}
 \label{sec:related-leakage}
@@ -145,12 +150,15 @@ moved the numbers: on a binding-affinity benchmark, two groups independently
 produced improved splits and previously reported performance fell against them
 \citep{graber2025resolving,graber2025addendum}.
 
-Every case documented in this literature is contamination --- material that
-should have been held out was not, and the measured score was too high. The
-complement, in which material that should have been evaluated was never
-evaluated at all and the measured score is too low, is what this paper
-describes, and we are not aware of it having been characterised. Its consequences
-are taken up in Section~\ref{sec:generalisation}.
+In every case cited above the defect is contamination --- material that should
+have been held out was not, and the measured score was too high. The complement,
+in which material that should have been evaluated was never evaluated at all and
+the measured score is too low, is what this paper describes. We have not found it
+characterised. That claim is of a different kind from the ones about ElectroCom61
+above: those range over three identified studies, whereas this one is bounded by
+a reading of a literature rather than by an enumerable set, and should be read as
+such. Its consequences are taken up in
+Section~\ref{sec:generalisation}.
 
 \subsection{Metrics and efficiency reporting}
 \label{sec:related-metrics}
@@ -179,6 +187,6 @@ an explicit design goal in recent detectors --- in the transformer line since
 DETR \citep{detr}, and within the YOLO family in architectures trained to
 produce a single prediction per object \citep{yolov10}.
 
-None of these conventions appears in any study reported on ElectroCom61. No
-study on the dataset reports mAP@50--95, a repeatability estimate, or a timing
-measurement.
+None of these conventions appears in the three studies reported on
+ElectroCom61: none of them reports mAP@50--95, a repeatability estimate, or a
+timing measurement.

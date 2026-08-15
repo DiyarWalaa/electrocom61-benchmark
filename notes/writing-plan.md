@@ -192,14 +192,18 @@ the three papers this study argues with: the detector families evaluated, prior
 work on electronic-component and e-waste detection generally, and whatever else
 the search turns up. None of that has been gathered.
 
-Two search items are outstanding and both belong to this section's work:
+One search item is outstanding:
 
-- **`yolov13paper`'s venue, pages and DOI.** Not indexed in IEEE Xplore as of
-  August 2026 and not returned by general search; the entry is cited as in press
-  with its ISBN. See the note above the entry in `references.bib`.
 - **Whether YOLOv13 is distributed outside the Ultralytics package.** The claim
   was removed from 5.1 and 7.1 rather than left unsourced. Its source would be
   the iMoonLab repository or the YOLOv13 arXiv paper, neither consulted.
+
+**Closed 2026-08-15:** `yolov13paper`'s venue, pages and DOI. It was indexed
+after all — IEEE Xplore document 11602786, 2026 IEEE International Conference on
+Smart Sustainable Systems for Computer and Engineering Applications (3SCEA),
+Cairo, 19–21 April 2026, doi `10.1109/3SCEA68071.2026.11602786`. The entry is no
+longer in press and no longer carries its ISBN. Xplore shows no page range, so
+the field is omitted rather than guessed.
 
 ### Section 9 — Conclusion, Section 1 — Introduction, Abstract
 

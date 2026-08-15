@@ -2,10 +2,10 @@
 % References.
 %
 % yolov12paper was completed on 2026-08-14 from reference 34 of the YOLOv13
-% paper. yolov13paper REMAINS A STUB: its own venue, pages and DOI appear
-% nowhere in its PDF, so they cannot be filled from the sources to hand.
-% Citation strings are also recorded in data/config_provenance.csv (citation
-% column) and in notes/writing-corrections.md.
+% paper. yolov13paper was completed on 2026-08-15 from IEEE Xplore document
+% 11602786, once the paper was indexed; it is no longer a stub and no longer
+% in press. Citation strings are also recorded in data/config_provenance.csv
+% (citation column) and in notes/writing-corrections.md.
 % ---------------------------------------------------------------------------
 
 % COMPLETE 2026-08-14. Fields taken from reference 34 of the YOLOv13 paper's
@@ -26,18 +26,32 @@
   doi       = {10.1109/ICEEM66692.2025.11225036},
 }
 
-% CITED AS IN PRESS, 2026-08-14. This is as complete as the entry can be made
-% from the sources available. The PDF gives only ISBN 979-8-3315-5668-6 and
-% "Copyright 2026 IEEE"; it names no venue, page range or DOI. Searched for by
-% ISBN and by exact title -- not indexed in IEEE Xplore, and no general web
-% result returns it. Fill in venue, pages and DOI if it is later indexed.
+% INDEXED AND CONFIRMED, 2026-08-15. Supersedes the earlier in-press entry.
+% Source: IEEE Xplore document 11602786. Conference held 19-21 April 2026.
+%
+% PAGE RANGE OMITTED DELIBERATELY: the Xplore record does not show one, and a
+% guessed range in a citation is worse than an absent field. Add it if the
+% published PDF carries page numbers.
+%
+% AUTHOR SPELLING -- there is a discrepancy and this entry follows the
+% publisher. IEEE Xplore records the first author as "Raid Gaib"; the paper's
+% own PDF header reads "Raid Gaibi". The Xplore spelling is used here, and in
+% yolov12paper above, which already carried "Gaib, R." for what appears to be
+% the same person. Rationale: the publisher's record is what a reader resolving
+% the DOI will match against, and using one spelling across both entries keeps
+% the same author from appearing as two people in the bibliography.
+%
+% The ISBN is gone. It was in the entry only as a locator while the paper had no
+% DOI; the DOI supersedes it.
 @inproceedings{yolov13paper,
-  author    = {Gaibi, R. and BAlsabti, S. M. and Ahmed, S. K. and
+  author    = {Gaib, R. and BAlsabti, S. M. and Ahmed, S. K. and
                Yousif, S. M. and Albustani, Q. and Elhenidy, A. M.},
   title     = {E-waste Detection based on {YOLOv13}},
-  booktitle = {IEEE conference proceedings (venue not yet recorded)},
+  booktitle = {2026 IEEE International Conference on Smart Sustainable Systems
+               for Computer and Engineering Applications (3SCEA)},
+  address   = {Cairo, Egypt},
   year      = {2026},
-  note      = {In press. ISBN 979-8-3315-5668-6},
+  doi       = {10.1109/3SCEA68071.2026.11602786},
 }
 
 % The ElectroCom61 dataset paper itself. Supplied by the author, 2026-08-14.

@@ -164,7 +164,11 @@ of arithmetic over files that any user of a dataset already has.
 
 The transferable lesson is the direction of the error. A split defect is assumed
 to inflate scores, because the familiar defect is leakage --- a test image also
-seen in training is easy for the wrong reason. Here the defect was exclusion
+seen in training is easy for the wrong reason --- and corrections in that
+direction lower the numbers they are measured against, as when two groups
+independently corrected the split of a single binding-affinity benchmark and
+previously reported performance fell
+\citep{graber2025resolving,graber2025addendum}. Here the defect was exclusion
 rather than leakage, and what it excluded was disproportionately easy, so it
 \emph{deflated} the scores (Section~\ref{sec:accuracy}). ``A broken split means
 inflated results'' is a useful heuristic and not a rule. A defect that

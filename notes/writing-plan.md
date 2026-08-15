@@ -21,14 +21,14 @@ their claims are settled.
 | 6 | **8 — Limitations** | **complete** (drafted, fact-checked) |
 | 7 | **2 — Related Work** | **complete** (2.1–2.4 drafted, fact-checked) |
 | 8 | **9 — Conclusion** | **complete** (drafted, constraint-checked) |
-| 9 | 1 — Introduction | stub |
+| 9 | **1 — Introduction** | **complete** (drafted, constraint-checked) |
 | 10 | Abstract | not started |
 
-**Sections 2 through 9 are complete and fact-checked.** They are the model for
+**Sections 1 through 9 are complete and fact-checked.** They are the model for
 the rest: every number in them traces to a committed file, and anything that does
 not is marked in the section file's own header comment rather than left silent.
 
-**Remaining: Section 1 and the abstract.** Neither is blocked.
+**Remaining: the abstract only.** Not blocked.
 
 ## Writing rules
 
@@ -204,6 +204,23 @@ anywhere in this repository) and "two detectors, both above 95% mAP@50" (the
 detector count is not recorded, and the README's reading of the archived
 notebook is that the 95.9% figure comes from a dictionary unlabelled as to which
 metric it is, so attaching "mAP@50" to it asserts more than the source supports).
+
+### Section 1 — Introduction — DRAFTED
+
+Five paragraphs, 501 words, written last so it promises only what the body
+delivers. Three constraints checked mechanically: every numeral appears
+elsewhere (2,121; 12,937; 61; and the 50/95 of mAP@50--95); every citation is
+already in the bibliography AND already used elsewhere (electrocom61,
+lu2022sorting, sharma2024vision, yolov12paper, yolov13paper); zero sentences of
+60 characters or more shared verbatim with any other section.
+
+No separate research-questions list, by decision: the contributions cover the
+same ground and two overlapping lists would be redundant at this length.
+
+The contributions list says what each item ESTABLISHES rather than what it
+consists of, which is what keeps the section from arguing. The wording "none of
+which the three prior studies tabulate" is exact and must not drift back to "no
+prior study reports" -- see the correction recorded in 2.4's header.
 
 ### Section 9 — Conclusion — DRAFTED
 

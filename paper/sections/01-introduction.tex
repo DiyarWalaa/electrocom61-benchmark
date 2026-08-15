@@ -1,5 +1,77 @@
 \section{Introduction}
 \label{sec:introduction}
 
-% TODO: Motivate the study. The two prior papers on this dataset report
-% contradictory results; say why a controlled benchmark is needed.
+% THE INTRODUCTION STATES; SECTIONS 3, 7 AND 9 ARGUE. Nothing here should carry
+% a "because" that the body has not already earned. If a sentence here needs
+% defending, it belongs in the body instead.
+%
+% CONSTRAINTS, each checked mechanically after drafting:
+%   - Every numeral appears elsewhere in the paper: 15, 61, 2,121, 12,937.
+%   - Every citation is already in references.bib and already used elsewhere.
+%   - No claim that Sections 3-9 do not support.
+%
+% NO SEPARATE RESEARCH-QUESTIONS LIST, by decision. The contributions cover the
+% same ground, and at 33 pages two overlapping lists would be redundant.
+%
+% WORDING THAT MUST NOT DRIFT BACK. "None of the three prior studies tabulates"
+% is exact and was arrived at after a false claim reached the built PDF: both
+% benchmark studies PLOT mAP@50-95 in training curves, and one of them DOES
+% report confidence intervals and significance tests. See 2.4 and 7.1. Do not
+% simplify this to "no prior study reports".
+
+Recovering reusable components from discarded electronic equipment is done
+largely by hand, which is slow and brings workers into contact with hazardous
+material. Automating the recognition step is the standing motivation for
+applying object detection to the problem, and systems have been built to sort
+components once they have been detached from a board \citep{lu2022sorting} and
+to identify them in place on the board itself \citep{sharma2024vision}. Two
+constraints follow from the setting and both matter for how such a system should
+be evaluated. The conveyor does not stop for the detector, so the time taken to
+process one image is a deployment criterion rather than an implementation
+detail. And a recycling facility runs modest hardware, so the model that can be
+deployed is not necessarily the most accurate one available.
+
+ElectroCom61 is a public dataset for this task, containing 2{,}121 images of 61
+component classes carrying 12{,}937 annotations, distributed with a fixed
+train/validation/test partition \citep{electrocom61}. Three published studies
+report detection results on it: the dataset paper's own technical validation and
+two subsequent benchmark studies \citep{yolov12paper,yolov13paper}. The figures
+they report do not agree with one another, and none of the three states the
+conditions a reader would need in order to reconcile them --- which version of
+the dataset was used, which partition the figures were computed on, what seed
+was drawn, or which release of the model library produced the architectures.
+
+Underneath that disagreement is a defect in the published partition. Fifteen of
+the 61 classes have no instances in either the validation or the test set, so no
+score reported on that partition can include them. They are not the rare
+classes: eight of the ten most heavily annotated classes in the dataset are
+among the fifteen. What determines whether a class can be evaluated is which
+capture session it was photographed in, and whether that session happened to be
+assigned entirely to training.
+
+This paper makes three contributions.
+
+\begin{enumerate}
+  \item An audit of the released dataset, from its files alone, establishing
+    that the published partition cannot evaluate more than a quarter of the
+    annotation effort in the dataset, and that the cause is how capture sessions
+    were allocated rather than how rare any class is.
+  \item A corrected partition, released as a manifest, establishing that the
+    defect is repairable without collecting new data: every class becomes
+    evaluable while the split sizes and the measured test--train contamination
+    are held at their published values.
+  \item A controlled benchmark of five detectors on both partitions under one
+    configuration, establishing that correcting the split raises every model's
+    score, and reporting mAP@50--95, per-class average precision, the number of
+    classes actually evaluated and inference latency --- none of which the three
+    prior studies tabulate.
+\end{enumerate}
+
+Section~\ref{sec:related-work} sets out what has been reported on this dataset
+and the literature on split construction and evaluation reporting.
+Section~\ref{sec:dataset-audit} presents the audit and
+Section~\ref{sec:corrected-split} the corrected partition.
+Sections~\ref{sec:benchmark-setup} and~\ref{sec:results} give the benchmark and
+its results, Section~\ref{sec:discussion} interprets them,
+Section~\ref{sec:limitations} states what the study does not establish, and
+Section~\ref{sec:conclusion} concludes.

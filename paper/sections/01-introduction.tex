@@ -13,6 +13,26 @@
 % NO SEPARATE RESEARCH-QUESTIONS LIST, by decision. The contributions cover the
 % same ground, and at 33 pages two overlapping lists would be redundant.
 %
+% NOT WRITTEN -- THE CONCRETE DISAGREEMENT IN PARAGRAPH 2. It was to read: the
+% dataset paper reports YOLOv9s at 95.9% mAP@50 while the YOLOv12 paper's
+% comparison table gives 84.9% for the same architecture on the same dataset.
+% THREE COMPONENTS ARE UNVERIFIABLE FROM THIS REPOSITORY:
+%   - 84.9% appears NOWHERE in the repository -- not in README.md, notes/,
+%     data/, or any section. There is nothing to check it against.
+%   - Attributing 95.9% to YOLOv9s. README.md records that the archived
+%     notebook trains TWO models (gelan-c in cell 31, yolov9-e in cell 49) and
+%     that which of them produced the per-class dict is not stated.
+%   - Attributing 95.9% to mAP@50. README.md records the dict as unlabelled as
+%     to whether it is mAP@50, mAP@50-95, precision or recall. 2.1 says
+%     "a headline figure of 95.9%" with the metric unattributed for exactly
+%     this reason, and this sentence would contradict it.
+% The paper's own table may well state both attributions -- the README's
+% analysis is of the NOTEBOOK, not the PDF -- but nothing committed records
+% what the table says. TO RESTORE: record both figures, with the architecture
+% and metric each paper attributes them to and the table they come from, in a
+% committed file, the way data/published_complexity.csv holds the parameter
+% counts. Then this sentence is two lines.
+%
 % WORDING THAT MUST NOT DRIFT BACK. "None of the three prior studies tabulates"
 % is exact and was arrived at after a false claim reached the built PDF: both
 % benchmark studies PLOT mAP@50-95 in training curves, and one of them DOES
@@ -66,6 +86,11 @@ This paper makes three contributions.
     classes actually evaluated and inference latency --- none of which the three
     prior studies tabulate.
 \end{enumerate}
+
+Two of these results run against expectation. The defect had been understating
+reported performance rather than inflating it, which is the reverse of what a
+broken split is normally taken to do; and the detector that records the highest
+mAP@50 is not the one this application should deploy.
 
 Section~\ref{sec:related-work} sets out what has been reported on this dataset
 and the literature on split construction and evaluation reporting.

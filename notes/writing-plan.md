@@ -81,6 +81,66 @@ may simply relocate, and the run directories the prose cites are not going
 anywhere. From here, new sections are drafted tighter rather than to the density
 of 3 and 4.
 
+## Handoff — read this first if you are a fresh session
+
+State as of 2026-08-15. The paper builds clean at **34 pages**: 0 undefined
+references, 0 undefined citations, 0 BibTeX warnings, 1 overfull box (pre-existing,
+in 5.2) and 1 underfull (Figure 3's caption). **Sections 1 through 9 and the
+appendix are drafted and fact-checked. The abstract is the only piece left.**
+
+### Writing the abstract
+
+It is not blocked. Everything it needs is settled. Constraints, in order of how
+easily they are broken:
+
+1. **Every number must already appear in the body.** The safe set: 15 of 61
+   classes; 2,121 images; 12,937 annotations; five detectors; 1478/438/205.
+   Check any other against the body before using it.
+2. **Never a bare mAP@50** — pair it with mAP@50-95 (`CLAUDE.md`).
+3. **"None of the three prior studies tabulates"** is exact wording. Do NOT
+   write "no prior study reports": both benchmark studies *plot* mAP@50-95 in
+   training curves, and one *does* report confidence intervals and paired
+   t-tests. A version of that false claim reached a built PDF on 2026-08-15 and
+   had spread to four sections before it was caught.
+4. **RT-DETR-l leads on mAP@50 only**, not mAP@50-95, where YOLO26s leads. Any
+   phrasing like "most accurate" is wrong. The deployment recommendation is
+   YOLO26s.
+5. The headline findings, in the order Section 1 states them: the split cannot
+   evaluate 15 of 61 classes; eight of the ten most annotated classes are among
+   them, so it is not rarity; correcting the split *raises* every model's score.
+
+### Verification habits this project runs on
+
+- `powershell -File scriptsuild_paper.ps1` after every prose change. It fails
+  the build if `VERIFY`, `PLACEHOLDER`, `TODO` or `UNSOURCED` reaches the printed
+  bibliography — that check exists because internal notes were being typeset.
+- `python scripts/citation_audit.py` after any change to prose or bibliography.
+  Currently 79 citation instances across 35 entries.
+- Section files carry header comments recording what was checked, what was
+  written weaker than briefed, and why. **Read the header before editing a
+  section** — several record wording that must not drift back.
+
+### Open items, all in the author's hands
+
+- **The abstract.**
+- **Two figures for Section 1, paragraph 2.** A concrete instance of the
+  published disagreement was requested and NOT written: the dataset paper's
+  95.9% and the YOLOv12 paper's 84.9% for the same architecture. 84.9% appears
+  nowhere in this repository, and 95.9% cannot be attributed to a model or a
+  metric from anything committed (README.md records the notebook's per-class
+  dict as unlabelled, and two models are trained in it). See the header of
+  `01-introduction.tex`. To restore: record both figures with their architecture,
+  metric and source table in a committed file, as
+  `data/published_complexity.csv` does for parameter counts.
+- **Length.** 34 pages. Sections 3 and 4 exceed what most venues take; the
+  standing instruction is *stop adding, do not cut* until a venue is chosen.
+- **Unread citations.** Every entry except the three prior studies is
+  registry-resolved but unread; Section 8 concedes this. `notes/citation-audit.md`
+  lists all 79 uses with their sentences so each can be checked against a source.
+- **`dodge2020finetuning`** is in the bibliography, deliberately uncited.
+- **Four working files cannot be deleted** (the guard denies deletion) and are
+  gitignored: `paper/references.bib.head/.mid/.tail` and `paper/main.bbl.bak`.
+
 ## Section skeletons
 
 Claim-plus-evidence bullets are supplied per section before drafting. Recorded

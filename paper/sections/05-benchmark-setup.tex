@@ -107,10 +107,13 @@ that this study decided, together with its provenance.
 
 Seven settings were copied directly from prior work: 100 epochs, batch size 16,
 the AdamW optimiser, an initial learning rate of 0.01, weight decay 0.0005, and
-a Tesla P100 GPU, together with the three replicated architectures. Both prior
-studies of this dataset state these values \citep{yolov12paper,yolov13paper}.
+the P100 GPU provided by Kaggle, together with the three replicated
+architectures. Both prior studies of this dataset state these values
+\citep{yolov12paper,yolov13paper}.
 The choice to copy them is deliberate. If the results reported here differ from
 published ones, the training configuration cannot be offered as the explanation.
+One stated condition is not replicated here: the later study reports a 3-fold
+cross-validation, and every run in this study trains once on a single partition.
 
 Seven further settings were added because neither prior study states them.
 Three concern reproducibility directly: a fixed random seed of 0, deterministic

@@ -144,7 +144,7 @@ transformer detector needs a learning rate a hundredfold lower to train at all.
 Correcting the partition raises every model's score on both accuracy metrics ---
 mean average precision at an intersection-over-union threshold of 0.5 (mAP@50)
 and averaged over ten thresholds to 0.95 (mAP@50--95) --- on both evaluation
-partitions and without exception. The defect had been understating reported
+partitions and without exception. The defect had been understating measured
 performance rather than inflating it, the reverse of what a defective partition
 is normally taken to do. The detector recording the highest mAP@50 leads on
 neither mAP@50--95 nor inference latency and is not the one this application

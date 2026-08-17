@@ -125,9 +125,12 @@ with them. Neither benchmark study states which version it used
 The second is the evaluation partition. In the archived notebook the evaluation
 command is run without a test-split argument, so the reported figure is a
 validation-set score; the test directory is never passed to an evaluation
-command anywhere in it. Neither benchmark study states which partition its
-figures come from. A validation score and a test score are different quantities
-even when the split is sound, and the notebook selects its best checkpoint on
+command anywhere in it. Neither benchmark study names which partition its figures
+come from, and the later one states a 3-fold cross-validation over the whole
+dataset while reproducing the earlier study's central values unchanged, so what
+partition any of its rows rests on is not established \citep{yolov13paper}. A
+validation score and a test score are different quantities even when the split
+is sound, and the notebook selects its best checkpoint on
 the same partition it then reports.
 
 The third is how many classes the figure averages over. Under the published
@@ -144,8 +147,9 @@ loss function and default augmentation of every model distributed under a given
 name, so two studies can report results for the same architecture while training
 different networks. One architecture in the later comparison table is not
 provided by that package at all, but by a separate repository describing itself
-as based on it \citep{yolov13,yolov13repo}, so that row was produced on a
-different codebase from the rows beside it.
+as based on it \citep{yolov13,yolov13repo}. That study names no package,
+repository or version for that row or for any other, so what produced any of its
+figures cannot be established from the paper.
 
 The complexity columns are separable from the accuracy ones, because both
 studies do state parameter counts, and those can be set beside measured values
@@ -161,13 +165,18 @@ the interval between the fused and unfused figures. Fusion therefore explains
 none of them.
 
 The same pattern appears in how variance is handled, and there it costs more.
-The earlier benchmark study does report it: every cell of its results table
-carries a mean and standard deviation with a 95\% confidence interval, and its
-text reports paired $t$-tests at $p < 0.05$ \citep{yolov12paper}. What it does
-not state is how many runs those estimates were computed over, or by what
+The earlier benchmark study does report it: each cell of its three accuracy
+columns carries a mean and standard deviation with a 95\% confidence interval,
+and its text reports paired $t$-tests at $p < 0.05$ \citep{yolov12paper}. What it
+does
+does not state is how many runs those estimates were computed over, or by what
 procedure --- and without the number of runs, a standard deviation cannot be
 converted into anything a reader can check or reproduce. The later study
-reproduces the same table without the variance columns \citep{yolov13paper}. A
+reproduces the same table without the variance columns \citep{yolov13paper}. The
+later study, which prints no variance at all, is the one that states a procedure:
+a 3-fold cross-validation with $k = 3$ and three validation runs, reported for
+its own architecture. The estimates and the procedure are therefore attached to
+different sets of figures, and neither study states the relationship. A
 figure reported with an interval whose derivation is unstated is not more
 checkable than one reported without it; it only appears to be.
 
@@ -203,11 +212,13 @@ evaluation partitions. Compute the allocation of each capture session
 separately, rather than the aggregate. Read the number of classes the evaluation
 framework actually scored.
 
-The third is the cheapest and the most telling, because it requires no extra
-work at all. Ultralytics reports that count on every evaluation it runs. It was
-printed on every evaluation any of these studies performed, and it read 45 or 46
-against a dataset described throughout as having 61 classes. Reporting it beside
-the score --- as Section~\ref{sec:eval-protocol} does here --- would have made
+The third is the cheapest and the most telling, because a framework that computes
+mAP already has the number. Ultralytics reports that count on every evaluation it
+runs, and on the published split it reads 45 on validation and 46 on test against
+a dataset described throughout as having 61 classes. None of the three studies
+reports the count, and none states which framework release produced its figures.
+Reporting it beside the score --- as Section~\ref{sec:eval-protocol} does here
+--- would have made
 the defect self-evident without anyone looking for it.
 
 \subsection{What generalises beyond this dataset}

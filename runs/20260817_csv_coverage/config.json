@@ -1,0 +1,23 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "34bafe412297f67490458ed2b5c584ffc0cf7ff88469cf89663461dd0b532a6c",
+  "n_csv_data_rows": 2071,
+  "n_duplicate_csv_keys": 0,
+  "n_images_on_disk": 2121,
+  "n_images_without_csv_row": 50,
+  "n_joined": 2071,
+  "params": {
+    "splits": [
+      "train",
+      "valid",
+      "test"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-17T13:41:07.830538Z",
+  "script": "csv_coverage.py",
+  "script_sha256": "dab5a0b7d9a08127c7cf21e3c486ae970da065494b0c1f02f6e68bdfa205f369"
+}

@@ -86,12 +86,14 @@ and so charges for the last few pixels of box placement. The rescued classes
 clear the first bar comfortably and the second less so. Detecting them accounts
 for most of the gain; localising them precisely does not.
 
-The consequence for the literature is a plain one. Reported performance on
-ElectroCom61 has been understated rather than overstated. Every mAP reported in
-those three studies was computed over roughly 46 of the 61 classes
-(Section~\ref{sec:class-coverage}), and the fifteen missing from that average
-are the ones these models handle best. This is the opposite of the correction
-one expects to have to make to a benchmark with a split defect, and it is worth
+The consequence for the literature is a conditional one. Any figure computed on
+the published split understates what the same model reaches when all 61 classes
+are evaluable, and the fifteen classes missing from that average are the ones
+these models handle best (Section~\ref{sec:class-coverage}). None of the three
+studies states the count its figures were computed over or which partition they
+come from (Section~\ref{sec:disagreement}), so how far each is affected is not
+established here. This is the opposite of the correction one expects to have to
+make to a benchmark with a split defect, and it is worth
 stating explicitly because the reflex on hearing ``the split was broken'' is to
 assume the published numbers were too high.
 

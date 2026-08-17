@@ -89,9 +89,12 @@ RESULTS -- ONE ROW PER CHECK
 |     |                                   |           | misattributes "~2.5M" to YOLOv10s,   |
 |     |                                   |           | and neither mentions fusion or FLOPs.|
 | C05 | C05-timing-claims.txt             | CONFIRMED | No timing measurement of any kind in |
-|     |                                   |           | any of the three papers: 31 hits, 0  |
-|     |                                   |           | measurements, and zero hits for FPS, |
-|     |                                   |           | ms, latency and throughput.          |
+|     |                                   |           | any of the three papers: 31 matching |
+|     |                                   |           | lines, 0 measurements, 18            |
+|     |                                   |           | unquantified speed claims and 12     |
+|     |                                   |           | reference titles; zero hits for FPS, |
+|     |                                   |           | latency, throughput and              |
+|     |                                   |           | milliseconds.                        |
 | C06 | C06-map50-95.txt                  | DIFFERS   | mAP@50-95 appears in both benchmark  |
 |     |                                   |           | papers only as a training-curve      |
 |     |                                   |           | panel title, plus one unquantified   |

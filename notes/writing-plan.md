@@ -153,11 +153,30 @@ must not drift. The constraints it was held to, all checked mechanically:
 
 ### Verification habits this project runs on
 
-- `powershell -File scriptsuild_paper.ps1` after every prose change. It fails
+There is no runner script. The suite is this list, run by hand, so adding a
+check means adding it here.
+
+- `powershell -File scripts\build_paper.ps1` after every prose change. It fails
   the build if `VERIFY`, `PLACEHOLDER`, `TODO` or `UNSOURCED` reaches the printed
   bibliography — that check exists because internal notes were being typeset.
+  (This line held a literal backspace byte where the `\b` of the path should
+  be, rendering as `scriptsuild_paper.ps1`; repaired 2026-08-18.)
 - `python scripts/citation_audit.py` after any change to prose or bibliography.
   Currently 79 citation instances across 35 entries.
+- `python scripts/check_prose.py` after any change to prose. **Added 2026-08-18,
+  because nothing in the suite read a sentence.** A doubled verb — "What it
+  does does not state" — survived several commits and several clean builds in
+  7.1 before being caught by eye. It checks three things: doubled words, joining
+  consecutive lines so a word split across a line break is still caught; the
+  single-homes table below, which it PARSES from this file, so adding a row there
+  adds a check with no edit to the script; and the protected phrasings and
+  forbidden forms recorded under *Two things a fresh session must not undo* and
+  in the abstract's constraints. Those last cannot be parsed from English, so
+  each rule in the script carries an exact quotation from this file as its anchor
+  and fails if that text is ever rewritten — which is what stops the script and
+  this plan drifting apart. Rule 4 (never a bare mAP@50) is reported as a WARNING
+  rather than a failure, because quotations of prior work legitimately carry a
+  bare one and a hard failure would be wrong more often than right.
 - Section files carry header comments recording what was checked, what was
   written weaker than briefed, and why. **Read the header before editing a
   section** — several record wording that must not drift back.

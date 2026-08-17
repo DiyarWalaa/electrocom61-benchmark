@@ -1,0 +1,60 @@
+{
+  "abstracts_fetched": 26,
+  "caveat": "an abstract is the authors' own summary; it can justify reading a paper and can expose a plainly wrong citation, but it cannot confirm a specific claim",
+  "citation_uses": 82,
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "entries": 38,
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "34bafe412297f67490458ed2b5c584ffc0cf7ff88469cf89663461dd0b532a6c",
+  "no_abstract": [
+    "bernett2024guiding",
+    "coco",
+    "detr",
+    "lu2022sorting",
+    "sarswat2024realtime",
+    "sharma2024vision",
+    "sterkens2021xray",
+    "ultralytics",
+    "yolov13paper",
+    "yolov13repo"
+  ],
+  "params": {
+    "arxiv": "https://export.arxiv.org/api/query?id_list=%s",
+    "crossref": "https://api.crossref.org/works/%s",
+    "pause_seconds": 1.0,
+    "tier0_already_verified": [
+      "graber2025resolving",
+      "graber2025addendum"
+    ],
+    "tier1": [
+      "kong2026edge",
+      "kapoor2023leakage",
+      "vasu2023mobileone",
+      "chen2023run",
+      "picard2021seed",
+      "gundersen2023reporting",
+      "akesson2024random",
+      "rosenblatt2024leakage",
+      "bernett2024guiding",
+      "joeres2025datasail",
+      "figueiredo2024leakage",
+      "gupta2019lvis"
+    ],
+    "tier3": [
+      "yolov9",
+      "yolo11",
+      "yolov12",
+      "yolov13",
+      "yolo26",
+      "rtdetr",
+      "ultralytics",
+      "yolov13repo"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-17T21:35:01.361701Z",
+  "script": "citation_verification.py",
+  "script_sha256": "dc7a886f0b187108dc70decc5df326167aca4ab025335cc51a9c46848895538c"
+}

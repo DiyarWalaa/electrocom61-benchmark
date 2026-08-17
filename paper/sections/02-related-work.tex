@@ -97,6 +97,16 @@
 % the entries' own comments. lu2022sorting (supplied 2021, Crossref 2022) and
 % sharma2024vision (supplied 2023, Crossref 2024) both have DOI segments
 % carrying the earlier year, which is the likely source of the confusion.
+%
+% 2.2's OPENING PARAGRAPH WAS DELETED 2026-08-18 and should not come back. It
+% read "The application is the recovery of reusable components from discarded
+% circuit boards..." and restated Section 1's opening paragraph, which already
+% has the hand sorting, the hazard and the automation motive. Nothing was lost
+% with it: lu2022sorting and sharma2024vision are both cited in the survey
+% paragraph below, and electrocom61 is cited twice in 2.1. The survey paragraph
+% opened "Systems addressing it span the recovery pipeline", whose "it" pointed
+% at the deleted paragraph's "the application"; it now names component recovery
+% directly.
 % ---------------------------------------------------------------------------
 %
 % 2.1's NOVELTY SENTENCE WAS DROPPED, not attributed. It read "It is the only
@@ -135,10 +145,13 @@
 % split. Two objects: what the PAPER attributes (this section, quotable) and
 % what the NOTEBOOK evidences (7.1, hedged). Do not merge them.
 
-Work bearing on this study falls into four groups: what has been reported on
-ElectroCom61 itself, the application area it serves, the literature on split
-construction and evaluation validity, and the reporting conventions this
-benchmark adopts.
+What follows establishes two things: what the published record on ElectroCom61
+states and what it leaves out, and what is known about the mechanisms behind the
+properties this paper measures --- the classes a partition can leave unevaluated,
+and the processing time an accuracy figure cannot express. Four bodies of work
+bear on that: the results reported on this dataset, the application that makes
+processing time a criterion, the literature on split construction and evaluation
+validity, and the reporting conventions this benchmark adopts.
 
 \subsection{ElectroCom61 and the results reported on it}
 \label{sec:related-electrocom61}
@@ -177,15 +190,10 @@ taken up in Section~\ref{sec:disagreement}.
 \subsection{Electronic component detection and e-waste sorting}
 \label{sec:related-ewaste}
 
-The application is the recovery of reusable components from discarded circuit
-boards. Sorting them by hand is slow and brings workers into contact with
-hazardous material, which is the standing motivation for automating the
-recognition step; the dataset was assembled for that purpose
-\citep{electrocom61}.
-
-Systems addressing it span the recovery pipeline. Components detached from waste
-boards have been sorted automatically on a conveyor \citep{lu2022sorting}, and
-identified in place on the board itself \citep{sharma2024vision}. Classification
+Systems addressing component recovery span the pipeline. Components detached
+from waste boards have been sorted automatically on a conveyor
+\citep{lu2022sorting}, and identified in place on the board itself
+\citep{sharma2024vision}. Classification
 of e-waste more broadly has been approached with customisable YOLO variants
 \citep{rajeev2025ewaste} and with convolutional classifiers built for real-time
 operation \citep{sarswat2024realtime}. Two problems sit either side of component

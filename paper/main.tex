@@ -80,7 +80,8 @@
 % Tables are generated into ../tables/ by scripts/make_tables.py and pulled in
 % with \input{../tables/<name>}. They are never pasted into a section file.
 
-\title{A Controlled Benchmark of Object Detectors on ElectroCom61}
+\title{What a Detection Result on ElectroCom61 Measures: A Dataset Audit, a
+Corrected Partition, and a Controlled Benchmark}
 \author{Diyar Walaa}
 \date{\today}
 
@@ -131,7 +132,9 @@
 \begin{abstract}
 ElectroCom61 is a public object detection dataset for recovering reusable
 components from discarded electronic equipment, containing 2{,}121 images of 61
-component classes carrying 12{,}937 annotations. Its published
+component classes carrying 12{,}937 annotations. This paper asks what a detection
+result reported on it measures: which classes the figure covers, which metric it
+rests on, and whether it bears on deployment. Its published
 train/validation/test partition cannot evaluate 15 of those 61 classes: they
 hold no instances in either the validation or the test set. They are not the
 rare classes. Eight of the ten most

@@ -3,8 +3,12 @@
 
 % CONSTRAINTS THIS SECTION IS HELD TO, since a conclusion is where they slip:
 %   - No number appears here that does not appear earlier. The figures used are
-%     15 of 61, the ten most-annotated classes, and five detectors, all from
-%     Sections 3 and 5.
+%     15 of 61, the ten most-annotated classes, five detectors, and the 45/46
+%     evaluated-class counts, all from Sections 3 and 5.
+%   - The 45 and 46 in the opening sentence MUST keep their "computed on the
+%     published split" scoping. Unscoped they read as properties of the dataset
+%     rather than of the partition, which is the error the whole paper is about.
+%     The same scoping is carried at every other site: 3.1, 5.4, 7.1 and 7.2.
 %   - No citation. Every sentence here restates something this paper
 %     established, so a citation would either be redundant or would smuggle in a
 %     claim the body has not made.
@@ -30,6 +34,13 @@
 % overlap is real and deliberate -- they are the same underlying quantities --
 % so the wording is kept deliberately distinct, and the framing is prospective
 % rather than retrospective.
+
+A detection result reported on ElectroCom61 measures less than its name suggests:
+computed on the published split it averages over 45 classes on validation and 46
+on test rather than 61, reported as a bare mAP@50 it rests on the metric whose
+ranking moves when the split changes, and reported without a timing measurement
+it cannot say whether the model is fast enough for the conveyor the dataset was
+assembled for.
 
 This paper audited ElectroCom61 from its released files alone, constructed and
 released a corrected split, and trained five detectors on both the published and

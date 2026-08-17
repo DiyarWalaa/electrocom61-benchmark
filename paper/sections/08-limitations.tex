@@ -17,6 +17,34 @@
 % Kept to one page deliberately. A limitations section is read for what it
 % concedes, and hedging each concession costs the credibility the concession
 % was meant to buy.
+%
+% THE GUNDERSEN CLAUSE, ADDED 2026-08-17, IS THE ONE THING HERE THAT COULD BE
+% READ AS HEDGING, AND IS NOT. The rule above was weighed against it.
+%
+% The paragraph cites gundersen2023reporting for its sharpest finding -- that
+% conclusions drawn through randomness often do not survive it -- and used that
+% against this study. But the same paper declines to name a seed count because
+% running enough of them is impractical for most laboratories, and calls
+% initialisation seeds a reasonable proxy for exploratory work. Citing a source
+% for its severity while omitting its own stated practical limit is selective
+% use of that source. That is the SAME failure mode as the co-citation corrected
+% in 2.4 and 7.4 on the same day: leaning on a paper for a sharper claim than it
+% makes. The clause is there for citation accuracy, not for mitigation.
+%
+% NOTHING IN THE CONCESSION IS SOFTENED. "cannot be separated from run-to-run
+% variation that was never measured" stands unchanged, and the added sentence
+% ends by restating what the limitation IS rather than excusing it. It also
+% lands on this paper's own thesis -- Section 9's four things reportable at no
+% cost -- by distinguishing a missed threshold, which this study does not claim
+% anyone owes, from an unquantified variation, which is the actual defect.
+%
+% TO REMOVE IT, delete the two sentences from "That same work declines" to
+% "never quantified." The paragraph closes correctly without them.
+%
+% NO NUMERAL WAS ADDED. Gundersen's "even ten seeds" was deliberately not
+% quoted: a numeral in this paper must trace to a committed file, and a figure
+% read out of someone else's prose does not. "enough of them" carries the claim
+% without asserting a number this repository cannot support.
 
 Every accuracy figure in this paper comes from a single training run. There is
 no variance estimate for any of them, which is why
@@ -27,7 +55,11 @@ scans on standard image benchmarks report the spread between seeds as modest
 while individual seeds well above and well below the average remain easy to
 find \citep{picard2021seed}, and a model comparison resting on differences this
 small is precisely the case in which conclusions have been shown not to survive
-the randomness they were drawn through \citep{gundersen2023reporting}. The
+the randomness they were drawn through \citep{gundersen2023reporting}. That same
+work declines to recommend a number of seeds, on the ground that running enough
+of them is impractical for most laboratories, and treats initialisation seeds as
+a reasonable proxy for exploratory studies. What is conceded here is therefore
+not that a threshold was missed but that the variation was never quantified. The
 latency figures are better off, because each architecture was timed twice and
 the spread between the two is measured and reported
 (Section~\ref{sec:efficiency-measurement}); the accuracy measurements have no

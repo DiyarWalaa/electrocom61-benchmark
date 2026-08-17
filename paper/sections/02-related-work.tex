@@ -37,6 +37,56 @@
 % variance finding is stated here and argued in 7.1.
 %   "none measures inference speed" -> Sections 6.5 and 7.4
 %
+% 2.3's GRABER SENTENCE CORRECTED 2026-08-17. It said "two groups independently
+% produced improved splits", citing graber2025resolving and graber2025addendum.
+% AN ADDENDUM IS NOT A SECOND GROUP: same six authors, same journal. The real
+% independent work is a preprint the addendum acknowledges, which is not in this
+% bibliography and was deliberately not added -- so the claim had no source and
+% was removed rather than sourced. The addendum citation went with it: without
+% the two-groups clause it carried no claim. See the block above
+% graber2025resolving in references.bib.
+%
+% "Established benchmarks have been corrected" was also plural against one
+% corrected benchmark, and is now singular.
+%
+% THE SCOPE "previously reported performance" IS LOAD-BEARING. Read in full, the
+% drop was not uniform: the authors' own GEMS model held on the corrected split
+% and GenScore fell by much less than Pafnucy. The sentence survives because
+% GEMS is their NEW model rather than a previously reported one, and GenScore
+% still fell. "by margins that differed between models" is there to stop this
+% being read as every model falling equally. Do not simplify it away.
+%
+% 2.3's BERNETT CLAUSE SCOPED 2026-08-17. It read "checklists exist for
+% detecting the condition before a model is trained", which is a domain-general
+% claim. bernett2024guiding is not domain-general: its seven questions concern
+% homology, shared patients and experimental batches, and its abstract scopes
+% itself to "constructing machine learning models in biological domains". Three
+% words were added -- "for biological domains" -- taken from the abstract's own
+% wording rather than paraphrased. THE SCOPE IS THE POINT: 2.3's closing
+% paragraph argues that the complement of leakage has not been characterised in
+% the literature, and that argument is weaker, not stronger, if the sources it
+% rests on are quoted as broader than they are.
+%
+% CORRECTED 2026-08-17, AFTER THE FULL TEXTS WERE READ. 2.4 said "Parameter
+% counts and FLOPs both correlate poorly with measured on-device latency" and
+% cited vasu2023mobileone and chen2023run together. BOTH HALVES WERE WRONG.
+%   - chen2023run (FasterNet) says nothing about parameter counts and reports no
+%     correlation coefficients at all. Its claim is narrower and mechanical:
+%     reducing FLOPs does not reduce latency proportionally, because latency is
+%     FLOPs over an achieved FLOPS rate that collapses for memory-bound
+%     operators. Its own abstract carries this and no more.
+%   - vasu2023mobileone reports an ASYMMETRY, not "poorly": Spearman 0.30
+%     (p = 0.18) for parameter count against 0.47 (p = 0.03) for FLOPs. FLOPs is
+%     the better of the two proxies.
+% "Both poorly" was a co-citation that averaged two different papers into one
+% claim neither makes. The values are recorded in data/published_proxy_claims.csv;
+% the same sentence in 7.4 was corrected with it.
+%
+% THE FLATTENING ALSO CONTRADICTED OUR OWN 6.4, which finds GFLOPs reproducing
+% the latency order except for the leading pair while parameter count does not.
+% The corrected sentences agree with it. That agreement is now the point 7.4
+% makes, so do not re-flatten this to "neither works".
+%
 % ---------------------------------------------------------------------------
 % 2.2's SURVEY PARAGRAPH: RESOLVED 2026-08-15. The six systems were supplied
 % with full titles, authors and venues, and every field was resolved against
@@ -168,8 +218,8 @@ Group structure is the recurring mechanism. Where observations are not
 independent --- repeated measurements of the same subject, samples from the same
 source --- a split that ignores the grouping places related items on both sides
 of the boundary and inflates measured performance; this has been shown directly
-for connectome-based models \citep{rosenblatt2024leakage}, and checklists exist
-for detecting the condition before a model is trained
+for connectome-based models \citep{rosenblatt2024leakage}, and, for biological
+domains, checklists exist for detecting the condition before a model is trained
 \citep{bernett2024guiding}.
 
 The problem has also been given tooling. Leakage-reduced splitting has been
@@ -177,10 +227,10 @@ formalised as a combinatorial optimisation over similarity between items and
 solved with clustering heuristics, so that group-aware partitions can be
 produced automatically rather than by hand \citep{joeres2025datasail}.
 
-Established benchmarks have been corrected on these grounds, and the corrections
-moved the numbers: on a binding-affinity benchmark, two groups independently
-produced improved splits and previously reported performance fell against them
-\citep{graber2025resolving,graber2025addendum}.
+An established benchmark has been corrected on these grounds, and the correction
+moved the numbers: on a binding-affinity benchmark, previously reported
+performance fell against an improved split, by margins that differed between
+models \citep{graber2025resolving}.
 
 In every case cited above the defect is contamination --- material that should
 have been held out was not, and the measured score was too high. The complement,
@@ -200,10 +250,15 @@ thresholds from 0.5 to 0.95 as the standard detection metric, alongside the
 single-threshold mAP@50 that preceded it \citep{coco}.
 
 The complexity figures most often reported in place of a timing measurement are
-known to mislead. Parameter counts and FLOPs both correlate poorly with measured
-on-device latency \citep{vasu2023mobileone,chen2023run}, and on low-compute edge
-hardware latency has been reported to track detection accuracy more closely than
-either \citep{kong2026edge}.
+known to mislead, and they do not mislead equally. Ranking several
+mobile-friendly networks deployed on a mobile device, one study finds latency
+only weakly correlated with parameter count, at a Spearman coefficient of 0.30
+with $p = 0.18$, and moderately correlated with FLOPs, at 0.47 with $p = 0.03$
+\citep{vasu2023mobileone}. A second concerns FLOPs alone: reducing them does not
+reduce latency proportionally, because latency is FLOPs divided by an achieved
+operations-per-second rate that falls for memory-bound operators
+\citep{chen2023run}. On low-compute edge hardware, latency has been reported to
+track detection accuracy more closely than either quantity \citep{kong2026edge}.
 
 Single-run results carry a similar hazard. Scanning many seeds on standard image
 benchmarks finds the spread between them modest, but seeds performing markedly

@@ -16,6 +16,23 @@
 %        runs/20260805_figure_verification_sheet_02/summary.md;
 %        runs/20260802_burst_clusters_02/gap_histogram.csv
 %
+% ADDED TO 3.1 ON 2026-08-16 -- THE SCOPE SENTENCE. "All 61 classes carry
+% training instances, so the defect leaves what the models learn untouched and
+% falls on the measurement alone." This was assumed everywhere and stated
+% nowhere, and a reader who did not supply the assumption could take the
+% coverage defect for a TRAINING defect -- i.e. that the models never saw the
+% fifteen classes, which would make the whole benchmark a different argument.
+% CHECKED against class_split_counts.csv: of 61 classes, zero have no training
+% instances; the minimum is 50 and the fifteen unevaluable ones hold 153 to 293.
+%
+% 6.1 WAS CHECKED AND DELIBERATELY LEFT ALONE. Its fourth paragraph already
+% cites sec:class-coverage for the same fact, and its second says the fifteen
+% classes were "returned to the evaluation partitions", which localises the
+% change to the measurement without restating why. Repeating the scope sentence
+% there would duplicate a claim that has a single home, which is the rule
+% recorded in notes/writing-plan.md. If 3.1 is ever cut, 6.1 loses the
+% assumption with it -- move the sentence rather than dropping it.
+%
 % THREE PLACES WHERE THE DRAFTED BULLET AND THE COMMITTED SOURCE DIVERGED. The
 % source was followed in each case; see the report accompanying this draft.
 %   3.3  the bullet said "within about one point" of 70/20/10. The run
@@ -74,7 +91,10 @@ classes that no result reported on the published split can have measured.
 
 The consequence is that every mAP figure reported on this dataset averages over
 roughly 46 classes rather than 61, and the two averages are not comparable
-quantities. The framework reports the count directly: under the published split
+quantities. All 61 classes carry training instances, so the defect leaves what
+the models learn untouched and falls on the measurement alone: a detector
+trained on 61 classes is reported by a figure computed over 46. The framework
+reports the count directly: under the published split
 it evaluates 45 classes on validation and 46 on test, across all five detectors
 trained here. A score computed over a reduced set of classes is not wrong, but it
 answers a narrower question than its name suggests, which is why the count is

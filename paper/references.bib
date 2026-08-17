@@ -343,11 +343,41 @@
 %   UNSAFE -- citing it as the FIRST corrected split for that benchmark. It is
 %             not, and the addendum exists to say so. We make no such claim.
 %
-% STANDING RULE: cite graber2025addendum alongside graber2025resolving wherever
-% the latter appears. A reader who follows the DOI will meet the addendum
-% anyway; citing only the original would look like we had not seen it.
+% THE STANDING RULE ABOVE WAS WITHDRAWN 2026-08-17. It read: "cite
+% graber2025addendum alongside graber2025resolving wherever the latter appears."
+% It is withdrawn because the sentences it applied to made a claim neither item
+% supports, and the rule was helping that claim look sourced.
 %
-% VERIFY: the paper itself has still not been read from within this repository.
+% WHAT WENT WRONG. 2.3 and 7.3 both said "two groups independently" corrected
+% this benchmark's split, citing the paper and its addendum together. Those are
+% THE SAME SIX AUTHORS in the same journal -- an addendum is not a second group.
+% The underlying fact is real, and it is in the addendum: a separate group's
+% "Leak Proof PDBBind" preprint proposed an improved split independently. But
+% that preprint is not in this bibliography and a decision was taken not to add
+% it, so the claim had no citable source at all. It was removed rather than
+% sourced, which is the direction this project resolves such things.
+%
+% BOTH SENTENCES NOW CITE graber2025resolving ALONE, for the SAFE use above --
+% that cleaning a split lowered previously reported scores. The addendum does
+% not touch that use, so nothing was lost by dropping it.
+%
+% THE ENTRY IS KEPT AND IS DELIBERATELY UNCITED, like dodge2020finetuning.
+% BibTeX prints only cited entries, so it costs nothing in the PDF, and it
+% preserves a resolved bibliographic record that would otherwise have to be
+% rebuilt from the DOI. DO NOT RE-CITE IT to "balance" the graber citation: with
+% the two-groups clause gone it carries no claim, and restoring it is how the
+% error would come back. It becomes citable only if Leak Proof PDBBind is added
+% to this bibliography and the independence claim is made properly, from the
+% preprint itself.
+%
+% READ IN FULL 2026-08-17 (this supersedes the earlier VERIFY note). The drop
+% was NOT uniform, which the prose must not imply: the authors' own GEMS model
+% held its performance on the corrected split, and GenScore fell by much less
+% than Pafnucy. Our sentences survive because they are scoped to PREVIOUSLY
+% REPORTED performance -- GEMS is their new model, not a previously reported
+% one, and GenScore did still fall. 2.3 says "by margins that differed between
+% models" to keep that visible. Do not rewrite either sentence as "every model
+% fell" or "performance fell uniformly".
 % Fields from Crossref.
 @article{graber2025resolving,
   author  = {Graber, David and Stockinger, Peter and Meyer, Fabian and
@@ -362,8 +392,9 @@
   doi     = {10.1038/s42256-025-01124-5},
 }
 
-% The addendum to graber2025resolving. Fields from Crossref. Cite the two
-% together -- see the standing rule above.
+% The addendum to graber2025resolving. Fields from Crossref. DELIBERATELY
+% UNCITED since 2026-08-17 -- see the block above for why, and do not re-cite it
+% without reading that first.
 @article{graber2025addendum,
   author  = {Graber, David and Stockinger, Peter and Meyer, Fabian and
              Mishra, Siddhartha and Horn, Claus and Buller, Rebecca},

@@ -101,6 +101,30 @@ collected_bundle.zip
 !data/published_accuracy.csv
 
 # ---------------------------------------------------------------------------
+# What the complexity-proxy papers actually claim. Same discipline again: read
+# by hand from their full texts, NO SCRIPT CAN REGENERATE IT.
+#
+# It exists because of a real citation error. 2.4 and 7.4 both said "parameter
+# counts and FLOPs both correlate poorly with measured on-device latency" and
+# cited MobileOne and FasterNet together. Both halves were wrong. FasterNet says
+# nothing about parameter counts and reports no correlation coefficients at all;
+# MobileOne reports an ASYMMETRY -- latency weakly correlated with parameter
+# count and moderately with FLOPs -- which "both poorly" flattened, and which
+# our own 6.4 independently finds.
+#
+# The third row records a negative: that FasterNet reports no coefficients. That
+# is the fact whose absence allowed the error, so it is written down rather than
+# left to be rediscovered.
+#
+# THE source_location COLUMN IS INCOMPLETE for the two MobileOne rows. The
+# coefficients came from the author's reading of the full text and the section
+# or table they sit in was not recorded. Fill it before submission; until then
+# these two values cannot be re-checked in one step, which is the whole purpose
+# of the column.
+# ---------------------------------------------------------------------------
+!data/published_proxy_claims.csv
+
+# ---------------------------------------------------------------------------
 # Text extractions of the built PDF, produced with miktex-pdftotext for upload.
 # Derived from paper/main.pdf, which is itself ignored, so committing them would
 # version a copy of a build product and let it drift from the PDF silently.

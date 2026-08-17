@@ -121,6 +121,100 @@ TIER1 = [
 # Tier 0: checked against the source already, so no re-reading is needed.
 TIER0 = ["graber2025resolving", "graber2025addendum"]
 
+# ---------------------------------------------------------------------------
+# WHAT HAS ACTUALLY BEEN CHECKED, AND AGAINST WHAT.
+#
+# Filled by hand as the reading pass proceeds. It is a record of the author's
+# judgement, not a measurement, so nothing here can be derived and nothing here
+# should be inferred -- an entry absent from this table has NOT been checked.
+#
+# THE DISTINCTION BETWEEN full text AND abstract only IS THE REASON THIS EXISTS.
+# An abstract is the authors' summary of their own work: it can expose a
+# citation that is plainly wrong, and it cannot confirm that a specific claim is
+# right. An entry verified from an abstract alone is in a weaker state than one
+# verified from the full text, and if this study ever describes its own
+# verification method it must not present the two as equivalent.
+# ---------------------------------------------------------------------------
+FULL_TEXT = "full text"
+ABSTRACT_ONLY = "abstract only"
+CORRECTED = "corrected"
+
+STATUS_TEXT = {
+    FULL_TEXT: "**Verified against the full text.** Passing, no action.",
+    ABSTRACT_ONLY: ("**Verified from the ABSTRACT ONLY.** The full text is "
+                    "paywalled and was not available. An abstract can expose a "
+                    "citation that is plainly wrong but cannot confirm that a "
+                    "specific claim is right, so this entry is in a weaker "
+                    "state than the ones checked against a full text."),
+    CORRECTED: ("**Checked against the full text; the citation was WRONG and "
+                "has been corrected.**"),
+}
+
+VERIFICATION = {
+    "apicella2025leakage": (FULL_TEXT, ""),
+    "rosenblatt2024leakage": (
+        FULL_TEXT,
+        "The phrase \"samples from the same source\" does not appear in the "
+        "source and does not need to: it is this paper's own framing of the "
+        "general condition, not an attributed claim. The citation sits on "
+        "\"shown directly for connectome-based models\", which is exact."),
+    "kapoor2023leakage": (FULL_TEXT, ""),
+    "picard2021seed": (FULL_TEXT, ""),
+    "gundersen2023reporting": (
+        FULL_TEXT,
+        "Reading it also supplied the clause now in Section 8: the paper "
+        "declines to recommend a seed count because running enough of them is "
+        "impractical for most laboratories, and treats initialisation seeds as "
+        "a reasonable proxy for exploratory studies. Section 8 had been citing "
+        "its severity while omitting its stated practical limit."),
+    "kong2026edge": (FULL_TEXT, ""),
+    "graber2025resolving": (
+        FULL_TEXT,
+        "Reading it found a claim that had to be REMOVED. 2.3 and 7.3 said "
+        "\"two groups independently\" corrected this benchmark, citing this "
+        "paper together with its addendum -- but an addendum is not a second "
+        "group, being the same six authors in the same journal. The genuinely "
+        "independent work is a preprint the addendum acknowledges, which is "
+        "not in this bibliography, so the claim was removed rather than "
+        "sourced. Also: the drop was NOT uniform. The authors' own GEMS model "
+        "held on the corrected split and GenScore fell by much less than "
+        "Pafnucy. Both sentences are scoped to PREVIOUSLY REPORTED "
+        "performance, which excludes GEMS by construction, and 2.3 says \"by "
+        "margins that differed between models\"."),
+    "graber2025addendum": (
+        FULL_TEXT,
+        "Read, and then DELIBERATELY UNCITED. With the two-groups clause gone "
+        "it carries no claim of its own. The entry is kept so the resolved "
+        "bibliographic record survives; BibTeX prints only cited entries, so "
+        "it costs nothing in the PDF. Re-citing it is how the removed error "
+        "would come back."),
+    "bernett2024guiding": (
+        ABSTRACT_ONLY,
+        "The abstract was enough to find a real defect: the framework is scoped "
+        "to \"constructing machine learning models in biological domains\" and "
+        "its seven questions concern homology, shared patients and "
+        "experimental batches, while 2.3 had cited it for a domain-general "
+        "claim. 2.3 now says \"for biological domains\". What the abstract "
+        "CANNOT settle is whether the checklist framing itself is described "
+        "accurately; that needs the full text."),
+    "vasu2023mobileone": (
+        CORRECTED,
+        "2.4 and 7.4 said \"parameter counts and FLOPs both correlate poorly "
+        "with measured on-device latency\" and co-cited this with chen2023run. "
+        "This paper reports an ASYMMETRY -- Spearman 0.30 (p = 0.18) for "
+        "parameter count against 0.47 (p = 0.03) for FLOPs -- which \"both "
+        "poorly\" flattened. Values recorded in "
+        "data/published_proxy_claims.csv."),
+    "chen2023run": (
+        CORRECTED,
+        "Carried half of the same false co-citation. It says nothing about "
+        "parameter counts and reports no correlation coefficients at all; its "
+        "claim is that reducing FLOPs does not reduce latency proportionally, "
+        "because latency is FLOPs over an achieved FLOPS rate that collapses "
+        "for memory-bound operators. Both sentences were rewritten so each "
+        "citation carries only what its paper states."),
+}
+
 # Tier 3: the citation asserts only that this paper is where a model or a piece
 # of software comes from. Wrong attribution is possible but would be obvious,
 # and no sentence here rests on a finding.
@@ -342,6 +436,15 @@ def fetch_abstract(rec):
     return "", "", "; ".join(errors)
 
 
+def unchecked_tier1_keys(unchecked, tier1):
+    """Tier-1 entries with no verification status, in tier-1's own order.
+
+    Kept in TIER1 order rather than sorted: that order is the risk ordering, so
+    the first name printed is the one to read next.
+    """
+    return [k for k in TIER1 if k in set(unchecked) and k in tier1]
+
+
 def wrap(text, width=78, indent="> "):
     words, lines, cur = text.split(), [], ""
     for w in words:
@@ -406,6 +509,49 @@ def main():
     # ---- write the note ---------------------------------------------------
     need_reading = [k for k, r in results.items()
                     if not r["abstract"] and not r["skipped"]]
+
+    # ---- verification state, counted rather than asserted -----------------
+    def with_status(state):
+        return sorted(k for k in bib
+                      if VERIFICATION.get(k, ("", ""))[0] == state)
+
+    full = with_status(FULL_TEXT)
+    abstract_only = with_status(ABSTRACT_ONLY)
+    corrected = with_status(CORRECTED)
+    unchecked = sorted(k for k in bib if k not in VERIFICATION)
+    n_full, n_abstract = len(full), len(abstract_only)
+    n_corrected, n_unchecked = len(corrected), len(unchecked)
+    t1 = set(TIER1)
+    n_full_t1 = len([k for k in full if k in t1])
+    n_abstract_t1 = len([k for k in abstract_only if k in t1])
+    n_corrected_t1 = len([k for k in corrected if k in t1])
+    n_unchecked_t1 = len([k for k in unchecked if k in t1])
+
+    # Phrased from the counts so the sentence cannot go stale against the table.
+    if not abstract_only:
+        abstract_only_line = ("Every checked entry was checked against a full "
+                              "text.")
+    else:
+        abstract_only_line = (
+            "**%s verified from an abstract alone**, %s tier 1: %s. The full "
+            "text was paywalled and not available. If this study ever "
+            "describes its own verification method, these must not be "
+            "presented as equivalent to a full-text check."
+            % ("%d entry is" % n_abstract if n_abstract == 1
+               else "%d entries are" % n_abstract,
+               "%d of them" % n_abstract_t1 if n_abstract_t1 else "none",
+               ", ".join("`%s`" % k for k in abstract_only)))
+
+    if not unchecked_tier1_keys(unchecked, t1):
+        tier1_outstanding_line = "**Every tier-1 entry has been checked.**"
+    else:
+        remaining = unchecked_tier1_keys(unchecked, t1)
+        tier1_outstanding_line = (
+            "**%d tier-1 entr%s still unchecked: %s.** Tier 1 is where a wrong "
+            "citation changes what this paper claims, so these come before "
+            "anything in tiers 2 and 3."
+            % (len(remaining), "y is" if len(remaining) == 1 else "ies are",
+               ", ".join("`%s`" % k for k in remaining)))
     L = ["# Citation verification",
          "",
          "Generated by `scripts/citation_verification.py`; run record in "
@@ -430,6 +576,26 @@ def main():
          "| no abstract available --- open the DOI yourself | %d |"
          % len(need_reading),
          "| already verified, not re-fetched | %d |" % len(TIER0),
+         "",
+         "## Verification state",
+         "",
+         "Filled by hand as the reading pass proceeds. **An entry absent from "
+         "the table below has not been checked**, and nothing here is derived "
+         "from the fetches above.",
+         "",
+         "| state | entries | of which tier 1 |",
+         "|---|---|---|",
+         "| verified against the full text | %d | %d |"
+         % (n_full, n_full_t1),
+         "| verified from the abstract only | %d | %d |"
+         % (n_abstract, n_abstract_t1),
+         "| citation was wrong, now corrected | %d | %d |"
+         % (n_corrected, n_corrected_t1),
+         "| not yet checked | %d | %d |" % (n_unchecked, n_unchecked_t1),
+         "",
+         abstract_only_line,
+         "",
+         tier1_outstanding_line,
          "",
          "Note on tier 1: the brief named *two* seed papers. Three entries are "
          "grouped there --- `picard2021seed`, `gundersen2023reporting` and "
@@ -469,6 +635,16 @@ def main():
                  % (len(rows), "" if len(rows) == 1 else "s"))
         L.append("")
 
+        status, status_note = VERIFICATION.get(key, ("", ""))
+        if status:
+            L.append(STATUS_TEXT[status])
+            if status_note:
+                L.append("")
+                L.append(status_note)
+        else:
+            L.append("_Not yet checked._")
+        L.append("")
+
         if res["skipped"]:
             L.append("**Abstract not fetched --- %s.**" % res["skipped"])
         elif res["abstract"]:
@@ -478,7 +654,16 @@ def main():
         else:
             reason = res["error"] or ("no abstract is deposited for this DOI"
                                       if rec["doi"] else "no identifier")
-            L.append("**No abstract available --- %s.**" % reason)
+            L.append("**No abstract available from the registries --- %s.**"
+                     % reason)
+            if status:
+                # Without this the block contradicts itself: a status of
+                # "abstract only" beside "no abstract available" reads as an
+                # error rather than as two different sources. The registries
+                # are not the only place an abstract exists.
+                L.append("")
+                L.append("The status above was reached by reading it at the "
+                         "publisher's page rather than through a registry.")
             if link:
                 L.append("")
                 L.append("Open it yourself: <%s>" % link)

@@ -85,29 +85,14 @@ where random effects during training have been studied directly, a
 statistically significant difference has been reported to be a weak indicator
 that a true difference exists \citep{akesson2024random}.
 
-The contamination figures are floors rather than estimates, and three separate
-restrictions make them so. Only pairs whose class inventories match exactly are
-ever compared, so a genuine duplicate with one component occluded is never
-scored (Section~\ref{sec:duplicate-contamination}). Pairs carrying two annotated
-boxes or fewer are excluded from the ranking, which is the conservative choice
-for a ranking and the permissive one for a count of zero
-(Section~\ref{sec:correction-limits}). And the corrected split's figure at the
-loosest threshold is not independent of the grouping that produced it, because
-that grouping used the same threshold (Section~\ref{sec:grouping-rule}); the
-figures at the two stricter thresholds carry no such dependence.
-
-The fifteen rescued classes hold between five and ten test instances each. Five
-instances is the threshold at which a class becomes measurable, not a sample
-size from which a per-class average precision can be quoted with confidence. The
-corrected split makes those classes evaluable and claims nothing further about
-how well they are evaluated.
-
-The grouping threshold and the allocation that follows from it are established
-for one seed. The allocator is greedy, so a different seed explores a different
-region of the search space and could hold the frozen split sizes where this one
-fails or fail where this one holds. The sweep in
-Section~\ref{sec:tau-choice} answers the question for seed 20260804 and does not
-establish that 15 seconds is the right threshold in general.
+Four limitations of the corrected split itself are stated where the construction
+is described: the contamination figures are floors rather than estimates, the
+rescued classes are measurable rather than well measured, the figure at the
+loosest threshold is not independent of the grouping that produced it, and the
+threshold is established for one seed
+(Section~\ref{sec:correction-limits}). One figure belongs here because it appears
+nowhere else in the paper: the fifteen rescued classes hold between five and ten
+test instances each.
 
 The confidence threshold used at evaluation is fixed by the Ultralytics release
 rather than stated explicitly in the configuration

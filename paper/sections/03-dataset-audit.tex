@@ -53,16 +53,15 @@
 % metadata CSV carries FOUR distinct DEVICE_NAME values against the paper's
 % three phones.
 
-This section audits the released ElectroCom61 archive before any detector is
-trained on it: which classes the published split can evaluate, how each capture
-session was allocated across the three partitions, what the shipped metadata
-describes, and whether near-duplicate images straddle the split boundary. Every
-measurement below is taken from the released files alone --- image filenames,
-label files and the metadata CSV --- using only the Python standard library and
-no model. The audit finds that more than a quarter of the annotation effort sits
-in classes the published split cannot evaluate, that the cause is session
-allocation rather than class frequency, and that the metadata shipped with v2
-describes v1.
+This section asks which classes the published split can evaluate, and answers it
+from the released files alone --- image filenames, label files and the metadata
+CSV, using only the Python standard library and no model. Two questions have to
+be settled first: whether the shipped metadata is a reliable guide to the archive
+it travels in, and whether near-duplicate images straddle the split boundary,
+since a correction must preserve whatever the published split already achieves.
+The audit finds that more than a quarter of the annotation effort sits in classes
+the published split cannot evaluate, that the cause is session allocation rather
+than class frequency, and that the metadata shipped with v2 describes v1.
 
 \subsection{Class coverage under the published split}
 \label{sec:class-coverage}

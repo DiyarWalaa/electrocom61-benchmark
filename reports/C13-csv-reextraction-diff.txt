@@ -1,0 +1,271 @@
+================================================================================
+CHECK    : C13 - Independent re-extraction of the two hand-typed CSVs, diffed cell by cell
+QUESTION : Does an independent reading of the PDFs reproduce every value in
+           data/published_complexity.csv and data/published_accuracy.csv, and does every
+           table_location point at the table its value actually sits in?
+SOURCES  : [SAYEEDI] 25795-61999-1-PB.pdf, Table 3 on PDF/printed p. 9.
+           [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             TABLE I, caption and header on PDF p. 3, body rows on PDF p. 4.
+           [GAIB] E-waste detection base on yolov13.pdf, TABLE I on PDF p. 4.
+           All values re-read from 300 dpi renders (reports/tables/SAYEEDI-p09-09.png,
+           ELHENIDY-p03-3.png, ELHENIDY-p04-4.png, GAIB-p04-4.png), not from the text layer
+           and not from the committed CSVs.
+           Committed files read but NOT modified: data/published_complexity.csv (15 data
+           rows), data/published_accuracy.csv (12 data rows).
+VERDICT  : CONFIRMED
+ONE LINE : All 27 committed rows and all 48 numeric cells re-extract identically, zero
+           disagreements, and every table_location points at the correct table.
+AFFECTS  : Every manuscript number sourced from data/published_complexity.csv or
+           data/published_accuracy.csv, which is every prior-work accuracy and complexity
+           figure the paper cites.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. ZERO DISAGREEMENTS. The independent re-extraction reproduces every value in both
+   committed files. 27 rows compared, 48 numeric cells compared, 0 differ. The 48 are 30
+   from published_complexity.csv (15 rows x layers and params_millions) and 18 from
+   published_accuracy.csv (12 value cells plus the 3 populated and 3 empty variance cells on
+   the two benchmark rows).
+
+2. Row counts match exactly:
+     data/published_complexity.csv : 15 data rows -> 15 re-extracted, 15 matched, 0 missing,
+                                     0 extra.
+     data/published_accuracy.csv   : 12 data rows -> 12 re-extracted, 12 matched, 0 missing,
+                                     0 extra.
+     Total                         : 27 rows.
+
+3. EVERY table_location IS CORRECT. All 15 complexity rows say "Table I" and all 15 values
+   do sit in a table captioned "TABLE I" in the paper named by their source column. All 10
+   electrocom61 accuracy rows say "Table 3" and all 10 values do sit in Sayeedi's Table 3,
+   "Technical Validation Table.", on printed page 9. The two remaining accuracy rows say
+   "Table I" and both values do sit in the relevant paper's TABLE I. Verified individually
+   in the table below.
+
+4. THE source COLUMN IS ALSO CORRECT throughout. "yolov12paper" resolves to [ELHENIDY]
+   and "yolov13paper" to [GAIB]; the seven complexity rows attributed to each are present
+   in that paper's table, and the eighth row (YOLOv13s) is correctly attributed to
+   yolov13paper alone, which is the only paper that has it.
+
+5. THREE THINGS ARE RECORDED DIFFERENTLY IN THE CSVs THAN ON THE PAGE. None is a
+   disagreement about a value; all three are normalisations, and all three are correct
+   choices. They are listed so that a reader re-checking a row against the PDF is not
+   surprised by them:
+
+   (a) THE metric COLUMN NORMALISES THE HEADER STRING. Rows 12 and 13 of
+       published_accuracy.csv record metric "mAP@50". The column header printed in
+       [ELHENIDY] is "mAP@0.5 (mean +/- SD, 95% CI)" and in [GAIB] is "mAP@0.5". These are
+       the same quantity under a different label. Sayeedi's header genuinely is "mAP@50".
+
+   (b) THE value COLUMN DROPS THE PERCENT SIGN. Sayeedi's Table 3 prints "95.9 %", "92.4 %"
+       and so on, with a space before the sign; the CSV stores 95.9 and 92.4. [ELHENIDY]
+       and [GAIB] print bare numbers with no unit anywhere in cell or header. Storing all
+       three sources as bare numbers is the only consistent choice, and the two total_loss
+       rows already carry a note saying they are unitless while their siblings are
+       percentages.
+
+   (c) THE model COLUMN NORMALISES THE ROW LABEL. The CSVs use "YOLOv8s" and "YOLOv9s"; both
+       papers print "YOLO v8s [20]" and "YOLO v9s [24]" with a space and a reference number.
+       "YOLOv12S" keeps the printed capital S. "EcoDetect-YOLOv2" is printed over two lines
+       in [ELHENIDY] and on one in [GAIB].
+
+6. ONE THING THE CSVs DO NOT RECORD, and could. Neither file carries a PDF page number, so
+   re-checking a value means locating the table in the paper first. For [ELHENIDY] that is
+   more work than it sounds: TABLE I's caption and header row are on PDF p. 3 and all seven
+   body rows are on PDF p. 4, so "Table I" alone sends a reader to a page that contains no
+   values. The re-extraction file adds a pdf_page column carrying the page the VALUES sit
+   on. This is an addition to the schema, not a correction to it.
+
+7. THE NOTE ON ROW 12 OF published_accuracy.csv IS ACCURATE. It states that [ELHENIDY]
+   gives each cell as a mean and standard deviation with a 95% confidence interval and
+   "states neither the number of runs nor the procedure". C07 verified both halves against
+   the paper's full six pages: the estimates are in TABLE I, and the words "runs", "seed",
+   "fold", "cross-validation", "repeated", "trials", "n =" and "average of" do not appear
+   anywhere in [ELHENIDY].
+
+8. THE NOTE ON ROW 13 IS ALSO ACCURATE. It records [GAIB] as reproducing the earlier table
+   without its variance estimates. C03 confirmed this cell by cell: all 35 shared numeric
+   cells identical, and the "(mean +/- SD, 95% CI)" decoration absent from all three of
+   [GAIB]'s metric headers.
+
+EVIDENCE
+
+--------------------------------------------------------------------------------
+DIFF 1 -- data/published_complexity.csv, all 15 rows.
+Committed schema: model,source,layers,params_millions,table_location
+"Committed" is the value in the file. "Re-extracted" is the value read off the 300 dpi
+render. Two numeric cells per row, 30 numeric cells in total.
+--------------------------------------------------------------------------------
+
+| # | model            | source       | field           | Committed | Re-extracted | Verdict |
+|---|------------------|--------------|-----------------|-----------|--------------|---------|
+| 1 | YOLOv8s          | yolov12paper | layers          | 214       | 214          | MATCH   |
+| 1 | YOLOv8s          | yolov12paper | params_millions | 17.6      | 17.6         | MATCH   |
+| 2 | YOLOv9s          | yolov12paper | layers          | 930       | 930          | MATCH   |
+| 2 | YOLOv9s          | yolov12paper | params_millions | 60.8      | 60.8         | MATCH   |
+| 3 | YOLOv10s         | yolov12paper | layers          | 319       | 319          | MATCH   |
+| 3 | YOLOv10s         | yolov12paper | params_millions | 2.6       | 2.6          | MATCH   |
+| 4 | YOLOv11s         | yolov12paper | layers          | 272       | 272          | MATCH   |
+| 4 | YOLOv11s         | yolov12paper | params_millions | 2.5       | 2.5          | MATCH   |
+| 5 | EcoDetect-YOLOv2 | yolov12paper | layers          | 196       | 196          | MATCH   |
+| 5 | EcoDetect-YOLOv2 | yolov12paper | params_millions | 23.4      | 23.4         | MATCH   |
+| 6 | YOLO_EC          | yolov12paper | layers          | 325       | 325          | MATCH   |
+| 6 | YOLO_EC          | yolov12paper | params_millions | 25.1      | 25.1         | MATCH   |
+| 7 | YOLOv12S         | yolov12paper | layers          | 292       | 292          | MATCH   |
+| 7 | YOLOv12S         | yolov12paper | params_millions | 19.7      | 19.7         | MATCH   |
+| 8 | YOLOv8s          | yolov13paper | layers          | 214       | 214          | MATCH   |
+| 8 | YOLOv8s          | yolov13paper | params_millions | 17.6      | 17.6         | MATCH   |
+| 9 | YOLOv9s          | yolov13paper | layers          | 930       | 930          | MATCH   |
+| 9 | YOLOv9s          | yolov13paper | params_millions | 60.8      | 60.8         | MATCH   |
+|10 | YOLOv10s         | yolov13paper | layers          | 319       | 319          | MATCH   |
+|10 | YOLOv10s         | yolov13paper | params_millions | 2.6       | 2.6          | MATCH   |
+|11 | YOLOv11s         | yolov13paper | layers          | 272       | 272          | MATCH   |
+|11 | YOLOv11s         | yolov13paper | params_millions | 2.5       | 2.5          | MATCH   |
+|12 | EcoDetect-YOLOv2 | yolov13paper | layers          | 196       | 196          | MATCH   |
+|12 | EcoDetect-YOLOv2 | yolov13paper | params_millions | 23.4      | 23.4         | MATCH   |
+|13 | YOLO_EC          | yolov13paper | layers          | 325       | 325          | MATCH   |
+|13 | YOLO_EC          | yolov13paper | params_millions | 25.1      | 25.1         | MATCH   |
+|14 | YOLOv12S         | yolov13paper | layers          | 292       | 292          | MATCH   |
+|14 | YOLOv12S         | yolov13paper | params_millions | 19.7      | 19.7         | MATCH   |
+|15 | YOLOv13s         | yolov13paper | layers          | 648       | 648          | MATCH   |
+|15 | YOLOv13s         | yolov13paper | params_millions | 2.5       | 2.5          | MATCH   |
+
+  30 numeric cells compared, 30 match, 0 differ.
+
+--------------------------------------------------------------------------------
+DIFF 2 -- data/published_accuracy.csv, all 12 rows.
+Committed schema:
+model,source,metric,value,plus_minus,interval_low,interval_high,table_location,notes
+--------------------------------------------------------------------------------
+
+| # | model          | source       | metric     | field        | Committed | Re-ext. | Verdict |
+|---|----------------|--------------|------------|--------------|-----------|---------|---------|
+| 1 | YOLOv9s        | electrocom61 | mAP@50     | value        | 95.9      | 95.9    | MATCH   |
+| 2 | YOLOv9s        | electrocom61 | precision  | value        | 92.4      | 92.4    | MATCH   |
+| 3 | YOLOv9s        | electrocom61 | recall     | value        | 94.9      | 94.9    | MATCH   |
+| 4 | YOLOv9s        | electrocom61 | F1         | value        | 93.63     | 93.63   | MATCH   |
+| 5 | YOLOv9s        | electrocom61 | total_loss | value        | 0.5795    | 0.5795  | MATCH   |
+| 6 | EfficientDetV2 | electrocom61 | mAP@50     | value        | 95.6      | 95.6    | MATCH   |
+| 7 | EfficientDetV2 | electrocom61 | precision  | value        | 95.6      | 95.6    | MATCH   |
+| 8 | EfficientDetV2 | electrocom61 | recall     | value        | 99.7      | 99.7    | MATCH   |
+| 9 | EfficientDetV2 | electrocom61 | F1         | value        | 97.6      | 97.6    | MATCH   |
+|10 | EfficientDetV2 | electrocom61 | total_loss | value        | 0.40146   | 0.40146 | MATCH   |
+|11 | YOLOv9s        | yolov12paper | mAP@50     | value        | 84.9      | 84.9    | MATCH   |
+|11 | YOLOv9s        | yolov12paper | mAP@50     | plus_minus   | 0.3       | 0.3     | MATCH   |
+|11 | YOLOv9s        | yolov12paper | mAP@50     | interval_low | 84.6      | 84.6    | MATCH   |
+|11 | YOLOv9s        | yolov12paper | mAP@50     | interval_high| 85.2      | 85.2    | MATCH   |
+|12 | YOLOv9s        | yolov13paper | mAP@50     | value        | 84.9      | 84.9    | MATCH   |
+|12 | YOLOv9s        | yolov13paper | mAP@50     | plus_minus   | (empty)   | (empty) | MATCH   |
+|12 | YOLOv9s        | yolov13paper | mAP@50     | interval_low | (empty)   | (empty) | MATCH   |
+|12 | YOLOv9s        | yolov13paper | mAP@50     | interval_high| (empty)   | (empty) | MATCH   |
+
+  (Row numbering above follows the CSV's data rows; rows 11 and 12 here are the file's data
+  rows 11 and 12, which are lines 12 and 13 of the file including the header.)
+
+  18 value/variance cells compared, 18 match, 0 differ. The four empty variance cells on the
+  yolov13paper row are correctly empty: [GAIB]'s TABLE I prints "84.9" with no plus-minus
+  and no interval, and carries no variance column at all.
+
+--------------------------------------------------------------------------------
+DIFF 3 -- table_location verification. Does each stated location point at the table the
+value actually sits in?
+--------------------------------------------------------------------------------
+
+| Committed rows           | table_location | The table actually containing the value | Verdict |
+|--------------------------|----------------|-----------------------------------------|---------|
+| complexity, all 7 rows   | Table I        | [ELHENIDY] "TABLE I. A COMPARISON OF    | CORRECT |
+| with source=yolov12paper |                | YOLOV12 WITH THE STATE-OF-THE-ART       |         |
+|                          |                | OBJECT DETECTION MODELS". Caption and   |         |
+|                          |                | header row on PDF p. 3, body rows on    |         |
+|                          |                | PDF p. 4. The paper's only table.       |         |
+| complexity, all 8 rows   | Table I        | [GAIB] "TABLE I. A COMPARISON OF        | CORRECT |
+| with source=yolov13paper |                | YOLOv12 WITH THE STATE-OF-THE-ART       |         |
+|                          |                | OBJECT DETECTION MODELS", entirely on   |         |
+|                          |                | PDF p. 4. The paper's only table.       |         |
+| accuracy, all 10 rows    | Table 3        | [SAYEEDI] "Table 3 / Technical          | CORRECT |
+| with source=electrocom61 |                | Validation Table.", PDF and printed     |         |
+|                          |                | p. 9. Sayeedi's Tables 1 and 2 carry    |         |
+|                          |                | no metrics, so Table 3 is the only      |         |
+|                          |                | table these values could sit in.        |         |
+| accuracy, YOLOv9s,       | Table I        | [ELHENIDY] TABLE I, row "YOLO v9s       | CORRECT |
+| yolov12paper             |                | [24]", mAP@0.5 cell, PDF p. 4.          |         |
+| accuracy, YOLOv9s,       | Table I        | [GAIB] TABLE I, row "YOLO v9s [24]",    | CORRECT |
+| yolov13paper             |                | mAP@0.5 cell, PDF p. 4.                 |         |
+
+  27 of 27 table_location values verified correct. None points at the wrong table, and none
+  points at a table that does not exist.
+
+--------------------------------------------------------------------------------
+The re-extraction file.
+--------------------------------------------------------------------------------
+
+Written to C:\research\electrocom61\reports\reextracted_published_values.csv, 27 data rows:
+15 corresponding to published_complexity.csv and 12 to published_accuracy.csv (the ten
+electrocom61 rows plus the two YOLOv9s benchmark rows).
+
+Schema. The two committed files have DIFFERENT schemas, so a single file cannot literally
+carry "the same schema" as both. The re-extraction uses their union, plus two columns that
+identify and locate each row:
+  committed_file  -- which committed file this row corresponds to, so the diff is 1:1
+  model, source, metric, value, plus_minus, interval_low, interval_high  -- from
+                     published_accuracy.csv
+  layers, params_millions  -- from published_complexity.csv
+  table_location  -- present in both committed files
+  pdf_page        -- added; the PDF page the VALUE sits on, which "Table I" alone does not
+                     give for [ELHENIDY]
+  notes           -- what is printed on the page, including the exact row label and any
+                     typographic detail the normalised columns drop
+
+Every row was read from a 300 dpi page render. The committed CSVs were read once, after the
+re-extraction was complete, and were not modified.
+
+SEARCH TERMS USED
+
+No text search was used to produce the re-extracted values; they were read off page images,
+which is the only reliable method for a two-column IEEE table whose header and body straddle
+a page break. Text search was used only to locate the tables in the first place and to
+confirm each paper has no second table:
+
+  ^\s*(Table|TABLE)\s+([IVX]+|\d+)[\.\s]
+  Table\s*\d
+  Table\s*(2|II)\b
+  50-95 | 50:95 | mAP50 | AP50          (to confirm no mAP@50-95 column exists to transcribe)
+  GFLOP | FLOP | model size | MB        (to confirm no further complexity column exists)
+
+COULD NOT DETERMINE
+
+Nothing about the committed values. Every one of the 48 numeric cells across the two files
+was located, re-read from a page image, and matched, as were all 27 table_location values.
+
+Two things remain undetermined about what the values MEAN, which is outside this check but
+bears on how they can be used and is recorded in C04, C07 and C09 rather than here: whether
+the parameter counts are fused or unfused, and how many runs [ELHENIDY]'s standard
+deviations were computed over. Neither paper states either.
+
+IMPACT ON THE MANUSCRIPT
+
+No correction required, and no edit to either committed file. This is the strongest possible
+outcome for a check of this kind: two files that no script can regenerate, hand-typed from
+five PDFs, re-derived independently from page images and agreeing in every cell.
+
+Both files' .gitignore preambles warn that they cannot be regenerated and must be
+re-transcribed if lost. That warning now has a second, independent transcription standing
+behind it: this report and reports/reextracted_published_values.csv together record every
+value, its exact printed form, its table, and its PDF page, so a future re-transcription has
+something to check itself against.
+
+Two optional improvements, neither of which affects a number:
+
+  - Consider adding the PDF page to the table_location column, or as a second column. For
+    [SAYEEDI] "Table 3" is unambiguous because the printed page number and the PDF page
+    number coincide at 9. For [ELHENIDY] "Table I" sends a reader to PDF p. 3, which carries
+    the caption and the header row but not one of the values the file records; the values
+    are on PDF p. 4. The re-extraction file's pdf_page column is a worked example of the
+    fix.
+
+  - The metric column normalises [ELHENIDY]'s and [GAIB]'s printed "mAP@0.5" to "mAP@50" so
+    that all three sources share one label. That is the right call and should stay, but it
+    is invisible in the file. A one-line note on rows 11 and 12 saying the printed header is
+    "mAP@0.5" would close the last gap between the file and the page, in the same style as
+    the existing notes on the two total_loss rows.

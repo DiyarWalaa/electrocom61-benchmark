@@ -1,0 +1,197 @@
+================================================================================
+CHECK    : C05 - Timing measurements in prior work
+QUESTION : Does any of the three papers that report results on ElectroCom61 report a timing
+           measurement -- FPS, latency, inference time, throughput -- of any kind?
+SOURCES  : [SAYEEDI] 25795-61999-1-PB.pdf, PDF pp. 1-12 (printed 1-12), full text.
+           [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 1-6, full text (no printed folio).
+           [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7, full text (no printed
+             folio).
+           All tables and figures on those pages additionally inspected at 300 dpi.
+VERDICT  : CONFIRMED
+ONE LINE : No timing measurement of any kind appears in any of the three papers: 31 hits
+           across 17 search terms, of which 0 are measurements, 0 are numeric values copied
+           from another paper, 22 are motivational uses of "real-time", and 9 are reference
+           titles.
+AFFECTS  : The manuscript's absolute claim that none of the three prior studies reports a
+           timing measurement; Section 6.4 and Section 7.4's latency argument, which rests
+           on there being no published latency to compare against.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. THE ABSOLUTE CLAIM HOLDS. Across all three papers there is no FPS figure, no
+   milliseconds figure, no seconds-per-image or images-per-second figure, no latency value,
+   no throughput value, and no inference-time value. Not in a table, not in body text, not
+   on a figure axis, not in an abstract.
+
+2. The units that would carry such a measurement do not occur at all. Searching for FPS,
+   "frames per second", the standalone token "ms", "millisecond", "s/img", "img/s",
+   "latency", "inference time", "throughput", "GPU time" and "runtime" returns ZERO hits in
+   all three papers combined.
+
+3. Every one of the 31 hits is accounted for. Classified as the check requires:
+
+| Class                                                    | Count | Papers            |
+|----------------------------------------------------------|-------|-------------------|
+| (a) a measurement of this paper's own models             | 0     | --                |
+| (b) a numeric timing value copied from another paper     | 0     | --                |
+| (c) a motivational use of "real-time" with no measurement| 22    | all three         |
+| (d) other -- reference-list titles containing "real-time"| 9     | all three         |
+|     TOTAL                                                | 31    |                   |
+
+4. The nearest thing to a timing statement in any of the three is a QUALITATIVE phrase
+   attached to a value copied from another study. [ELHENIDY] PDF p. 1 writes "An enhanced
+   YOLOv3 [12] demonstrated 92.1% accuracy with high speed in industrial environments". The
+   number copied is an accuracy, not a speed; "high speed" carries no value and no unit.
+   [GAIB] PDF p. 1 carries the same sentence in reworded form. Neither is a timing
+   measurement, so neither falls into class (b).
+
+5. The training-curve figures were checked directly at 300 dpi in case a timing panel had
+   been included among them. [ELHENIDY] Fig. 3 (PDF p. 5) has ten panels: train/box_loss,
+   train/cls_loss, train/dfl_loss, metrics/precision(B), metrics/recall(B), val/box_loss,
+   val/cls_loss, val/dfl_loss, metrics/mAP50(B), metrics/mAP50-95(B). [GAIB] Fig. 3 (PDF
+   p. 5) has ten panels: train/box_loss, train/cls_loss, train/dfl_loss,
+   metrics/precision(B), metrics/recall(B), metrics/mAP50-95(B), val/box_loss, val/cls_loss,
+   metrics/mAP50(B), metrics/mAP75(B). No panel in either figure plots time, speed or
+   latency. Both x-axes are epoch counts.
+
+6. Neither results table has a timing column. [SAYEEDI] Table 3 columns are Model, mAP@50,
+   Precision, Recall, F1-Score, Total Loss. [ELHENIDY] and [GAIB] TABLE I columns are
+   Model, Layers, Parameters (M), mAP@0.5, Precision, Recall. See C02 for the full
+   transcriptions.
+
+EVIDENCE
+
+Every occurrence, with page and one line of context. "Class" uses the scheme above.
+
+[SAYEEDI] -- 7 occurrences, 0 measurements
+
+| PDF p | Printed p | Context (one line)                                        | Class |
+|-------|-----------|-----------------------------------------------------------|-------|
+| 3     | 3         | "the ones used in works done in computer vision based     | (c)   |
+|       |           | real time detection [12,17,18]"                           |       |
+| 4     | 4         | "ensures that the dataset is effective for real-time      | (c)   |
+|       |           | electronic component detection."                          |       |
+| 8     | 8         | "YOLOv9s, previously trained on the MS COCO dataset"      | (c)   |
+|       |           | (matched on "fast"/"speed" stem only; no timing content)  |       |
+| 10    | 10        | "positioning them as suitable choices for real-time       | (c)   |
+|       |           | electronic component recognition"                         |       |
+| 12    | 12        | ref [12] title: "...real-time component identification    | (d)   |
+|       |           | from waste printed circuit boards"                        |       |
+| 12    | 12        | ref [18] title: "A system for a real-time electronic      | (d)   |
+|       |           | component detection and classification on a conveyor"     |       |
+| 12    | 12        | ref [22] title: "Improved YOLOv4-tiny network for         | (d)   |
+|       |           | real-time electronic component detection"                 |       |
+
+[ELHENIDY] -- 11 occurrences, 0 measurements
+
+| PDF p | Context (one line)                                                    | Class |
+|-------|-----------------------------------------------------------------------|-------|
+| 1     | Abstract: "YOLOv12 achieves higher mAP and real-time inference        | (c)   |
+|       | response than the previous YOLO versions."  No value given.           |       |
+| 1     | "An enhanced YOLOv3 [12] demonstrated 92.1% accuracy with high        | (c)   |
+|       | speed in industrial environments"  -- the number is an accuracy       |       |
+| 1     | "A YOLOv3-based system for PCB recycling [14] achieved 90.5%          | (c)   |
+|       | real-time accuracy"  -- the number is an accuracy                     |       |
+| 1     | "it leverages the lightweight YOLOv12 [16], which balances            | (c)   |
+|       | real-time speed with improved detection"                              |       |
+| 2     | Sec. II: "validate machine learning models for electronic component   | (c)   |
+|       | recognition in real time."                                            |       |
+| 2     | Sec. III: "It is perfect for use in real-time sorting systems"        | (c)   |
+| 3     | Sec. IV: "its high computational cost makes it less practical for     | (c)   |
+|       | deployment in real-time or edge environments."                        |       |
+| 3     | Sec. IV: "confirming their suitability for low-power, real-time       | (c)   |
+|       | applications."                                                        |       |
+| 6     | ref [10] title: "You only look once: Unified, real-time object        | (d)   |
+|       | detection."                                                           |       |
+| 6     | ref [16] title: "YOLOv12: Attention-Centric Real-Time Object          | (d)   |
+|       | Detectors."                                                           |       |
+| 6     | ref [21] title: "Yolov10: Real-time end-to-end object detection."     | (d)   |
+
+[GAIB] -- 13 occurrences, 0 measurements
+
+| PDF p | Context (one line)                                                    | Class |
+|-------|-----------------------------------------------------------------------|-------|
+| 1     | Abstract: "YOLOv13 achieves higher mAP and real-time inference        | (c)   |
+|       | response than the previous YOLO versions."  No value given.           |       |
+| 1     | "A modified YOLOv3 [12] with improved accuracy of 92.1% at high       | (c)   |
+|       | speed in industries"  -- the number is an accuracy                    |       |
+| 1     | "a PCB recycling system that could obtain a real-time accuracy of     | (c)   |
+|       | 90.5%"  -- the number is an accuracy                                  |       |
+| 1     | "it utilizes lightweight YOLOv12, [16], where real-time performance   | (c)   |
+|       | and better small and partially occluded elements are more balanced"   |       |
+| 2     | Sec. II: "validate machine learning models for electronic component   | (c)   |
+|       | recognition in real time."                                            |       |
+| 2     | Sec. III: "maintaining efficiency that can be applied to real time    | (c)   |
+|       | applications."                                                        |       |
+| 3     | Sec. IV: "makes it less practical for deployment in real-time or      | (c)   |
+|       | edge environments."                                                   |       |
+| 3     | Sec. IV: "confirming their suitability for low-power, real-time       | (c)   |
+|       | applications."                                                        |       |
+| 7     | Sec. V: "the deployment of these models should be proven to optimize  | (c)   |
+|       | the use of edge hardware"                                             |       |
+| 7     | ref [10] title: "You only look once: Unified, real-time object        | (d)   |
+|       | detection."                                                           |       |
+| 7     | ref [16] title: "YOLOv12: Attention-Centric Real-Time Object          | (d)   |
+|       | Detectors."                                                           |       |
+| 7     | ref [21] title: "Yolov10: Real-time end-to-end object detection."     | (d)   |
+| 7     | ref [26] title: "YOLOv13: Real-Time Object Detection with             | (d)   |
+|       | Hypergraph-Enhanced Adaptive Visual Perception."                      |       |
+
+Terms returning ZERO hits in all three papers:
+
+| Term                | SAYEEDI | ELHENIDY | GAIB |
+|---------------------|---------|----------|------|
+| FPS                 | 0       | 0        | 0    |
+| frames per second   | 0       | 0        | 0    |
+| ms (standalone)     | 0       | 0        | 0    |
+| millisecond(s)      | 0       | 0        | 0    |
+| latency             | 0       | 0        | 0    |
+| inference time      | 0       | 0        | 0    |
+| throughput          | 0       | 0        | 0    |
+| runtime / run time  | 0       | 0        | 0    |
+| GPU time            | 0       | 0        | 0    |
+| s/img               | 0       | 0        | 0    |
+| img/s               | 0       | 0        | 0    |
+| per image           | 0       | 0        | 0    |
+
+SEARCH TERMS USED
+
+Single case-insensitive regex over the per-page text layer of all three PDFs (12 + 6 + 7 =
+25 pages), each hit then read in context:
+
+  FPS | frames per second | \bms\b | millisecond | latency | inference time | speed |
+  throughput | real[- ]?time | runtime | run time | GPU time | s/img | img/s | per image |
+  fast
+
+Total 31 matching lines. All 31 are listed above.
+
+Supplementary visual check, because a timing value could sit in a figure that carries no
+text layer: [SAYEEDI] PDF pp. 8 and 9 (Fig. 4 methodology framework, Fig. 5 confusion
+matrix), [ELHENIDY] PDF pp. 1-6 (all pages, including Fig. 2 confusion matrix and Fig. 3
+training curves and prediction samples), [GAIB] PDF pp. 1-7 (all pages, including Fig. 1
+architecture, Fig. 2 confusion matrix, Fig. 3 training curves, Fig. 4 prediction samples),
+all rendered at 300 dpi and inspected. No timing axis, panel, annotation or caption found.
+
+COULD NOT DETERMINE
+
+Nothing. The claim under test is an absolute one and a single measured FPS anywhere would
+break it; the search space is 25 pages, the term list covers every unit and phrasing such a
+measurement could take, and every one of the 31 hits has been read and classified.
+
+IMPACT ON THE MANUSCRIPT
+
+No change required. The absolute claim -- that none of the three papers reporting results on
+ElectroCom61 reports a timing measurement of any kind -- is confirmed.
+
+One sharpening is available, and it strengthens the claim rather than weakening it. All
+three papers invoke real-time operation as a motivation: [ELHENIDY] and [GAIB] each assert
+in their abstract that their model "achieves higher mAP and real-time inference response
+than the previous YOLO versions", and both conclude that lightweight variants are "suitable
+for low-power, real-time applications". Those are the strongest speed statements in the
+corpus and none carries a number. If Section 6.4 or 7.4 wants to say why measuring latency
+here is worth doing, the fact that the prior work asserts real-time suitability without ever
+measuring it is the evidence for it, and it is stated as a fact about what is printed rather
+than as a characterisation of the authors.

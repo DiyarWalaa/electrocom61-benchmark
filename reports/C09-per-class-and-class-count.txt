@@ -1,0 +1,218 @@
+================================================================================
+CHECK    : C09 - Per-class results and the class count the evaluation was computed over
+QUESTION : Do Sayeedi, Elhenidy or Gaib report per-class AP anywhere, and does any of them
+           state how many classes the evaluation was computed over, as distinct from how
+           many classes the dataset contains?
+SOURCES  : [SAYEEDI] 25795-61999-1-PB.pdf, PDF pp. 1-12 (printed 1-12), full text; Figs. 1,
+             2, 4, 5, 6 and Tables 1-3 inspected; 300 dpi renders of PDF pp. 3, 4, 8, 9.
+           [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 1-6, full text; 300 dpi renders of all six pages.
+           [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7, full text; 300 dpi
+             renders of all seven pages.
+           None of the three has an appendix or supplementary section.
+VERDICT  : CONFIRMED
+ONE LINE : No per-class AP is reported for any model in any of the three papers; each states
+           the dataset has 61 classes but none states the number of classes the evaluation
+           was computed over, and the three confusion matrices are the only per-class
+           evidence any of them publishes.
+AFFECTS  : Section 2.4; any comparison of this study's per-class results against prior work,
+           and the basis on which a published mAP over ElectroCom61 can be compared with one
+           computed here.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. PER-CLASS AP IS NOT REPORTED FOR ANY MODEL IN ANY OF THE THREE PAPERS. Not in a table,
+   not in body text, not in a figure, not in an appendix -- none of the three has an
+   appendix. Every accuracy number any of them prints is a dataset-level aggregate.
+
+2. What each paper does publish at the class level, and why none of it is per-class AP:
+
+| Paper    | Per-class artefact                | PDF p | What it shows                    |
+|----------|-----------------------------------|-------|----------------------------------|
+| SAYEEDI  | Fig. 2 "Distribution of Per Class | 6     | ANNOTATION COUNTS per class in   |
+|          | Annotation in ElectroCom61        |       | the dataset. A data statistic,   |
+|          | dataset."                         |       | not a model result.              |
+| SAYEEDI  | Fig. 5 "Confusion Matrix for      | 9     | Normalised confusion matrix,     |
+|          | YOLOv9s."                         |       | YOLOv9s. Per-class confusion,    |
+|          |                                   |       | not per-class AP.                |
+| SAYEEDI  | Fig. 6, confusion matrix for      | 10    | Normalised confusion matrix,     |
+|          | EfficientDetV2                    |       | EfficientDetV2. Same.            |
+| ELHENIDY | Fig. 2 "Normalized Confusion      | 4     | Normalised confusion matrix.     |
+|          | matrix"                           |       | Colour bar 0.0-1.0. Per-class    |
+|          |                                   |       | confusion, not per-class AP.     |
+| GAIB     | Fig. 2 "Normalized Confusion      | 4     | Confusion matrix. Colour bar     |
+|          | matrix"                           |       | 0-100+ (raw counts, despite the  |
+|          |                                   |       | caption reading "Normalized").   |
+|          |                                   |       | Per-class confusion, not AP.     |
+
+   A confusion matrix gives a per-class diagonal, which is a recall-like quantity, not an
+   average precision. None of the three papers converts one into a per-class AP, tabulates
+   its diagonal, or prints any numeric value read off it.
+
+3. NO PR CURVE IS PUBLISHED BY ANY OF THE THREE. [SAYEEDI] has Figs. 1-6 and none is a
+   precision-recall curve. [ELHENIDY] has Fig. 1 (architecture), Fig. 2 (confusion matrix),
+   and two figures both captioned "Fig. 3" (training curves; prediction samples). [GAIB] has
+   Fig. 1 (architecture), Fig. 2 (confusion matrix), Fig. 3 (training curves), Fig. 4
+   (prediction samples). The Ultralytics training-curve grids in [ELHENIDY] and [GAIB] plot
+   aggregate metrics against epochs, one curve per metric, not one curve per class.
+
+4. THE CLASS COUNT: ALL THREE STATE 61 FOR THE DATASET, NONE STATES IT FOR THE EVALUATION.
+   The distinction the check asks about is exactly the one none of them draws. Every "61" in
+   all three papers is a statement about how many classes ElectroCom61 contains, never about
+   how many classes an mAP was averaged over.
+
+| Paper    | PDF p | Printed statement                            | About dataset or eval? |
+|----------|-------|----------------------------------------------|------------------------|
+| SAYEEDI  | 1     | "encompassing 61 commonly used electronic     | dataset                |
+|          |       | components" (abstract)                       |                        |
+| SAYEEDI  | 2     | "With 61 distinct classes of electronic       | dataset                |
+|          |       | components" (Value of the Data)              |                        |
+| SAYEEDI  | 3     | Table 1 row "Ours ... 61" (No. of Classes)   | dataset                |
+| SAYEEDI  | 9     | "reflecting high accuracy in classifying the  | dataset, describing    |
+|          |       | 61 electronic components"                    | the confusion matrix   |
+| ELHENIDY | 2     | "61 different kinds of widely used electronic | dataset                |
+|          |       | components make up the dataset." (Sec. II)   |                        |
+| ELHENIDY | 6     | "imbalanced across 61 component classes"      | dataset                |
+|          |       | (Sec. V)                                     |                        |
+| GAIB     | 2     | "61 different kinds of widely used electronic | dataset                |
+|          |       | components make up the dataset." (Sec. II)   |                        |
+| GAIB     | 6     | "covers 61 component classes" (Sec. V)        | dataset                |
+
+5. THE CONFUSION MATRICES SUGGEST THE EVALUATION RAN OVER 62 ROWS AND COLUMNS, not 61, but
+   no paper says so. All three matrices carry a "background" row and column in addition to
+   the component classes. This is the standard Ultralytics confusion-matrix layout. Reading
+   the axis labels off the 300 dpi renders, [ELHENIDY] Fig. 2 and [GAIB] Fig. 2 both run
+   from "1-5-Volt-Battery" to "Zener-Diode" followed by "background", and [SAYEEDI] Fig. 5
+   does the same. The number of class labels is not printed on any of them and no caption
+   states a count. This is an observation about the figures, not a statement any paper
+   makes.
+
+6. NO PAPER STATES WHICH SPLIT ITS HEADLINE NUMBERS WERE COMPUTED ON in a way that fixes a
+   single partition. [SAYEEDI] Section 4.2, PDF p. 8: "We trained both models using our
+   dataset, focusing on the training set images, and subsequently evaluated their
+   performance using the validation and testing sets." -- two partitions, not one.
+   [ELHENIDY] and [GAIB] state the 70/20/10 split in Section II and never say which
+   partition TABLE I is computed on.
+
+EVIDENCE
+
+Search results for the per-class terms, exhaustively:
+
+| Term          | [SAYEEDI]                        | [ELHENIDY] | [GAIB] |
+|---------------|----------------------------------|------------|--------|
+| "per-class"   | 1 hit, PDF p. 5: "The list of    | 0          | 0      |
+|               | classes and the per-class        |            |        |
+|               | annotation in the dataset is     |            |        |
+|               | shown in Fig. 2."  -- annotation |            |        |
+|               | counts, not AP                   |            |        |
+| "per class"   | 1 hit, PDF p. 6: Fig. 2 caption  | 0          | 0      |
+|               | "Distribution of Per Class       |            |        |
+|               | Annotation in ElectroCom61       |            |        |
+|               | dataset."                        |            |        |
+| "class-wise"  | 0                                | 0          | 0      |
+| "classwise"   | 0                                | 0          | 0      |
+| "61 classes"  | 0 (the paper writes "61 distinct | 0          | 0      |
+|               | classes" and "61 component       |            |        |
+|               | classes" instead)                |            |        |
+| "all classes" | 0                                | 0          | 0      |
+| "each class"  | 1 hit, PDF p. 8: "ensuring a     | 0          | 0      |
+|               | balanced representation of each  |            |        |
+|               | class" -- about data collection  |            |        |
+| "AP" as a     | 0 (only "mAP")                   | 0 (only    | 0 (only|
+| per-class     |                                  | "mAP")     | "mAP") |
+| metric        |                                  |            |        |
+
+Complete figure inventory of all three papers, so the "including figures" part of the
+question is answered exhaustively rather than by sampling:
+
+  [SAYEEDI], PDF pp. 1-12:
+    Fig. 1, PDF p. 5  -- "Example of Fully Annotated Images using Bounding Boxes"
+    Fig. 2, PDF p. 6  -- "Distribution of Per Class Annotation in ElectroCom61 dataset"
+    Fig. 3, PDF p. 7  -- folder structure
+    Fig. 4, PDF p. 8  -- "Framework of Experimental Design/Methodology"
+    Fig. 5, PDF p. 9  -- "Confusion Matrix for YOLOv9s."
+    Fig. 6, PDF p. 10 -- confusion matrix, EfficientDetV2
+    No PR curve. No per-class AP figure.
+
+  [ELHENIDY], PDF pp. 1-6:
+    Fig. 1, PDF p. 3  -- "The original YOLOv12 architecture"
+    Fig. 2, PDF p. 4  -- "Normalized Confusion matrix"
+    Fig. 3, PDF p. 5  -- "Training performance results" (ten Ultralytics metric panels)
+    Fig. 3, PDF p. 5  -- "Samples of the predicted results" (duplicate figure number as
+                          printed; the body text on PDF p. 4 calls it "figure 4")
+    No PR curve. No per-class AP figure.
+
+  [GAIB], PDF pp. 1-7:
+    Fig. 1, PDF p. 3  -- "YOLOv13 architecture"
+    Fig. 2, PDF p. 4  -- "Normalized Confusion matrix"
+    Fig. 3, PDF p. 5  -- "Training performance results" (ten Ultralytics metric panels)
+    Fig. 4, PDF p. 6  -- "Samples of the predicted results"
+    No PR curve. No per-class AP figure.
+
+Complete table inventory, confirming no per-class rows:
+
+  [SAYEEDI]  Table 1 "Gap Analysis" (PDF p. 3), 8 rows, one per DATASET, no metrics.
+             Table 2 "Camera Specifications Table." (PDF p. 4), 3 rows, one per DEVICE.
+             Table 3 "Technical Validation Table." (PDF p. 9), 2 rows, one per MODEL.
+  [ELHENIDY] TABLE I (header PDF p. 3, body PDF p. 4), 7 rows, one per MODEL.
+  [GAIB]     TABLE I (PDF p. 4), 8 rows, one per MODEL.
+
+  No table in any of the three has one row per class.
+
+Confusion-matrix axis labels, read off the 300 dpi renders. All three matrices label both
+axes with component class names in alphabetical order and terminate with "background":
+  first label  "1-5-Volt-Battery"
+  last labels  "... Trimmer-Potentiometer, Water-Sensor, Zener-Diode, background"
+  [SAYEEDI] Fig. 5 axes: Predicted (vertical), unlabelled horizontal; colour bar 0.0-1.0.
+  [ELHENIDY] Fig. 2 axes: Predicted (vertical), unlabelled horizontal; colour bar 0.0-1.0.
+  [GAIB] Fig. 2 axes: Predicted (vertical), True (horizontal); colour bar 0 to above 100,
+    i.e. raw counts, although the caption reads "Normalized Confusion matrix".
+No numeric cell value is printed on any of the three matrices.
+
+SEARCH TERMS USED
+
+Case-insensitive over the full text layer of all three PDFs (12 + 6 + 7 = 25 pages):
+
+  per-class | per class | class-wise | classwise | 61 class | all classes | each class |
+  AP\b | average precision | mAP | confusion | PR curve | precision-recall | recall curve |
+  appendix | supplementary
+
+Visual pass, because a per-class table or PR curve could be a raster figure with no text
+layer: every page of [ELHENIDY] (6) and [GAIB] (7) rendered at 300 dpi and inspected, plus
+[SAYEEDI] PDF pp. 3, 4, 8, 9. Every figure and every table listed in the inventories above
+was examined directly.
+
+COULD NOT DETERMINE
+
+The exact number of rows and columns in any of the three confusion matrices. The labels are
+legible at 300 dpi but no paper prints a count, and counting tick labels off a rasterised
+62-label axis is not a basis for a number this study would cite.
+
+Whether the mAP figures in any of the three were averaged over 61 classes or over 61 classes
+plus a background class. No paper states it. This is the substantive gap the check was
+looking for, and it is a genuine NOT STATED in all three sources.
+
+Which partition each headline number was computed on. [SAYEEDI] names two partitions;
+[ELHENIDY] and [GAIB] name none.
+
+IMPACT ON THE MANUSCRIPT
+
+No correction required. The claim that no prior study publishes per-class results on
+ElectroCom61 is confirmed across all three papers, including their figures.
+
+Two consequences are worth stating explicitly in Section 2.4, because both are absences that
+constrain what a comparison against prior work can mean:
+
+  - No prior study publishes per-class AP on this dataset. Any per-class result this study
+    reports is therefore the first, and has nothing to be compared against rather than
+    something it agrees or disagrees with. Say the former.
+
+  - None of the three states the number of classes its mAP was averaged over, and all three
+    use confusion matrices that carry a background row and column. A published mAP@50 on
+    ElectroCom61 and one computed here are therefore not known to share a denominator. That
+    is a fact about what the sources omit, and it belongs beside any table that places a
+    published figure next to one of ours. It compounds the partition problem: Sayeedi
+    evaluates on "the validation and testing sets" without separating them, and neither
+    benchmark paper names a partition at all.

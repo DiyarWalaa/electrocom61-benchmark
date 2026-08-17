@@ -1,0 +1,286 @@
+================================================================================
+CHECK    : C11 - Sayeedi's dataset description, including the camera table
+QUESTION : What does the dataset paper print for its size, split, licence, annotation,
+           preprocessing, versioning and DOI, and are three phones tabulated with the third
+           given the display and cover-glass specifications of an iPhone?
+SOURCES  : [SAYEEDI] 25795-61999-1-PB.pdf, PDF pp. 1-12 (printed 1-12), full text.
+           Table 1 on PDF/printed p. 3, Table 2 on PDF/printed p. 4, Table 3 on
+           PDF/printed p. 9, Specifications Table on PDF/printed p. 2.
+           Tables read from 300 dpi renders: reports/tables/SAYEEDI-p03-03.png,
+           SAYEEDI-p04-04.png, SAYEEDI-p08-08.png, SAYEEDI-p09-09.png.
+VERDICT  : CONFIRMED
+ONE LINE : Every dataset figure is confirmed as printed, and the camera claim holds exactly
+           -- three devices are tabulated as Smartphone 1, 2 and 3, and Smartphone 3 is
+           given "Super Retina XDR OLED" with "Ceramic Shield glass", both Apple
+           designations, alongside a 5.4-inch 1080 x 2340 panel.
+AFFECTS  : Section 2.1 and Section 3; any statement about capture-device diversity, and the
+           burst-aware split work in runs/20260804_burst_aware_split_04/.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. THE HEADLINE DATASET FIGURES, all confirmed as printed:
+
+| Item                  | Printed value                        | PDF/printed p | Location    |
+|-----------------------|--------------------------------------|---------------|-------------|
+| Total images          | 2121                                 | 4             | Sec. 3.3    |
+| Number of classes     | 61                                   | 4 and 3       | Sec. 3.3;   |
+|                       |                                      |               | Table 1     |
+|                       |                                      |               | row "Ours"  |
+| Total annotations     | 12,937                               | 4             | Sec. 3.3    |
+| Train split           | 70 % (1478 images)                   | 4             | Sec. 3.3    |
+| Validation split      | 20 % (438 images)                    | 4             | Sec. 3.3    |
+| Test split            | 10 % (205 images)                    | 4             | Sec. 3.3    |
+| Licence               | CC BY 4.0                            | 1 and 2       | footer;     |
+|                       | (http://creativecommons.org/         |               | abstract    |
+|                       | licenses/by/4.0/)                    |               | block       |
+| Annotation tool       | Roboflow                             | 4             | Sec. 3.1    |
+| Annotation format     | text files with class labels and     | 6             | Sec. 3.4    |
+|                       | bounding box coordinates             |               |             |
+| Image resolution      | resized to 640 x 640 pixels          | 4             | Sec. 3.2    |
+| Preprocessing         | (a) Auto-Orient  (b) Resize to       | 4             | Sec. 3.2    |
+|                       | 640 x 640, "This stretching          |               |             |
+|                       | maintains aspect ratio consistency"  |               |             |
+| Augmentation applied  | NONE STATED. The abstract says       | 1, 4          | abstract;   |
+|                       | "minimal pre-processing"; Sec. 3.2   |               | Sec. 3.2    |
+|                       | lists only Auto-Orient and Resize.   |               |             |
+|                       | No augmentation section exists.      |               |             |
+| Repository            | Mendeley Data                        | 2             | Specs Table |
+| Dataset version       | version 2, via the identifier        | 2             | Specs Table |
+|                       | "10.17632/6scy6h8sjz.2" and the URL  |               |             |
+|                       | ".../datasets/6scy6h8sjz/2"          |               |             |
+| Dataset DOI           | 10.17632/6scy6h8sjz.2                | 2             | Specs Table |
+| Article DOI           | https://doi.org/10.1016/             | 1             | page footer |
+|                       | j.dib.2025.111331                    |               |             |
+| Code repository       | https://github.com/faiyazabdullah/   | 2             | abstract    |
+|                       | ElectroCom61                         |               | continuation|
+
+   The three split sizes sum to 2121, matching the stated total: 1478 + 438 + 205 = 2121.
+
+2. THE CAMERA CLAIM IS CONFIRMED IN FULL. Table 2 "Camera Specifications Table." on PDF and
+   printed page 4 describes exactly THREE capture devices, labelled "Smartphone 1",
+   "Smartphone 2" and "Smartphone 3". Section 3.1 on the same page states "This
+   comprehensive data collection was achieved through the use of main cameras on three
+   smartphones."
+
+3. SMARTPHONE 3 IS GIVEN APPLE DISPLAY AND COVER-GLASS SPECIFICATIONS. Its Display cell
+   reads "Type: Super Retina XDR OLED, HDR10, Dolby Vision, 625 nits (HBM), 1200 nits
+   (peak)" and ends "Protection: Ceramic Shield glass". "Super Retina XDR" and "Ceramic
+   Shield" are both Apple product designations. The panel size and resolution given -- 5.4
+   inches, 71.9 cm2, 1080 x 2340 pixels at 19.5:9, ~476 ppi -- are those of the 5.4-inch
+   iPhone form factor. Smartphones 1 and 2 by contrast carry "Schott Xensation Up" and
+   "Corning Gorilla Glass 3", which are not Apple designations.
+
+   The paper does not name any manufacturer or model for any of the three devices. The
+   identification above rests on the printed specification strings, which are transcribed
+   verbatim below so the inference is checkable rather than asserted.
+
+4. NO SEED, NO FRAMEWORK VERSION, AND NO SINGLE NAMED PARTITION FOR THE REPORTED FIGURES:
+     - Random seed: NOT STATED. The word "seed" does not occur in the paper. The nearest
+       statement is Section 4.1, PDF p. 8: "The selection of these groups was managed
+       through a randomization algorithm implemented in Python" -- which concerns which
+       components were photographed together, not model training.
+     - Training framework version: NOT STATED. No PyTorch, TensorFlow, Ultralytics, CUDA or
+       Python version appears anywhere. The one software version in the paper is in the
+       reference list: "[28] B. Dwyer, J. Nelson, J. Solawetz 'Roboflow (version 1.0)
+       [software]', 2022", which is the annotation tool, not a training framework.
+     - Partition the reported figures were computed on: NOT RESOLVED TO ONE. Section 4.2,
+       PDF p. 8, states "We trained both models using our dataset, focusing on the training
+       set images, and subsequently evaluated their performance using the validation and
+       testing sets." Two partitions are named and Table 3 does not say which of them its
+       row values come from, nor whether they are pooled.
+     - No epochs, batch size, optimizer, learning rate or GPU is stated for either of the
+       two technical-validation models.
+
+EVIDENCE
+
+--------------------------------------------------------------------------------
+Table 2 -- "Camera Specifications Table."
+PDF page 4, printed page 4. Read from reports/tables/SAYEEDI-p04-04.png at 300 dpi.
+Exact column headers, in printed order:  Device | Capacity | Display | Camera
+Transcribed verbatim, including punctuation, spacing and the tilde used for approximations.
+--------------------------------------------------------------------------------
+
+Smartphone 1
+  Capacity: 128 GB
+  Display:
+    Type: AMOLED
+    Size: 6.43 inches, 99.8 cm2 (~85.3 % screen-to-body ratio)
+    Resolution: 1080 x 2400 pixels, 20:9 ratio (~409 ppi density)
+    Protection: Schott Xensation Up
+    Always-on display
+  Camera:
+    Triple: 64 MP, f/1.8, (wide), PDAF
+    2 MP, f/2.4, (macro)
+    2 MP, f/2.4, (depth)
+    Features: LED flash, HDR, panorama
+
+Smartphone 2
+  Capacity: 128 GB
+  Display:
+    Type: AMOLED, 120Hz, 1200 nits (peak)
+    Size: 6.67 inches, 107.4 cm2 (~85.0 % screen-to-body ratio)
+    Resolution: 1080 x 2400 pixels, 20:9 ratio (~395 ppi density)
+    Protection: Corning Gorilla Glass 3
+  Camera:
+    Triple: 48 MP, f/1.8, (wide), PDAF
+    8 MP, f/2.2, 120 deg (ultrawide), 1/4.0", 1.12 micrometre
+    2 MP, f/2.4, (macro)
+    Features: Dual-LED dual-tone flash, HDR, panorama
+
+Smartphone 3
+  Capacity: 256 GB
+  Display:
+    Type: Super Retina XDR OLED, HDR10, Dolby Vision, 625 nits (HBM), 1200 nits (peak)
+    Size: 5.4 inches, 71.9 cm2 (~85.1 % screen-to-body ratio)
+    Resolution: 1080 x 2340 pixels, 19.5:9 ratio (~476 ppi density)
+    Protection: Ceramic Shield glass
+  Camera:
+    Dual: 12 MP, f/1.6, 26mm (wide), 1.4 micrometre, dual pixel PDAF, OIS
+    12 MP, f/2.4, 13mm, 120 deg (ultrawide), 1/3.6"
+    Features: Dual-LED dual-tone flash, HDR (photo/panorama)
+
+(In the printed table the degree sign and the micron sign are used; they are spelled out
+here to keep this file plain ASCII. Cell contents are otherwise verbatim.)
+
+Summary of the camera claim:
+
+| Manuscript claim                                    | Verdict   | Evidence               |
+|-----------------------------------------------------|-----------|------------------------|
+| Three phones are described                          | CONFIRMED | Table 2 has 3 rows;    |
+|                                                     |           | Sec. 3.1 says "three   |
+|                                                     |           | smartphones"           |
+| Tabulated as Smartphone 1, 2 and 3                  | CONFIRMED | Device column values   |
+| The third is given the display specifications of an | CONFIRMED | "Super Retina XDR      |
+| iPhone                                              |           | OLED, HDR10, Dolby     |
+|                                                     |           | Vision, 625 nits (HBM),|
+|                                                     |           | 1200 nits (peak)";     |
+|                                                     |           | 5.4 in, 1080 x 2340,   |
+|                                                     |           | 19.5:9, ~476 ppi       |
+| The third is given the cover-glass specification of | CONFIRMED | "Protection: Ceramic   |
+| an iPhone                                           |           | Shield glass"          |
+
+--------------------------------------------------------------------------------
+Specifications Table (unnumbered, the Data in Brief standard block)
+PDF page 2, printed page 2. Relevant rows transcribed verbatim.
+--------------------------------------------------------------------------------
+
+  Subject                Computer Vision and Pattern Recognition
+  Specific subject area  Detection of electronic components ranging from simple
+                         single-purpose circuit components to more complex ones.
+  Type of data           Image
+                         Raw, Processed
+  Data collection        The data are collected by capturing images using the regular
+                         camera of three different smartphone devices.
+  Data source location   Institution: United International University (UIU)
+                         City/Region: Dhaka
+                         Country: Bangladesh
+                         The images were taken in the Electronics Lab Support Room
+                         (Room 524) at United International University.
+  Data accessibility     Repository name: Mendeley Data
+                         Data identification number: 10.17632/6scy6h8sjz.2
+                         Direct URL to data: https://data.mendeley.com/datasets/6scy6h8sjz/2
+
+--------------------------------------------------------------------------------
+Supporting passages, transcribed from the pages named.
+--------------------------------------------------------------------------------
+
+Section 3.3 "Distribution analysis", PDF/printed p. 4:
+  "The 'ElectroCom61' dataset includes a total of 2121 images and 12,937 annotations, which
+   are distributed across various classes representing different types of electronic
+   components. The distribution is split into 70 % (1478 images) training, 20 % (438 images)
+   validation, and 10 % (205 images) testing"
+
+Section 3.2 "Data preprocessing", PDF/printed p. 4:
+  "The primary steps include - (a) Auto-Orient: Images were automatically oriented based on
+   the embedded sensor data to maintain consistency in the dataset. (b) Resize: All images
+   were resized to a uniform dimension of 640 x 640 pixels. This stretching maintains aspect
+   ratio consistency"
+
+Section 3.1 "Data collection", PDF/printed p. 4:
+  "The dataset is reliably annotated using the tool Roboflow [28]"
+
+Section 3.4 "Folder structure", PDF/printed pp. 5-6:
+  "The dataset is organised into three primary directories corresponding to the data splits:
+   Train, Valid, and Test. Each directory contains two subdirectories - (a) Image ... (b)
+   Label: This folder contains the annotations corresponding to each image in the 'image'
+   folder. These annotations are stored in text files and include details such as the class
+   labels and bounding box coordinates for object detection tasks."
+
+Section 3.5 "Metadata", PDF/printed p. 6:
+  "we provide a CSV file named 'Metadata_ElectroCom61.csv'"
+
+Section 4.2 "Technical validation", PDF/printed p. 8:
+  "We trained both models using our dataset, focusing on the training set images, and
+   subsequently evaluated their performance using the validation and testing sets."
+
+Reference [28], PDF/printed p. 12:
+  "B. Dwyer, J. Nelson, J. Solawetz 'Roboflow (version 1.0) [software]', 2022."
+
+Class-balance statement, Section 3.3, PDF/printed p. 5:
+  "The classes are also quite balanced having a normal distribution among the classes where
+   the class having the highest annotation (IC-chip) has only twice the number of
+   annotations compared to the class with the lowest annotations (RFID scanner)."
+
+SEARCH TERMS USED
+
+Case-insensitive over the full text layer of [SAYEEDI] (12 pages):
+
+  seed | random | version | framework | PyTorch | TensorFlow | epoch | batch | learning rate|
+  optimi | GPU | hardware | YOLO format | txt | licen[cs]e | CC BY | resolution | megapixel |
+  pixels | Roboflow | Mendeley | DOI | 10\.\d{4} | annotation | augment | per-class |
+  per class | smartphone | camera | Table\s*\d
+
+Zero-hit terms, recorded so the negatives are traceable: seed, PyTorch, TensorFlow,
+Ultralytics, CUDA, epoch, batch, optimizer, learning rate, GPU (as a training hardware
+statement).
+
+Tables 1, 2 and 3 and the pages carrying the split and preprocessing statements were read
+off 300 dpi renders. Three text-layer/image disagreements were found, all in Table 1 and all
+resolved in favour of the image: the text layer produced "10 0 0", "12,0 0 0" and "11,0 0 0"
+where the page prints "1000", "12,000" and "11,000". These are pdftotext artifacts on Data
+in Brief's digit spacing. No disagreement was found in Table 2, Table 3, or the
+Specifications Table.
+
+COULD NOT DETERMINE
+
+The make and model of any of the three capture devices. The paper names none. Smartphone 3's
+specification strings are Apple designations and its panel dimensions match the 5.4-inch
+iPhone form factor, but the paper does not say so and this report does not assert a model
+number.
+
+Whether the 95.9 % mAP@50 in Table 3 was computed on the validation set, the test set, or
+both pooled. Section 4.2 names both and Table 3 names neither.
+
+The native capture resolution of the images before the 640 x 640 resize. The camera table
+gives sensor megapixel counts and the display resolutions of the three handsets, which are
+not the same thing as the resolution the photographs were captured or stored at, and no
+capture resolution is printed.
+
+Which Mendeley version the reported figures correspond to. The Specifications Table points
+at version 2 of the deposit; nothing states whether the technical validation was run on that
+version or an earlier one.
+
+IMPACT ON THE MANUSCRIPT
+
+No correction required. Every figure the manuscript takes from this paper is confirmed
+against a 300 dpi render, the three splits sum to the stated total, and the camera claim
+holds in every particular including the cover glass.
+
+Three points bear on how the dataset description should be used:
+
+  - The paper states no augmentation, only Auto-Orient and a 640 x 640 resize, and describes
+    its own preprocessing as "minimal". If Section 3 contrasts our pipeline with the
+    dataset's as-released state, that contrast rests on two named steps and nothing else.
+
+  - No seed and no training framework version are stated, and no partition is uniquely named
+    for the Table 3 figures. Together these mean the 95.9 % cannot be reproduced or even
+    unambiguously located from the paper alone. This is the same gap C09 records for the
+    class denominator, and it is the reason the manuscript's own reporting rule exists.
+
+  - The 5.4-inch device sits alongside two 6.4-6.7-inch devices with different sensors,
+    different cover glass and a different capture stack. If the burst-aware split work or
+    any capture-condition analysis groups images by device, the camera table is the printed
+    evidence for how different the three actually are, and it is transcribed here in full so
+    that analysis does not have to re-open the PDF.

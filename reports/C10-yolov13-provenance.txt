@@ -1,0 +1,200 @@
+================================================================================
+CHECK    : C10 - YOLOv13 provenance in Gaib
+QUESTION : Which package, repository or codebase does Gaib state as providing each
+           architecture in its table, and what does it state for YOLOv13 as against the
+           other rows?
+SOURCES  : [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7 in full; TABLE I on
+             PDF p. 4; reference list on PDF p. 7; 300 dpi renders of all seven pages.
+           [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF p. 6 reference list, consulted only to establish that Gaib's reference
+             numbering is inherited rather than independent.
+           Conference papers: neither carries a printed folio.
+VERDICT  : NOT FOUND
+ONE LINE : Gaib names no package, repository or codebase for YOLOv13 or for any other row --
+           every architecture is identified by a bibliographic citation alone, the only
+           repository URLs in the paper belong to two reference entries for models that are
+           not YOLOv13, and iMoonLab is never mentioned.
+AFFECTS  : Section 2.4; any statement about which implementation produced the published
+           YOLOv13 numbers, and the reproducibility discussion.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. NO PACKAGE, REPOSITORY OR CODEBASE IS STATED AS PROVIDING YOLOv13. The row is labelled
+   "YOLOv13s [26]" in TABLE I (PDF p. 4) and reference [26] is a paper, not software:
+   "Lei, Mengqi, Siqi Li, Yihong Wu, Han Hu, You Zhou, Xinhu Zheng, Guiguang Ding, Shaoyi
+   Du, Zongze Wu, and Yue Gao. 'YOLOv13: Real-Time Object Detection with
+   Hypergraph-Enhanced Adaptive Visual Perception.' arXiv preprint arXiv:2506.17733
+   (2025)." No URL, no repository, no package name, no version accompanies it.
+
+2. THE SAME IS TRUE OF EVERY OTHER ROW. Gaib identifies each architecture by a citation
+   only. Two of those citations happen to contain a repository URL because the cited work is
+   itself a software release, but the paper never says that any of them supplied the code it
+   ran. The full picture:
+
+| TABLE I row           | Cites | What reference [n] is                | Repository/package named? |
+|-----------------------|-------|--------------------------------------|---------------------------|
+| YOLO v8s [20]         | [20]  | "Glenn Jocher and Ayush Chaurasia    | github.com/ultralytics/   |
+|                       |       | and Jing Qiu, Ultralytics YOLOv8,    | ultralytics -- present in |
+|                       |       | 2023."                               | the reference itself      |
+| YOLO v9s [24]         | [24]  | Wang, Yeh, Liao, "Yolov9: Learning   | no                        |
+|                       |       | what you want to learn...", ECCV     |                           |
+|                       |       | 2024                                 |                           |
+| YOLOv10s [21]         | [21]  | Wang, Ao, et al., "Yolov10:          | no                        |
+|                       |       | Real-time end-to-end object          |                           |
+|                       |       | detection", NeurIPS 37 (2024)        |                           |
+| YOLOv11s [22]         | [22]  | Khanam, R. and Hussain, M., 2024,    | no                        |
+|                       |       | "Yolov11: An overview of the key     |                           |
+|                       |       | architectural enhancements",         |                           |
+|                       |       | arXiv:2410.17725                     |                           |
+| EcoDetect-YOLOv2 [11] | [11]  | Su, Jing, et al., Sensors 25.11      | no                        |
+|                       |       | (2025): 3451                         |                           |
+| YOLO_EC [13]          | [13]  | Fan, Cui, Fei, Sensors 23.7 (2023):  | no                        |
+|                       |       | 3646                                 |                           |
+| YOLOv12S [12]         | [12]  | Huang, Rui, et al., "A rapid         | no                        |
+|                       |       | recognition method for electronic    |                           |
+|                       |       | components based on the improved     |                           |
+|                       |       | YOLO-V3 network", Electronics 8.8    |                           |
+|                       |       | (2019): 825                          |                           |
+| YOLOv13s [26]         | [26]  | Lei, Mengqi, et al., "YOLOv13:       | no                        |
+|                       |       | Real-Time Object Detection with      |                           |
+|                       |       | Hypergraph-Enhanced Adaptive Visual  |                           |
+|                       |       | Perception", arXiv:2506.17733 (2025) |                           |
+
+3. SO THE ANSWER TO "YOLOv13 VERSUS THE OTHER ROWS" IS THAT NOTHING DISTINGUISHES THEM.
+   YOLOv13 is not given a provenance the other rows lack, and the other rows are not given
+   one YOLOv13 lacks. All eight are cited, none is sourced.
+
+4. iMoonLab IS NEVER MENTIONED. The string does not occur anywhere in the paper. The
+   YOLOv13 reference [26] names the authors of the arXiv paper but not the organisation or
+   the repository that publishes the implementation.
+
+5. THE ONLY TWO ULTRALYTICS STRINGS IN THE PAPER ARE REFERENCE ENTRIES, both for models
+   that are not YOLOv13:
+     [20] "Glenn Jocher and Ayush Chaurasia and Jing Qiu, Ultralytics YOLOv8, 2023.
+          https://github.com/ultralytics/ultralytics"   -- cited by the YOLOv8s row
+     [23] "Glenn Jocher, yolov5, 2020. Documentation at: https://docs.ultralytics.com/"
+          -- cited by no row in TABLE I
+   Neither is presented as the framework Gaib trained with. The paper's one statement about
+   its software stack is in Section IV, PDF p. 3, and names a different thing entirely:
+   "The deep learning package tool, Pytorch 2.0.0, is utilised." No Ultralytics version is
+   stated anywhere (see C08).
+
+6. THE ONE CODE POINTER GAIB GIVES IS ITS OWN, and it is a notebook rather than a
+   repository. Abstract, PDF p. 1: "The source code is available on this link
+   www.kaggle.com/code/alielhenidy/e-waste-detection-yolov13". [ELHENIDY]'s abstract gives
+   the parallel link "https://www.kaggle.com/code/alielhenidy/yolov12-waste-train". Neither
+   link is described as the origin of any of the compared architectures; each is offered as
+   the authors' own training code.
+
+7. NOTE ON THE REFERENCE NUMBERING, because it bears on how much weight the [n] labels can
+   carry. Gaib's TABLE I row labels are inherited unchanged from Elhenidy's TABLE I,
+   including "[12]" on the YOLOv12S row. In BOTH papers, reference [12] is Huang et al.'s
+   improved YOLO-V3 paper, and in both papers the YOLOv12 architecture is reference [16]
+   (Tian, Ye and Doermann, "YOLOv12: Attention-Centric Real-Time Object Detectors",
+   arXiv:2502.12524). The YOLOv12S row therefore cites a YOLOv3 paper in both. This is a
+   citation error in the sources; it is recorded because it means the bracketed numbers in
+   TABLE I cannot be relied on as provenance even in the weak sense of pointing at the right
+   architecture paper.
+
+EVIDENCE
+
+Search results for the provenance terms across [GAIB], all 7 pages:
+
+| Term          | Hits | Where, and what each is                                          |
+|---------------|------|------------------------------------------------------------------|
+| Ultralytics   | 2    | PDF p. 7, reference [20] ("Ultralytics YOLOv8, 2023") and         |
+|               |      | reference [23] ("Documentation at: https://docs.ultralytics.com/")|
+| GitHub        | 1    | PDF p. 7, inside reference [20]:                                  |
+|               |      | https://github.com/ultralytics/ultralytics                        |
+| repository    | 0    | --                                                                |
+| repositor*    | 0    | --                                                                |
+| implementation| 0    | --                                                                |
+| implementat*  | 0    | --                                                                |
+| framework     | 0    | --                                                                |
+| iMoonLab      | 0    | --                                                                |
+| kaggle        | 2    | PDF p. 1, abstract, the authors' own notebook link; PDF p. 3,     |
+|               |      | "The P100 Kaggle GPU is used for the training."                   |
+| source code   | 1    | PDF p. 1, abstract, referring to the authors' own notebook        |
+| available     | 2    | PDF p. 1 (source code available); PDF p. 7, Ethical               |
+|               |      | Considerations, "The ElectroCom61 dataset employed in this study  |
+|               |      | is publicly available and cited in this paper."                   |
+| codebase      | 0    | --                                                                |
+| package       | 1    | PDF p. 3, Section IV: "The deep learning package tool, Pytorch    |
+|               |      | 2.0.0, is utilised."                                              |
+
+The YOLOv13 reference in full, transcribed from PDF p. 7:
+
+  "[26] Lei, Mengqi, Siqi Li, Yihong Wu, Han Hu, You Zhou, Xinhu Zheng, Guiguang Ding,
+   Shaoyi Du, Zongze Wu, and Yue Gao. "YOLOv13: Real-Time Object Detection with
+   Hypergraph-Enhanced Adaptive Visual Perception." arXiv preprint arXiv:2506.17733 (2025)."
+
+The two Ultralytics references in full, transcribed from PDF p. 7:
+
+  "[20] Glenn Jocher and Ayush Chaurasia and Jing Qiu , Ultralytics YOLOv8,
+   2023.https://github.com/ultralytics/ultralytics"
+
+  "[23] Glenn Jocher, yolov5,2020. Documentation at: https://docs.ultralytics.com/"
+
+The one software statement in the paper, transcribed from PDF p. 3, Section IV:
+
+  "The deep learning package tool, Pytorch 2.0.0, is utilised."
+
+The one code link, transcribed from PDF p. 1, abstract:
+
+  "The source code is available on this link
+   www.kaggle.com/code/alielhenidy/e-waste-detection-yolov13"
+
+SEARCH TERMS USED
+
+Case-insensitive over the full text layer of [GAIB] (7 pages):
+
+  Ultralytics | GitHub | repositor | implementat | framework | iMoonLab | kaggle |
+  source code | available | codebase | package | pip | conda | clone | weights | \.pt\b
+
+Zero-hit terms, recorded so the negative is traceable: iMoonLab, repository, repositories,
+implementation, implementations, framework, codebase, pip, conda, clone, weights, .pt.
+
+The reference list was additionally read off the 300 dpi render (reports/tables/
+GAIB-p07-7.png) rather than only from the text layer, because a two-column reference list
+extracts with interleaved lines. [ELHENIDY]'s reference list (PDF p. 6) was read the same
+way to establish the shared numbering described in finding 7. No text-layer/image
+disagreement was found in either list.
+
+COULD NOT DETERMINE
+
+Which implementation of YOLOv13 produced the 648-layer, 2.5 M-parameter, 91.8 mAP@0.5 row.
+The paper cites the architecture's arXiv description and states only that PyTorch 2.0.0 was
+used. There is no repository, no package, no version, and no commit. The Kaggle notebook
+link in the abstract may contain the answer, but the notebook is outside the scope of this
+read-only PDF pass and nothing printed in the paper states what it uses.
+
+Whether the seven non-YOLOv13 rows were run at all by these authors, or carried over from
+Elhenidy. See C03: all 35 shared numeric cells are identical. Nothing in either paper states
+which.
+
+IMPACT ON THE MANUSCRIPT
+
+No correction required, but this check supplies a fact the manuscript can use and should not
+overstate.
+
+The safe formulation is that Gaib identifies every architecture in its table by citation
+alone and names no package, repository or version for any of them, YOLOv13 included. It is
+NOT safe to say Gaib used the iMoonLab implementation, or the Ultralytics implementation, or
+any implementation: the paper's only software statement is "Pytorch 2.0.0", and the two
+Ultralytics URLs in it sit inside reference entries for YOLOv8 and YOLOv5, one of which is
+not cited by any table row.
+
+Two smaller points, both facts about what is printed:
+
+  - The 648-layer count Gaib gives YOLOv13s is unusually large next to the 214-325 range of
+    the other rows apart from YOLOv9s's 930. With no implementation named and no statement
+    of whether counts are fused (see C04), there is nothing in the paper that would let a
+    reader reproduce or check it. If Section 7.4 discusses published layer counts, this is
+    the row with the least behind it.
+
+  - Both papers' TABLE I labels the YOLOv12S row "[12]", and in both papers reference [12]
+    is a 2019 YOLO-V3 paper while the actual YOLOv12 reference is [16]. If the manuscript
+    cites either table's row labels as evidence of which architecture was evaluated, cite
+    the row label text rather than the bracketed number.

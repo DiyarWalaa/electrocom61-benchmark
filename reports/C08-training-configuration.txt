@@ -1,0 +1,240 @@
+================================================================================
+CHECK    : C08 - Training configuration stated by the two benchmark papers
+QUESTION : For each of nineteen configuration items, does Elhenidy state it and does Gaib
+           state it, with what exact value, in which section, and is "Sec. IV" the right
+           section to cite in each paper?
+SOURCES  : [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 1-6 in full; Sections I-V located at PDF pp. 1, 2, 2, 2, 6.
+           [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7 in full; Sections I-V
+             located at PDF pp. 1, 2, 2, 3, 6.
+           Conference papers: neither carries a printed folio.
+VERDICT  : DIFFERS
+ONE LINE : Six of the seven claimed settings are confirmed verbatim in both papers and the
+           three claimed absences hold, but the hardware is printed as "The P100 Kaggle GPU"
+           with no "Tesla", and Gaib additionally states a 3-fold cross-validation and a
+           train/valid/test split that the manuscript's list does not mention.
+AFFECTS  : Section 2.4 and data/config_provenance.csv wherever they cite the prior work's
+           training configuration; the "Sec. IV" citation used for both papers.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. THE SECTION TO CITE. Both papers use the same five-section IEEE structure, and in both
+   the training configuration sentence sits in Section IV. "Sec. IV" is therefore correct
+   for both, with one caveat about which PDF page to look on:
+
+| Paper     | Section heading as printed        | Starts on PDF p | Config sentence on |
+|-----------|-----------------------------------|-----------------|--------------------|
+| ELHENIDY  | I. INTRODUCTION                   | 1               | --                 |
+| ELHENIDY  | II. DATASET                       | 2               | --                 |
+| ELHENIDY  | III. Methodology                  | 2               | --                 |
+| ELHENIDY  | IV. EXPERIMENTS AND RESULTS       | 2 (right col.)  | PDF p. 2           |
+| ELHENIDY  | V. CONCLUSION AND FUTURE WORK     | 6               | --                 |
+| GAIB      | I. INTRODUCTION                   | 1               | --                 |
+| GAIB      | II. DATASET                       | 2               | --                 |
+| GAIB      | III. Methodology                  | 2               | --                 |
+| GAIB      | IV. EXPERIMENTS AND RESULTS       | 3               | PDF p. 3           |
+| GAIB      | V. CONCLUSION AND FUTURE WORK     | 6               | --                 |
+
+   Note that several items in the list below are NOT in Section IV. Image size, the split
+   ratio, the number of classes and the augmentation settings are all in Section II
+   "DATASET" in both papers, and Gaib's cross-validation is in Section III "Methodology".
+   A blanket "Sec. IV" citation covers the optimiser block only.
+
+2. THE MANUSCRIPT'S SEVEN CLAIMED SETTINGS, tested one by one against the printed text:
+
+| Claimed             | [ELHENIDY] printed        | [GAIB] printed            | Verdict     |
+|---------------------|---------------------------|---------------------------|-------------|
+| 100 epochs          | "Training is conducted    | "Training is conducted    | CONFIRMED   |
+|                     | for 100 epochs"           | for 100 epochs"           | both        |
+| batch 16            | "with a batch size of     | "with a batch size of     | CONFIRMED   |
+|                     | 16 ,"                     | 16 ,"                     | both        |
+| AdamW               | "optimizer (AdamW)"       | "optimizer (AdamW)"       | CONFIRMED   |
+|                     |                           |                           | both        |
+| lr0 0.01            | "learning rate (0.01)"    | "learning rate (0.01)"    | CONFIRMED   |
+|                     |                           |                           | as a value; |
+|                     |                           |                           | the name    |
+|                     |                           |                           | "lr0" is    |
+|                     |                           |                           | NOT printed |
+| weight decay 0.0005 | "weight decay (0.0005)"   | "weight decay (0.0005)"   | CONFIRMED   |
+|                     |                           |                           | both        |
+| Tesla P100          | "The P100 Kaggle GPU is   | "The P100 Kaggle GPU is   | DIFFERS --  |
+|                     | used for the training."   | used for the training."   | "Tesla" is  |
+|                     |                           |                           | not printed |
+| PyTorch 2.0.0       | "The deep learning        | "The deep learning        | CONFIRMED   |
+|                     | package tool, Pytorch     | package tool, Pytorch     | as a value; |
+|                     | 2.0.0, is utilised."      | 2.0.0, is utilised."      | printed     |
+|                     |                           |                           | "Pytorch"   |
+
+3. THE MANUSCRIPT'S THREE CLAIMED ABSENCES ALL HOLD, in both papers:
+     - No Ultralytics version. CONFIRMED. The only Ultralytics strings in either paper are
+       two reference-list entries: [20] "Glenn Jocher and Ayush Chaurasia and Jing Qiu,
+       Ultralytics YOLOv8, 2023. https://github.com/ultralytics/ultralytics" and [23]
+       "Glenn Jocher, yolov5, 2020. Documentation at: https://docs.ultralytics.com/". Both
+       are citations of other models, not a statement of the package version used to train.
+     - No imgsz training argument. CONFIRMED. The string "imgsz" does not occur in either
+       paper. A 640x640 figure IS printed in both, but as a preprocessing statement in
+       Section II, not as a training argument -- see item 4 below.
+     - No random seed. CONFIRMED. The word "seed" does not occur in either paper.
+
+4. ONE ITEM NEEDS SPLITTING, because a blanket "not stated" would be wrong and a blanket
+   "stated" would be misleading. Both papers print, in Section II "DATASET": "the photos
+   were auto-oriented to standardise them and shrunk to 640x640 pixels, which included some
+   stretching." That is an image-size statement about the dataset as prepared, and it is
+   the same sentence Sayeedi's preprocessing section supports. It is NOT a statement of the
+   imgsz argument passed at training time, and neither paper gives one.
+
+5. TWO ITEMS GAIB STATES THAT ELHENIDY DOES NOT, and that the manuscript's list does not
+   mention:
+     - 3-fold cross-validation, k = 3, three validation runs, results averaged. Section III
+       "Methodology", PDF pp. 2-3. Transcribed in full in C07.
+     - Nothing else: the split ratio and class count below are stated by both.
+
+6. TWELVE OF THE NINETEEN ITEMS ARE NOT STATED BY EITHER PAPER: momentum, PyTorch aside
+   there is no CUDA version, no Python version, no seed, no patience or early stopping, no
+   pretrained weights or transfer-learning initialisation, no Ultralytics version, no imgsz
+   argument, no dataset version or Roboflow export version, no Mendeley version.
+
+EVIDENCE
+
+The full configuration sentence, printed identically in both papers apart from the model
+name and the trailing clause. [ELHENIDY] Section IV, PDF p. 2, right column:
+
+  "Table 1 presents a comparison between YOLOv12 and the most advanced object detection
+   models. The P100 Kaggle GPU is used for the training. The deep learning package tool,
+   Pytorch 2.0.0, is utilised. Training is conducted for 100 epochs with a batch size of
+   16 , learning rate (0.01), optimizer (AdamW), and weight decay (0.0005)."
+
+[GAIB] Section IV, PDF p. 3, left column:
+
+  "Table 1 presents a comparison between YOLOv13 and the most advanced object detection
+   models. The P100 Kaggle GPU is used for the training. The deep learning package tool,
+   Pytorch 2.0.0, is utilised. Training is conducted for 100 epochs with a batch size of
+   16 , learning rate (0.01), optimizer (AdamW), and weight decay (0.0005)."
+
+Item-by-item table. "Section" is the printed section number; "PDF p" is the page the value
+appears on.
+
+| Item                     | [ELHENIDY]                        | [GAIB]                          |
+|--------------------------|-----------------------------------|---------------------------------|
+| epochs                   | STATED: 100. Sec. IV, PDF p. 2    | STATED: 100. Sec. IV, PDF p. 3  |
+| batch size               | STATED: 16. Sec. IV, PDF p. 2     | STATED: 16. Sec. IV, PDF p. 3   |
+| optimizer                | STATED: AdamW. Sec. IV, PDF p. 2  | STATED: AdamW. Sec. IV, p. 3    |
+| initial learning rate    | STATED as "learning rate (0.01)". | STATED as "learning rate        |
+| (lr0)                    | The token "lr0" is NOT printed.   | (0.01)". "lr0" NOT printed.     |
+|                          | Sec. IV, PDF p. 2                 | Sec. IV, PDF p. 3               |
+| weight decay             | STATED: 0.0005. Sec. IV, p. 2     | STATED: 0.0005. Sec. IV, p. 3   |
+| momentum                 | NOT STATED                        | NOT STATED                      |
+| GPU / hardware           | STATED as "The P100 Kaggle GPU".  | STATED as "The P100 Kaggle      |
+|                          | The word "Tesla" is NOT printed.  | GPU". "Tesla" NOT printed.      |
+|                          | Sec. IV, PDF p. 2                 | Sec. IV, PDF p. 3               |
+| image size (imgsz)       | NOT STATED as a training          | NOT STATED as a training        |
+|                          | argument; "imgsz" does not occur  | argument; "imgsz" does not      |
+|                          |                                   | occur                           |
+| input resolution         | STATED: "shrunk to 640x640        | STATED: "shrunk to 640x640      |
+|                          | pixels, which included some       | pixels, which included some     |
+|                          | stretching". Sec. II, PDF p. 2    | stretching". Sec. II, PDF p. 2  |
+| PyTorch version          | STATED: "Pytorch 2.0.0".          | STATED: "Pytorch 2.0.0".        |
+|                          | Sec. IV, PDF p. 2                 | Sec. IV, PDF p. 3               |
+| Ultralytics version      | NOT STATED                        | NOT STATED                      |
+| CUDA version             | NOT STATED                        | NOT STATED                      |
+| Python version           | NOT STATED                        | NOT STATED                      |
+| random seed              | NOT STATED                        | NOT STATED                      |
+| patience / early stopping| NOT STATED                        | NOT STATED                      |
+| pretrained weights       | NOT STATED. "Transfer learning"   | NOT STATED                      |
+|                          | occurs once, in Sec. V future     |                                 |
+|                          | work, PDF p. 6                    |                                 |
+| augmentation settings    | STATED, qualitatively. Sec. II,   | STATED, qualitatively. Sec. II, |
+|                          | PDF p. 2: "random rotations,      | PDF p. 2: same list, same       |
+|                          | flips, cropping, and scaling";    | wording                         |
+|                          | "brightness, contrast,            |                                 |
+|                          | saturation, and hue"; "noise      |                                 |
+|                          | injection and blurring". NO       |                                 |
+|                          | probabilities or magnitudes given |                                 |
+| train/val/test split     | STATED: "Training (70%),          | STATED: "Training (70%),        |
+|                          | validation (20%), and test (10%)  | validation (20%), and test      |
+|                          | sets were created from the        | (10%) sets were created from    |
+|                          | dataset." Sec. II, PDF p. 2       | the dataset." Sec. II, PDF p. 2 |
+|                          |                                   | ALSO: 3-fold cross-validation,  |
+|                          |                                   | k = 3, Sec. III, PDF pp. 2-3    |
+| dataset / Roboflow       | NOT STATED. The dataset is cited  | NOT STATED. Same: "the utilized |
+| export version           | as "the utilized dataset is       | dataset is 'ElectroCom61' [17]" |
+|                          | 'ElectroCom61' [17]" with no      | with no version. "Roboflow" and |
+|                          | version. "Roboflow" and           | "Mendeley" do not occur.        |
+|                          | "Mendeley" do not occur.          |                                 |
+| number of classes        | STATED: "61 different kinds of    | STATED: "61 different kinds of  |
+|                          | widely used electronic components | widely used electronic          |
+|                          | make up the dataset." Sec. II,    | components make up the          |
+|                          | PDF p. 2. Also Sec. V, PDF p. 6:  | dataset." Sec. II, PDF p. 2.    |
+|                          | "imbalanced across 61 component   | Also Sec. V, PDF p. 6: "covers  |
+|                          | classes"                          | 61 component classes"           |
+
+Tally: of the nineteen items, both papers STATE nine (epochs, batch size, optimizer,
+learning rate, weight decay, GPU, input resolution, PyTorch version, augmentation
+qualitatively, split ratio, class count -- eleven if the last two are counted separately)
+and NEITHER states momentum, imgsz-as-argument, Ultralytics version, CUDA version, Python
+version, seed, patience, pretrained weights, or dataset/export version. [GAIB] states one
+thing [ELHENIDY] does not: 3-fold cross-validation.
+
+SEARCH TERMS USED
+
+Case-insensitive over the full text layer of both PDFs (6 + 7 = 13 pages):
+
+  epoch | batch size | optimizer | AdamW | learning rate | weight decay | momentum | Tesla |
+  P100 | GPU | PyTorch | Ultralytics | CUDA | Python | seed | patience | early stop |
+  pretrain | pre-train | transfer learning | COCO | cuDNN | augment | imgsz | image size |
+  input size | 640 | resolution | split | Roboflow | Mendeley | version | classes | 61
+
+Section headings located with:  ^\s*(I|II|III|IV|V|VI|VII)\.\s+[A-Z]
+
+Zero-hit terms, recorded so the negatives are traceable: momentum, patience, "early stop",
+pretrain, pre-train, cuDNN, CUDA, "Python 3", imgsz, Roboflow, Mendeley, seed, Tesla.
+"Transfer learning" returns one hit, in [ELHENIDY] Section V future work, and none in
+[GAIB]. "COCO" returns zero in both.
+
+Configuration sentences additionally read off the 300 dpi renders
+(reports/tables/ELHENIDY-p02-2.png, GAIB-p03-3.png) to confirm the exact wording,
+punctuation and the absence of "Tesla". No text-layer/image disagreement was found.
+
+COULD NOT DETERMINE
+
+Which specific P100 SKU either paper used. "The P100 Kaggle GPU" identifies the platform but
+not the card variant, and no memory figure or driver version is printed.
+
+Whether the 640x640 preprocessing figure was also the training imgsz. Both papers state the
+first and neither states the second; treating them as the same value is an assumption the
+sources do not license.
+
+Whether the augmentations listed in Section II were applied by the training pipeline or
+baked into the dataset beforehand. Both papers list the transforms without probabilities,
+magnitudes or an application point.
+
+IMPACT ON THE MANUSCRIPT
+
+One correction is required and two refinements are available.
+
+CORRECTION. The hardware should not be cited as "Tesla P100". Both papers print "The P100
+Kaggle GPU is used for the training." The word Tesla appears in neither. If
+data/config_provenance.csv or Section 2.4 carries "Tesla P100" attributed to these sources,
+change it to "P100 Kaggle GPU" or quote the phrase. The card is almost certainly a Tesla
+P100 -- that is what Kaggle provisions -- but the manuscript's own rule is that every number
+and every attributed fact traces to what the source prints, and this one does not.
+
+REFINEMENT 1. "lr0 0.01" attributes an Ultralytics argument name to papers that print only
+"learning rate (0.01)". The value is right; the name is the manuscript's, not theirs. Same
+for "PyTorch", which both papers spell "Pytorch". Neither is worth a hedge in the prose, but
+if the configuration table quotes the sources it should quote what they wrote.
+
+REFINEMENT 2. The "Sec. IV" citation is correct for the optimiser block -- epochs, batch,
+learning rate, optimizer, weight decay, GPU, PyTorch -- and correct in both papers. It is
+NOT the right section for four other items the manuscript may also be citing: the 640x640
+resolution, the 70/20/10 split, the 61-class count and the augmentation list are all in
+Section II "DATASET" in both papers, and Gaib's 3-fold cross-validation is in Section III
+"Methodology". If a single citation covers all of these, split it.
+
+Finally, a fact worth adding rather than a correction: Gaib states a 3-fold cross-validation
+with k = 3 that Elhenidy does not, while dropping every variance column Elhenidy printed.
+C07 covers the statistical consequences; for the configuration table the relevant point is
+simply that the two papers' evaluation protocols are stated differently even though their
+optimiser settings are stated identically, word for word.

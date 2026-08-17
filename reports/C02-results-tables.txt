@@ -1,0 +1,256 @@
+================================================================================
+CHECK    : C02 - Full results tables in the three papers that report on ElectroCom61
+QUESTION : What exactly does every results table in Sayeedi, Elhenidy and Gaib contain, cell
+           by cell and header by header, and do the manuscript's four specific claims hold?
+SOURCES  : [SAYEEDI] 25795-61999-1-PB.pdf, PDF pp. 3, 4, 8, 9 (printed 3, 4, 8, 9).
+           [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 3-4 (conference paper, no printed folio).
+           [GAIB] E-waste detection base on yolov13.pdf, PDF p. 4 (no printed folio).
+           Every table below was transcribed from a 300 dpi render of its page, not from the
+           text layer.
+VERDICT  : CONFIRMED
+ONE LINE : All four manuscript claims are confirmed against the printed tables; the three
+           papers between them contain exactly three tables carrying model results, and the
+           only text-layer/image disagreements found are in Sayeedi's Table 1, which is not
+           a results table.
+AFFECTS  : Section 2.4 and every citation of a prior-work accuracy figure;
+           data/published_accuracy.csv; data/published_complexity.csv.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. [SAYEEDI] contains three tables. Only Table 3 reports model results.
+     Table 1 "Gap Analysis" (PDF p. 3, printed 3) compares eight datasets on size and
+       availability. It carries no accuracy metric of any kind.
+     Table 2 "Camera Specifications Table." (PDF p. 4, printed 4) describes three capture
+       devices. No metrics.
+     Table 3 "Technical Validation Table." (PDF p. 9, printed 9) is the results table.
+
+2. [ELHENIDY] contains exactly one table: TABLE I (caption printed on PDF p. 3, header row
+   on PDF p. 3, all seven body rows on PDF p. 4). It is the results table.
+
+3. [GAIB] contains exactly one table: TABLE I (caption, header and all eight body rows on
+   PDF p. 4). It is the results table.
+
+4. All four manuscript claims tested:
+
+| Manuscript claim                                     | Verdict   | Where verified        |
+|------------------------------------------------------|-----------|-----------------------|
+| [SAYEEDI] reports 95.9% mAP@50 for YOLOv9s           | CONFIRMED | Table 3, PDF/printed  |
+|                                                      |           | p. 9, row 1, col 2:   |
+|                                                      |           | "95.9 %"              |
+| [ELHENIDY] tabulates 84.9% mAP@50 for YOLOv9s        | CONFIRMED | TABLE I, PDF p. 4,    |
+|                                                      |           | row "YOLO v9s [24]":  |
+|                                                      |           | "84.9 +/- 0.3         |
+|                                                      |           | (84.6-85.2)"          |
+| [GAIB] tabulates 84.9% mAP@50 for YOLOv9s            | CONFIRMED | TABLE I, PDF p. 4,    |
+|                                                      |           | row "YOLO v9s [24]":  |
+|                                                      |           | "84.9"                |
+| [ELHENIDY] reports YOLOv12s as its most balanced     | CONFIRMED | TABLE I row           |
+| performer at 89.1% mAP@50                            |           | "YOLOv12S [12]":      |
+|                                                      |           | "89.1 +/- 0.4         |
+|                                                      |           | (88.7-89.5)"; body    |
+|                                                      |           | text PDF p. 4: "YOLOv |
+|                                                      |           | 12s provides the most |
+|                                                      |           | balanced performance."|
+| [SAYEEDI]'s results table carries only mAP@50,       | CONFIRMED | Table 3 has exactly   |
+| precision, recall, F1 and total loss -- no parameter |           | six columns: Model,   |
+| counts                                               |           | mAP@50, Precision,    |
+|                                                      |           | Recall, F1-Score,     |
+|                                                      |           | Total Loss            |
+
+5. Two unit conventions differ between the papers and matter when the numbers are quoted
+   side by side. [SAYEEDI] prints a "%" sign inside every metric cell ("95.9 %", with a
+   space). [ELHENIDY] and [GAIB] print bare numbers in every metric cell and carry no unit
+   in the column header either; the percent reading comes from the surrounding body text,
+   which writes "89.1%".
+
+6. The two benchmark papers label the same metric differently. [SAYEEDI] heads its column
+   "mAP@50". [ELHENIDY] and [GAIB] head theirs "mAP@0.5". These are the same quantity.
+
+7. Text-layer versus image disagreements found. All three are in [SAYEEDI] Table 1, which is
+   not a results table, and in every case THE IMAGE WINS:
+     - text layer "10 0 0"    -> image "1000"    (row [2], No. of Images)
+     - text layer "12,0 0 0"  -> image "12,000"  (row [22], No. of Images)
+     - text layer "11,0 0 0"  -> image "11,000"  (row [24], No. of Images)
+   These are pdftotext artifacts on Data in Brief's digit spacing, not errors in the paper.
+   No disagreement was found in Table 3, TABLE I of [ELHENIDY], or TABLE I of [GAIB].
+
+8. One oddity is printed in the source itself and is NOT an extraction artifact: [SAYEEDI]
+   Table 1 row [23] gives "2024" in the "No. of Classes" column. The 300 dpi render shows
+   2024 on the page. Recorded as printed.
+
+EVIDENCE
+
+--------------------------------------------------------------------------------
+[SAYEEDI] Table 3 -- "Technical Validation Table."
+PDF page 9, printed page 9. Read from reports/tables/SAYEEDI-p09-09.png at 300 dpi.
+Exact column headers, in printed order:
+  Model | mAP@50 | Precision | Recall | F1-Score | Total Loss
+--------------------------------------------------------------------------------
+
+| Model          | mAP@50 | Precision | Recall | F1-Score | Total Loss |
+|----------------|--------|-----------|--------|----------|------------|
+| YOLOv9s        | 95.9 % | 92.4 %    | 94.9 % | 93.63 %  | 0.5795     |
+| EfficientDetV2 | 95.6 % | 95.6 %    | 99.7 % | 97.6 %   | 0.40146    |
+
+Two body rows. No parameter count, no layer count, no GFLOPs, no model size, no timing
+column, no variance column, no per-class breakdown, no mAP@50-95 column.
+
+Corroborating body text on PDF p. 8 (printed 8), Section 4.2 "Technical validation":
+"For YOLOv9s, the mean Average Precision (mAP) at an Intersection over Union (IoU) threshold
+of 50 % was measured at 95.9 %, with a precision of 92.4 %, recall of 94.9 %, total loss of
+0.5795, and F1-score of 93.63 %." The sentence continues onto PDF p. 9 with the
+EfficientDetV2 figures. Table and text agree on every one of the ten values.
+
+--------------------------------------------------------------------------------
+[SAYEEDI] Table 1 -- "Gap Analysis." (NOT a results table; transcribed for completeness)
+PDF page 3, printed page 3. Read from reports/tables/SAYEEDI-p03-03.png at 300 dpi.
+Exact column headers, in printed order:
+  Dataset | Diversity | No. of Classes | Availability | No. of Images | No. of Annotations
+  | Comments
+--------------------------------------------------------------------------------
+
+| Dataset | Diversity   | No. of  | Availability | No. of | No. of      | Comments        |
+|         |             | Classes |              | Images | Annotations |                 |
+|---------|-------------|---------|--------------|--------|-------------|-----------------|
+| [2]     | Specialised | 4       | Private      | 1000   | 43,160      | 200 Images were |
+|         |             |         |              |        |             | augmented to    |
+|         |             |         |              |        |             | 1000            |
+| [3]     | Specialised | 9       | Public       | 500    | N/A         | Specialized in  |
+|         |             |         |              |        |             | batteries       |
+| [11]    | Specialised | 3       | Public       | 328    | N/A         |                 |
+| [18]    | Specialised | 4       | Upon Request | 11,875 | 28,536      |                 |
+| [22]    | Diverse     | 20      | Private      | 12,000 | N/A         | Detection       |
+|         |             |         |              |        |             | dataset but no. |
+|         |             |         |              |        |             | of annotations  |
+|         |             |         |              |        |             | was not         |
+|         |             |         |              |        |             | mentioned       |
+| [23]    | Specialised | 2024    | Public       | 748    | 9313        | Specialized in  |
+|         |             |         |              |        |             | ICs in PCBs     |
+| [24]    | Diverse     | 36      | Public       | 11,000 | N/A         | Includes        |
+|         |             |         |              |        |             | copyrighted     |
+|         |             |         |              |        |             | images          |
+| Ours    | Diverse     | 61      | Public       | 2121   | 12,937      |                 |
+
+Eight body rows. No accuracy metric in any column.
+
+--------------------------------------------------------------------------------
+[SAYEEDI] Table 2 -- "Camera Specifications Table." (NOT a results table)
+PDF page 4, printed page 4. Transcribed in full in C11; summarised here only to establish
+that it carries no metrics.
+Exact column headers, in printed order:  Device | Capacity | Display | Camera
+Three body rows: Smartphone 1, Smartphone 2, Smartphone 3. No accuracy metric.
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+[ELHENIDY] TABLE I -- caption printed in small caps:
+  "TABLE I.    A COMPARISON OF YOLOV12 WITH THE STATE-OF-THE-ART OBJECT DETECTION MODELS"
+Caption and header row on PDF page 3; all seven body rows on PDF page 4.
+Conference paper: no printed folio on either page.
+Read from reports/tables/ELHENIDY-p03-3.png and ELHENIDY-p04-4.png at 300 dpi.
+Exact column headers, in printed order:
+  Model | Layers | Parameters (M) | mAP@0.5 (mean +/- SD, 95% CI)
+  | Precision (mean +/- SD, 95% CI) | Recall (mean +/- SD, 95% CI)
+(The header cell breaks across two printed lines as "Parameters" / "(M)" and as
+"mAP@0.5 (mean +/- SD," / "95% CI)"; the "+/-" is printed as the plus-minus sign.)
+--------------------------------------------------------------------------------
+
+| Model            | Layers | Parameters | mAP@0.5        | Precision      | Recall         |
+|                  |        | (M)        | (mean +/- SD,  | (mean +/- SD,  | (mean +/- SD,  |
+|                  |        |            | 95% CI)        | 95% CI)        | 95% CI)        |
+|------------------|--------|------------|----------------|----------------|----------------|
+| YOLO v8s [20]    | 214    | 17.6       | 83.6 +/- 0.4   | 81.4 +/- 0.5   | 53.3 +/- 0.6   |
+|                  |        |            | (83.2-84.0)    | (80.9-81.9)    | (52.7-53.9)    |
+| YOLO v9s [24]    | 930    | 60.8       | 84.9 +/- 0.3   | 88.6 +/- 0.4   | 59.8 +/- 0.5   |
+|                  |        |            | (84.6-85.2)    | (88.2-89.0)    | (59.3-60.3)    |
+| YOLOv10s [21]    | 319    | 2.6        | 86.7 +/- 0.5   | 87.5 +/- 0.3   | 63.5 +/- 0.4   |
+|                  |        |            | (86.2-87.2)    | (87.2-87.8)    | (63.1-63.9)    |
+| YOLOv11s [22]    | 272    | 2.5        | 87.6 +/- 0.4   | 83.2 +/- 0.6   | 65.8 +/- 0.5   |
+|                  |        |            | (87.2-88.0)    | (82.6-83.8)    | (65.3-66.3)    |
+| EcoDetect-       | 196    | 23.4       | 88.5 +/- 0.5   | 84.2 +/- 0.4   | 64.7 +/- 0.6   |
+| YOLOv2 [11]      |        |            | (88.0-89.0)    | (83.8-84.6)    | (64.1-65.3)    |
+| YOLO_EC [13]     | 325    | 25.1       | 88.7 +/- 0.3   | 86.3 +/- 0.5   | 66.9 +/- 0.4   |
+|                  |        |            | (88.4-89.0)    | (85.8-86.8)    | (66.5-67.3)    |
+| YOLOv12S [12]    | 292    | 19.7       | 89.1 +/- 0.4   | 82.1 +/- 0.3   | 68.5 +/- 0.5   |
+| (printed bold)   |        |            | (88.7-89.5)    | (81.8-82.4)    | (68.0-69.0)    |
+
+Seven body rows. The final row, YOLOv12S, is printed in bold across all six cells. No unit
+symbol appears in any cell or header. No timing column, no GFLOPs column, no mAP@50-95
+column, no per-class breakdown.
+
+--------------------------------------------------------------------------------
+[GAIB] TABLE I -- caption printed in small caps:
+  "TABLE I.    A COMPARISON OF YOLOv12 WITH THE STATE-OF-THE-ART OBJECT DETECTION MODELS"
+Caption, header row and all eight body rows on PDF page 4. No printed folio.
+Read from reports/tables/GAIB-p04-4.png at 300 dpi.
+Exact column headers, in printed order:
+  Model | Layers | Parameters (M) | mAP@0.5 | Precision | Recall
+(The header cell breaks as "Parameters" / "(M)".)
+NOTE ON THE CAPTION: it names YOLOv12, not YOLOv13, in a paper whose title, abstract and
+final table row are about YOLOv13. Recorded as printed.
+--------------------------------------------------------------------------------
+
+| Model                 | Layers | Parameters (M) | mAP@0.5 | Precision | Recall |
+|-----------------------|--------|----------------|---------|-----------|--------|
+| YOLO v8s [20]         | 214    | 17.6           | 83.6    | 81.4      | 53.3   |
+| YOLO v9s [24]         | 930    | 60.8           | 84.9    | 88.6      | 59.8   |
+| YOLOv10s [21]         | 319    | 2.6            | 86.7    | 87.5      | 63.5   |
+| YOLOv11s [22]         | 272    | 2.5            | 87.6    | 83.2      | 65.8   |
+| EcoDetect-YOLOv2 [11] | 196    | 23.4           | 88.5    | 84.2      | 64.7   |
+| YOLO_EC [13]          | 325    | 25.1           | 88.7    | 86.3      | 66.9   |
+| YOLOv12S [12]         | 292    | 19.7           | 89.1    | 82.1      | 68.5   |
+| YOLOv13s [26]         | 648    | 2.5            | 91.8    | 87.8      | 91.3   |
+| (printed bold)        |        |                |         |           |        |
+
+Eight body rows. The final row, YOLOv13s, is printed in bold across all six cells. No unit
+symbol appears in any cell or header. No variance column, no confidence interval, no timing
+column, no GFLOPs column, no mAP@50-95 column, no per-class breakdown.
+
+Corroborating body text in [GAIB] Section IV (PDF p. 5): "YOLOv13s provides the most
+balanced and the highest performance. With 648 layers and 2.5M parameters, it achieves
+mAP@0.5 (91.8%) and recall (91.3%), while maintaining strong precision (87.8%)." Table and
+text agree on all five values.
+
+SEARCH TERMS USED
+
+Table discovery, run over the per-page text layer of all five PDFs:
+  ^\s*(Table|TABLE)\s+([IVX]+|\d+)[\.\s]      -> 13 caption lines
+  Table\s*\d                                   -> 14 lines in SAYEEDI and NGUYEN
+  Table\s*(2|II)\b                             -> to test for a second table in the two
+                                                  conference papers
+
+Cross-checks for columns the tables might have carried:
+  50-95, 50:95, 0.5:0.95, mAP50, AP50, GFLOP, FLOP, params, parameters, model size,
+  FPS, ms, latency, per-class, class-wise
+
+Rendered at 300 dpi and read off the image: SAYEEDI PDF pp. 3, 4, 8, 9; ELHENIDY PDF pp.
+1-6; GAIB PDF pp. 1-7.
+
+COULD NOT DETERMINE
+
+Nothing in the results tables themselves.
+
+One thing is undetermined but out of scope for this check and recorded so it is not lost:
+[ELHENIDY]'s body text on PDF p. 3 refers to "the performance comparison in Table 2", and on
+PDF p. 4 to "figure 4", but the paper contains only TABLE I and its two figure captions on
+PDF p. 5 are both numbered "Fig. 3". The cross-references and the printed labels do not
+line up. This does not affect any transcribed value.
+
+IMPACT ON THE MANUSCRIPT
+
+No change required. All four claims the manuscript makes about these tables are confirmed
+against 300 dpi renders of the printed pages.
+
+Two points of drafting hygiene follow from the transcription:
+
+  - When the manuscript places Sayeedi's 95.9 next to Elhenidy's or Gaib's 84.9, it is
+    placing a value printed with a "%" sign beside values printed bare. Both are
+    percentages, but only one paper says so in the table. If a subsection states a shared
+    basis, this is the place to state it.
+
+  - Sayeedi heads the column "mAP@50" and the two benchmark papers head it "mAP@0.5".
+    data/published_accuracy.csv normalises all three to "mAP@50". That normalisation is
+    correct but is not visible in the CSV; a reader re-checking a row against the PDF will
+    see a different header string than the one in the file.

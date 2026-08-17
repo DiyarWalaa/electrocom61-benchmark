@@ -1,0 +1,240 @@
+================================================================================
+CHECK    : C03 - Table-to-table comparison, Elhenidy vs Gaib
+QUESTION : Do the two conference papers' results tables share the same rows with identical
+           values, and does the later paper add exactly one row for its own architecture?
+SOURCES  : [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             TABLE I: caption and header row on PDF p. 3, seven body rows on PDF p. 4.
+           [GAIB] E-waste detection base on yolov13.pdf, TABLE I: caption, header and eight
+             body rows on PDF p. 4.
+           Both transcribed from 300 dpi renders (reports/tables/ELHENIDY-p03-3.png,
+           ELHENIDY-p04-4.png, GAIB-p04-4.png), not from the text layer.
+           Conference papers: neither carries a printed folio.
+VERDICT  : CONFIRMED
+ONE LINE : Seven rows appear in both tables and all 35 shared cells are identical; Gaib adds
+           exactly one row (YOLOv13s) and drops the variance decorations from the shared
+           mAP, precision and recall columns, so the column sets match in name but not in
+           content.
+AFFECTS  : Section 2.4's account of the relationship between the two studies;
+           data/published_complexity.csv (15 rows) and the two 84.9 rows of
+           data/published_accuracy.csv.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. ROW COUNTS, as actually counted rather than assumed:
+     [ELHENIDY] TABLE I: 7 body rows.
+     [GAIB]     TABLE I: 8 body rows.
+     Rows appearing in both: 7.
+     Rows unique to [ELHENIDY]: 0.
+     Rows unique to [GAIB]: 1 -- "YOLOv13s [26]".
+   The manuscript's "same seven rows, the later adding one row for its own architecture" is
+   confirmed on the counts.
+
+2. CELL-BY-CELL AGREEMENT on the seven shared rows. Comparing only the quantities both
+   tables print -- model label, layers, parameters, and the central value of mAP@0.5,
+   precision and recall -- there are 7 rows x 5 numeric cells = 35 shared numeric cells.
+   ALL 35 ARE IDENTICAL. Zero cells differ. The model labels are identical too, including
+   the space in "YOLO v8s" and "YOLO v9s" and the absence of one in "YOLOv10s",
+   "YOLOv11s" and "YOLOv12S", and including the capital S in "YOLOv12S".
+
+3. The reference numbers attached to each shared row are also identical between the two
+   papers: [20], [24], [21], [22], [11], [13], [12] in that order.
+
+4. COLUMN SETS: six columns in each, and the first three headers match exactly.
+   The last three do not.
+
+| Position | [ELHENIDY] header                | [GAIB] header  | Same? |
+|----------|----------------------------------|----------------|-------|
+| 1        | Model                            | Model          | yes   |
+| 2        | Layers                           | Layers         | yes   |
+| 3        | Parameters (M)                   | Parameters (M) | yes   |
+| 4        | mAP@0.5 (mean +/- SD, 95% CI)    | mAP@0.5        | no    |
+| 5        | Precision (mean +/- SD, 95% CI)  | Precision      | no    |
+| 6        | Recall (mean +/- SD, 95% CI)     | Recall         | no    |
+
+   [ELHENIDY]'s cells in columns 4-6 each carry three quantities: a central value, a
+   standard deviation after a plus-minus sign, and a parenthesised interval.
+   [GAIB]'s cells in columns 4-6 carry the central value alone. The standard deviations and
+   the intervals are absent from [GAIB], header and cells alike.
+
+5. The captions are the same string in both papers, including the model name:
+     [ELHENIDY]: "A COMPARISON OF YOLOV12 WITH THE STATE-OF-THE-ART OBJECT DETECTION MODELS"
+     [GAIB]:     "A COMPARISON OF YOLOv12 WITH THE STATE-OF-THE-ART OBJECT DETECTION MODELS"
+   They differ only in the casing of "YOLOV12" / "YOLOv12". [GAIB]'s caption names YOLOv12
+   although the table's added row, the paper's title and its abstract are about YOLOv13.
+
+6. Beyond the tables, the two papers' Section II "DATASET" is the same text. [GAIB]'s
+   Section II ends with the sentence "Combining these augmentation methods greatly increased
+   the effective dataset size, which decreased the chance of overfitting and improved
+   YOLOv12's resilience in practical deployment situations." -- naming YOLOv12 in the
+   YOLOv13 paper. [GAIB] Section IV likewise opens its discussion with "The YOLOv12 model
+   demonstrates a substantial increase in detection performance". Recorded as printed.
+
+EVIDENCE
+
+Side-by-side, every cell. "E" = [ELHENIDY], "G" = [GAIB]. Cells marked IDENTICAL compare
+the quantities both tables print.
+
+--------------------------------------------------------------------------------
+Row 1  Model label:  E "YOLO v8s [20]"   G "YOLO v8s [20]"        IDENTICAL
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 214                       | 214     | IDENTICAL                   |
+| Parameters (M) | 17.6                      | 17.6    | IDENTICAL                   |
+| mAP@0.5        | 83.6 +/- 0.4 (83.2-84.0)  | 83.6    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 81.4 +/- 0.5 (80.9-81.9)  | 81.4    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 53.3 +/- 0.6 (52.7-53.9)  | 53.3    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 2  Model label:  E "YOLO v9s [24]"   G "YOLO v9s [24]"        IDENTICAL
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 930                       | 930     | IDENTICAL                   |
+| Parameters (M) | 60.8                      | 60.8    | IDENTICAL                   |
+| mAP@0.5        | 84.9 +/- 0.3 (84.6-85.2)  | 84.9    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 88.6 +/- 0.4 (88.2-89.0)  | 88.6    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 59.8 +/- 0.5 (59.3-60.3)  | 59.8    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 3  Model label:  E "YOLOv10s [21]"   G "YOLOv10s [21]"        IDENTICAL
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 319                       | 319     | IDENTICAL                   |
+| Parameters (M) | 2.6                       | 2.6     | IDENTICAL                   |
+| mAP@0.5        | 86.7 +/- 0.5 (86.2-87.2)  | 86.7    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 87.5 +/- 0.3 (87.2-87.8)  | 87.5    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 63.5 +/- 0.4 (63.1-63.9)  | 63.5    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 4  Model label:  E "YOLOv11s [22]"   G "YOLOv11s [22]"        IDENTICAL
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 272                       | 272     | IDENTICAL                   |
+| Parameters (M) | 2.5                       | 2.5     | IDENTICAL                   |
+| mAP@0.5        | 87.6 +/- 0.4 (87.2-88.0)  | 87.6    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 83.2 +/- 0.6 (82.6-83.8)  | 83.2    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 65.8 +/- 0.5 (65.3-66.3)  | 65.8    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 5  Model label:  E "EcoDetect-YOLOv2 [11]"   G "EcoDetect-YOLOv2 [11]"   IDENTICAL
+       (E prints the label over two lines, with "[11]" on the second; G prints it on one.)
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 196                       | 196     | IDENTICAL                   |
+| Parameters (M) | 23.4                      | 23.4    | IDENTICAL                   |
+| mAP@0.5        | 88.5 +/- 0.5 (88.0-89.0)  | 88.5    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 84.2 +/- 0.4 (83.8-84.6)  | 84.2    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 64.7 +/- 0.6 (64.1-65.3)  | 64.7    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 6  Model label:  E "YOLO_EC [13]"   G "YOLO_EC [13]"          IDENTICAL
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 325                       | 325     | IDENTICAL                   |
+| Parameters (M) | 25.1                      | 25.1    | IDENTICAL                   |
+| mAP@0.5        | 88.7 +/- 0.3 (88.4-89.0)  | 88.7    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 86.3 +/- 0.5 (85.8-86.8)  | 86.3    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 66.9 +/- 0.4 (66.5-67.3)  | 66.9    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 7  Model label:  E "YOLOv12S [12]" (bold)   G "YOLOv12S [12]" (not bold)  IDENTICAL
+       text. The row is the bold, highlighted final row in E; in G it is an ordinary row and
+       the bold highlight has moved to the added YOLOv13s row.
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY]                | [GAIB]  | Verdict                     |
+|----------------|---------------------------|---------|-----------------------------|
+| Layers         | 292                       | 292     | IDENTICAL                   |
+| Parameters (M) | 19.7                      | 19.7    | IDENTICAL                   |
+| mAP@0.5        | 89.1 +/- 0.4 (88.7-89.5)  | 89.1    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Precision      | 82.1 +/- 0.3 (81.8-82.4)  | 82.1    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+| Recall         | 68.5 +/- 0.5 (68.0-69.0)  | 68.5    | central value IDENTICAL;    |
+|                |                           |         | SD and CI absent in G       |
+
+--------------------------------------------------------------------------------
+Row 8  UNIQUE TO [GAIB]:  "YOLOv13s [26]", printed bold across all six cells.
+--------------------------------------------------------------------------------
+| Column         | [ELHENIDY] | [GAIB] | Verdict                                        |
+|----------------|------------|--------|------------------------------------------------|
+| Layers         | (no row)   | 648    | unique to G                                    |
+| Parameters (M) | (no row)   | 2.5    | unique to G                                    |
+| mAP@0.5        | (no row)   | 91.8   | unique to G                                    |
+| Precision      | (no row)   | 87.8   | unique to G                                    |
+| Recall         | (no row)   | 91.3   | unique to G                                    |
+
+TALLY
+
+  Shared rows                              : 7
+  Shared numeric cells                     : 35
+  Shared numeric cells that are identical  : 35
+  Shared numeric cells that differ         : 0
+  Rows unique to [ELHENIDY]                : 0
+  Rows unique to [GAIB]                    : 1
+  Column headers identical                 : 3 of 6
+  Column headers differing                 : 3 of 6 (variance decoration dropped in G)
+
+SEARCH TERMS USED
+
+  ^\s*(Table|TABLE)\s+([IVX]+|\d+)[\.\s]   -- to establish each paper has exactly one table
+  Table\s*(2|II)\b                          -- to rule out a second table in either paper
+  95% CI, SD, standard deviation, confidence interval, t-test, p-value, p <
+                                            -- to establish which paper carries variance
+  Ultralytics, GitHub, repository, iMoonLab -- to check the added row's provenance (see C10)
+
+Both tables were read off 300 dpi renders rather than the text layer, because the two-column
+IEEE layout interleaves the table header row on one page with its body rows on the next.
+No text-layer/image disagreement was found in either table.
+
+COULD NOT DETERMINE
+
+Whether the seven shared rows in [GAIB] were recomputed and happened to reproduce
+[ELHENIDY]'s central values exactly, or were carried over. Nothing printed in either paper
+states which. Both papers describe the same training configuration and the same dataset,
+and [GAIB] additionally states a 3-fold cross-validation that [ELHENIDY] does not (see C07
+and C08), which would ordinarily be expected to move at least one of 35 values. The fact of
+the match is recorded; the cause is not determinable from the PDFs.
+
+IMPACT ON THE MANUSCRIPT
+
+No change required to the row counts or the values; the manuscript's description is
+accurate as written.
+
+Two refinements are available if Section 2.4 wants them, both of which are facts rather than
+inferences:
+
+  - "Identical values" is exactly right for the 35 shared numeric cells, but the two tables
+    do not print the same THING in columns 4-6. Elhenidy prints a mean with a standard
+    deviation and a 95% confidence interval; Gaib prints a bare number under a bare header.
+    If the manuscript says the later paper reproduces the earlier table, saying that it
+    reproduces it without the variance estimates is more precise, and it is already the
+    wording used in the note on data/published_accuracy.csv row 13.
+
+  - The shared caption names YOLOv12 in both papers. Any sentence that describes Gaib's
+    table as a YOLOv13 comparison table should be checked against that, since the printed
+    caption does not say so.

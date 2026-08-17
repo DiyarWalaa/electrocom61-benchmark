@@ -1,0 +1,236 @@
+================================================================================
+EVIDENCE EXTRACTION FROM FIVE PRIOR-WORK PDFs -- SUMMARY
+RUN      : 2026-08-17 15:13, commit 00d8aae (branch main, working tree clean at start)
+SCOPE    : Read-only. No .tex file and nothing under data/ was edited. Every value below was
+           re-derived from the PDFs, not taken from the manuscript.
+================================================================================
+
+PRE-FLIGHT
+
+  1. Git status clean, HEAD 00d8aae ("Set the home and the rules for evidence-extraction
+     reports"). Confirmed before any work began.
+  2. Exactly one deny_guard.py exists on this machine:
+     C:\research\electrocom61\scripts\deny_guard.py
+     No duplicate and no shim was found anywhere else (searched C:\ to depth 6).
+     Two related files sit beside it in the same directory and are not duplicates or shims:
+     scripts\deny_guard_selftest.py and scripts\__pycache__\deny_guard.cpython-312.pyc.
+  3. Stray files from previous sessions, all in per-session scratch directories under
+     C:\Users\athar\AppData\Local\Temp\claude\C--research-electrocom61\ and none inside the
+     repository. Left in place, not deleted:
+       session b88d060e...  scratchpad\commitmsg.txt, commitmsg2.txt, commitmsg3.txt,
+                            commitmsg4.txt, commitmsg5.txt, t.py, t2.py
+       session e41ab682...  scratchpad\ -- 20 .py files (append_notes.py, patch_f2.py,
+                            patch_f4.py, factcheck_05.py, validate_tables.py and others)
+       session 5d1e3800...  tasks\b82h2fz9n.output
+       session e41ab682...  tasks\bjz7n1wzg.output
+     Nothing stray was found inside C:\research\electrocom61. reports\ contained only an
+     empty tables\ directory.
+
+  The working directory never left C:\research\electrocom61. All inputs and outputs were
+  addressed by absolute path. No guard or hook file was created, moved or shimmed.
+
+FIVE-FILE INVENTORY
+
+  Mapping re-confirmed from page 1 of each PDF. All five are born-digital with usable text
+  layers. None was copied into the repository.
+
+| Tag      | File (all in C:\research\pdfs\)          | Identified from page 1 as            |
+|----------|------------------------------------------|--------------------------------------|
+| SAYEEDI  | 25795-61999-1-PB.pdf                     | "ElectroCom61: A multiclass dataset  |
+|          | 12 PDF pages, printed 1-12               | for detection of electronic          |
+|          |                                          | components", Md. Faiyaz Abdullah     |
+|          |                                          | Sayeedi et al., Data in Brief 59     |
+|          |                                          | (2025) 111331                        |
+| ELHENIDY | Automated-Electronic-Components-Waste-    | "Automated Electronic Components     |
+|          | Detection-Using-YOLOv12.pdf              | Waste Detection Using YOLOv12",      |
+|          | 6 PDF pages, no printed folio            | Ali M. Elhenidy et al., 4th IEEE     |
+|          |                                          | ICEEM 2025, Menoufia University,     |
+|          |                                          | Egypt, 4-5 October 2025              |
+| GAIB     | E-waste detection base on yolov13.pdf    | "E-waste Detection based on          |
+|          | 7 PDF pages, no printed folio            | YOLOv13", Raid Gaibi et al.,         |
+|          |                                          | 979-8-3315-5668-6/26 (c)2026 IEEE    |
+| NGUYEN   | main.pdf                                 | "IoTKITs: A novel dataset for IoT    |
+|          | 9 PDF pages, printed 1-9                 | education kit recognition",          |
+|          |                                          | Thanh-Thien Nguyen et al., Data in   |
+|          |                                          | Brief 60 (2025) 111650               |
+| CHEN     | processes-13-03802.pdf                   | "Research on Image Data Augmentation |
+|          | 19 PDF pages, printed "N of 19"          | and Accurate Classification of Waste |
+|          |                                          | Electronic Components Utilizing Deep |
+|          |                                          | Learning Techniques", Bolin Chen et  |
+|          |                                          | al., Processes 2025, 13, 3802        |
+
+  Page-number mapping: for SAYEEDI, NGUYEN and CHEN the PDF page index equals the printed
+  page number. ELHENIDY and GAIB are conference papers with no printed folio, so only the
+  PDF page index is citable.
+
+RESULTS -- ONE ROW PER CHECK
+
+| ID  | File                              | Verdict   | Finding                              |
+|-----|-----------------------------------|-----------|--------------------------------------|
+| C01 | C01-scope-chen-nguyen.txt         | CONFIRMED | Neither Chen nor Nguyen computes any |
+|     |                                   |           | result on ElectroCom61; each cites   |
+|     |                                   |           | it exactly twice, in related work    |
+|     |                                   |           | and in the reference list, and each  |
+|     |                                   |           | reports results only on its own new  |
+|     |                                   |           | dataset.                             |
+| C02 | C02-results-tables.txt            | CONFIRMED | All four claims hold: Sayeedi's      |
+|     |                                   |           | 95.9% mAP@50 for YOLOv9s, 84.9% in   |
+|     |                                   |           | both benchmark papers, Elhenidy's    |
+|     |                                   |           | 89.1% YOLOv12s, and Sayeedi's table  |
+|     |                                   |           | carrying no parameter counts.        |
+| C03 | C03-elhenidy-vs-gaib-diff.txt     | CONFIRMED | Seven shared rows, all 35 shared     |
+|     |                                   |           | numeric cells identical, one row     |
+|     |                                   |           | unique to Gaib (YOLOv13s); Gaib      |
+|     |                                   |           | drops the variance decoration from   |
+|     |                                   |           | the three metric headers.            |
+| C04 | C04-parameter-counts.txt          | CONFIRMED | 2.5 M YOLOv11s, 19.7 M YOLOv12S,     |
+|     |                                   |           | 60.8 M YOLOv9s confirmed in both     |
+|     |                                   |           | tables; both papers' prose           |
+|     |                                   |           | misattributes "~2.5M" to YOLOv10s,   |
+|     |                                   |           | and neither mentions fusion or FLOPs.|
+| C05 | C05-timing-claims.txt             | CONFIRMED | No timing measurement of any kind in |
+|     |                                   |           | any of the three papers: 31 hits, 0  |
+|     |                                   |           | measurements, and zero hits for FPS, |
+|     |                                   |           | ms, latency and throughput.          |
+| C06 | C06-map50-95.txt                  | DIFFERS   | mAP@50-95 appears in both benchmark  |
+|     |                                   |           | papers only as a training-curve      |
+|     |                                   |           | panel title, plus one unquantified   |
+|     |                                   |           | sentence in Gaib, so no mAP@50-95    |
+|     |                                   |           | value can be obtained for any model. |
+| C07 | C07-variance-and-statistics.txt   | DIFFERS   | Elhenidy prints 21 SDs, 21 CIs and a |
+|     |                                   |           | paired t-test but states no number   |
+|     |                                   |           | of runs; Gaib, which prints no       |
+|     |                                   |           | variance at all, is the paper that   |
+|     |                                   |           | states 3-fold cross-validation.      |
+| C08 | C08-training-configuration.txt    | DIFFERS   | Six of seven claimed settings        |
+|     |                                   |           | confirmed verbatim in both papers,   |
+|     |                                   |           | but the hardware is printed "The     |
+|     |                                   |           | P100 Kaggle GPU" with no "Tesla",    |
+|     |                                   |           | and four cited items are in Sec. II  |
+|     |                                   |           | or III rather than Sec. IV.          |
+| C09 | C09-per-class-and-class-count.txt | CONFIRMED | No per-class AP anywhere in the      |
+|     |                                   |           | three papers; all three state 61     |
+|     |                                   |           | classes for the dataset and none     |
+|     |                                   |           | states the class count the           |
+|     |                                   |           | evaluation was computed over.        |
+| C10 | C10-yolov13-provenance.txt        | NOT FOUND | Gaib names no package, repository or |
+|     |                                   |           | codebase for YOLOv13 or for any      |
+|     |                                   |           | other row; every architecture is     |
+|     |                                   |           | identified by citation alone and     |
+|     |                                   |           | iMoonLab is never mentioned.         |
+| C11 | C11-sayeedi-dataset-description.  | CONFIRMED | Every dataset figure confirmed as    |
+|     | txt                               |           | printed, and the camera claim holds: |
+|     |                                   |           | three devices tabulated, the third   |
+|     |                                   |           | given Super Retina XDR OLED and      |
+|     |                                   |           | Ceramic Shield glass.                |
+| C12 | C12-author-overlap.txt            | CONFIRMED | Elhenidy has four authors and Gaib   |
+|     |                                   |           | six; three of the four appear on     |
+|     |                                   |           | both, and the shared third surname   |
+|     |                                   |           | is printed four different ways.      |
+| C13 | C13-csv-reextraction-diff.txt     | CONFIRMED | All 27 committed rows and all 48     |
+|     |                                   |           | numeric cells re-extract             |
+|     |                                   |           | identically, zero disagreements, and |
+|     |                                   |           | all 27 table_location values point   |
+|     |                                   |           | at the correct table.                |
+
+  Verdict tally: CONFIRMED 9, DIFFERS 3, NOT FOUND 1, COULD NOT DETERMINE 0.
+
+PASTE THESE FIRST
+
+  Three checks returned DIFFERS. Each names a specific correction or addition:
+
+  1. C08-training-configuration.txt
+     The hardware. Both papers print "The P100 Kaggle GPU is used for the training." The
+     word "Tesla" appears in neither. Anywhere the manuscript or data/config_provenance.csv
+     cites "Tesla P100" to these sources, it is attributing a word they do not print.
+     Also: the "Sec. IV" citation is right for the optimiser block but wrong for the
+     640 x 640 resolution, the 70/20/10 split, the 61-class count and the augmentation list,
+     all of which are in Section II, and for Gaib's 3-fold cross-validation, which is in
+     Section III.
+
+  2. C07-variance-and-statistics.txt
+     The variance estimates and the resampling procedure are in different papers. Elhenidy
+     prints 21 standard deviations and 21 confidence intervals and states no number of runs,
+     seeds, repetitions or folds anywhere in its six pages. Gaib, which drops every variance
+     column while reproducing Elhenidy's central values to the decimal, is the paper that
+     states 3-fold cross-validation with k = 3 and three validation runs.
+
+  3. C06-map50-95.txt
+     Neither benchmark paper reports mAP@50-95 as a number. It appears in both only as an
+     Ultralytics training-curve panel title, and in Gaib additionally as one sentence with no
+     value attached. Saying the prior work reports mAP@50 without mAP@50-95 is right in
+     substance; naming where the metric does appear makes the claim survive a reader who
+     opens Gaib at page 5 and sees "mAP50-95" in the text.
+
+OTHER MATERIAL FINDINGS, from checks whose verdict was not DIFFERS
+
+  These are facts about the sources that the manuscript does not currently record. None
+  contradicts anything it claims.
+
+  - Both benchmark papers' prose attributes "~2.5M parameters" to YOLOv10s while their own
+    tables give YOLOv10s 2.6 and YOLOv11s 2.5. The tables are the values of record. (C04)
+  - Neither benchmark paper states whether its parameter counts are fused or unfused, and
+    neither prints a GFLOPs, FLOPs or model-size figure. (C04)
+  - None of the three papers states the number of classes its mAP was averaged over, and all
+    three publish confusion matrices carrying a background row and column. A published
+    mAP@50 on ElectroCom61 and one computed here are not known to share a denominator. (C09)
+  - Sayeedi evaluates on "the validation and testing sets" without separating them; neither
+    benchmark paper names a partition at all. (C09, C11)
+  - Gaib's TABLE I caption reads "A COMPARISON OF YOLOv12 ..." in a paper about YOLOv13, and
+    its Section II and Section IV prose name YOLOv12 in three further places. (C03)
+  - Both papers label the YOLOv12S table row "[12]", and in both, reference [12] is a 2019
+    YOLO-V3 paper while the YOLOv12 reference is [16]. (C10)
+  - Elhenidy's training curves run to roughly 175-180 epochs on the x-axis while its
+    Section IV states 100 epochs. (C06)
+  - Elhenidy's DOI, 10.1109/ICEEM66692.2025.11225036, is not printed in its own PDF; it is
+    recoverable from Gaib's reference [34]. No DOI for Gaib was found in either PDF. (C12)
+  - Nguyen's reference [1] miscites the ElectroCom61 paper as "Sci. Data 11 (1) (2024) 811"
+    with lead author "M.A.S. Faiyaz". (C01)
+
+METHOD
+
+  Text layers extracted with pdftotext (-layout and -raw), split one file per PDF page so
+  every quoted value carries a page index. Searching was done with a purpose-written helper
+  rather than ripgrep, because reports/.scratch is both hidden and gitignored and ripgrep
+  will not descend into it.
+
+  Every table transcribed in these reports was ALSO read off a 300 dpi PNG render of its
+  page, per the working rule that a two-column PDF's text layer is not trustworthy. Where
+  the two disagreed, the image won. Three such disagreements were found, all in Sayeedi's
+  Table 1 and all pdftotext artifacts on Data in Brief's digit spacing: "10 0 0", "12,0 0 0"
+  and "11,0 0 0" where the page prints 1000, 12,000 and 11,000. No disagreement was found in
+  any results table.
+
+  Renders live in reports/tables/ and are gitignored per CLAUDE.md: they are page
+  reproductions of copyrighted papers and this repository is public. The reports cite page
+  and table numbers instead, so the evidence trail survives without them. Re-checking a
+  transcribed value in a fresh checkout means re-rendering the page.
+
+  Intermediate text dumps and the two helper scripts live in reports/.scratch/, newly added
+  to .gitignore for the same reason.
+
+  No package was installed. pdftotext and pdftoppm were already present, supplied by the
+  MiKTeX installation at C:\Users\athar\AppData\Local\Programs\MiKTeX\miktex\bin\x64.
+
+FILES WRITTEN
+
+  All in C:\research\electrocom61\reports\ :
+    00-SUMMARY.txt
+    C01-scope-chen-nguyen.txt
+    C02-results-tables.txt
+    C03-elhenidy-vs-gaib-diff.txt
+    C04-parameter-counts.txt
+    C05-timing-claims.txt
+    C06-map50-95.txt
+    C07-variance-and-statistics.txt
+    C08-training-configuration.txt
+    C09-per-class-and-class-count.txt
+    C10-yolov13-provenance.txt
+    C11-sayeedi-dataset-description.txt
+    C12-author-overlap.txt
+    C13-csv-reextraction-diff.txt
+    reextracted_published_values.csv
+    tables\  -- 25 rendered page PNGs at 300 dpi, gitignored, not committed
+
+  One tracked file outside reports\ was modified: .gitignore, to add reports/.scratch/.
+  No .tex file and nothing under data/ was touched.

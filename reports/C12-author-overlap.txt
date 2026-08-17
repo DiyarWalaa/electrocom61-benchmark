@@ -1,0 +1,286 @@
+================================================================================
+CHECK    : C12 - Author lists and overlap between the two benchmark papers
+QUESTION : Who are the authors of Elhenidy and of Gaib, in printed order and with
+           affiliations, how many are there, and how many of the earlier paper's authors
+           appear on the later one?
+SOURCES  : [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             author block on PDF p. 1; reference list on PDF p. 6.
+           [GAIB] E-waste detection base on yolov13.pdf, author block on PDF p. 1;
+             reference list on PDF p. 7.
+           Both author blocks and both reference lists transcribed from 300 dpi renders
+           (reports/tables/ELHENIDY-p01-1.png, GAIB-p01-1.png, ELHENIDY-p06-6.png,
+           GAIB-p07-7.png), because a multi-column IEEE author grid extracts out of order.
+           Conference papers: neither carries a printed folio.
+VERDICT  : CONFIRMED
+ONE LINE : Elhenidy has four authors and Gaib six; three of the four -- Elhenidy, Alsabti and
+           Gaib -- appear on both, confirming the claim, and the surname of the third is
+           spelled four different ways across the two papers.
+AFFECTS  : The bibliography; Section 2.4's account of the relationship between the two
+           studies.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. AUTHOR COUNTS: [ELHENIDY] has FOUR authors. [GAIB] has SIX.
+
+2. OVERLAP: THREE of the four authors of [ELHENIDY] are among the six of [GAIB]. This
+   confirms the manuscript's claim exactly. The three shared authors are Ali M. Elhenidy,
+   Saif M. B. Alsabti, and Raid Gaib / Gaibi. The one author of [ELHENIDY] who does NOT
+   appear on [GAIB] is Muhammed E Abd Alkhalec Tharwat. The three authors unique to [GAIB]
+   are Shaimaa Khamees Ahmed, Siba Monther Yousif, and Qussay Albustani.
+
+3. THE SHARED AUTHORS MOVE POSITION BETWEEN THE TWO PAPERS. Ali M. Elhenidy is first author
+   of the earlier paper and last of the later; Raid gaib is last of the earlier and first of
+   the later. Saif M.BAlsabti is third in the earlier and second in the later.
+
+4. SPELLING VARIANTS. The third shared surname is printed four different ways across the two
+   PDFs, and this matters for a bibliography check:
+     "Raid gaib"   -- [ELHENIDY] author block, PDF p. 1, lowercase g
+     "Raid Gaibi"  -- [GAIB] author block, PDF p. 1, capital G with a trailing i
+     "R. Gaib"     -- [GAIB] references [28] and [33], PDF p. 7
+     "Raid gaib"   -- [GAIB] reference [31], PDF p. 7, lowercase g again
+   The shared email address Raidsata@gmail.com is printed under both author-block forms and
+   is what ties them together.
+   The second shared surname also varies:
+     "Saif M.BAlsabti"      -- both author blocks, PDF p. 1 of each (no space after "M.")
+     "S. M. BAlsabti"       -- [GAIB] references [28] and [33]
+     "Saif M. Balsabti"     -- [GAIB] reference [31]
+     "Al-Sabti, S.M.B."     -- [GAIB] reference [30]
+   The shared email dr.saifalsabti@gmail.com appears under both author-block forms.
+
+5. NO DOI IS PRINTED IN EITHER PDF FOR ITSELF. Both carry an IEEE ISBN/price line instead:
+     [ELHENIDY]: "979-8-3315-8956-1/25/$31.00 (c)2025 IEEE"
+     [GAIB]:     "979-8-3315-5668-6/26/$31.00 (c)2026 IEEE"
+   [ELHENIDY] additionally prints the conference URL "https://iceem2025.conferences.ekb.eg"
+   in its page-1 footer.
+
+6. [ELHENIDY]'s DOI IS RECOVERABLE, but from the other paper rather than from itself.
+   [GAIB] reference [34], PDF p. 7, cites it in full:
+     "A. M. Elhenidy, M. E. Abd Alkhalec Tharwat, S. M. BAlsabti and R. Gaib, 'Automated
+      Electronic Components Waste Detection Using YOLOv12,' 2025 4th International
+      Conference on Electronic Engineering (ICEEM), Menouf, Egypt, 2025, pp. 1-6, doi:
+      10.1109/ICEEM66692.2025.11225036."
+   Note that this citation lists the four authors in the same order as [ELHENIDY]'s own
+   author block, which corroborates the reading order recorded below.
+   No DOI for [GAIB] itself was found anywhere in either PDF.
+
+7. THE VENUE STATED ON [ELHENIDY]'s PAGE 1 is "4th IEEE International Conference on
+   Electronic Engineering, Menoufia University, Egypt / ICEEM2025, 4-5 October 2025".
+   [GAIB]'s page 1 carries no conference banner at all, only the IEEE ISBN line with a 2026
+   copyright year.
+
+EVIDENCE
+
+--------------------------------------------------------------------------------
+[ELHENIDY] author block, PDF p. 1, transcribed verbatim from the 300 dpi render.
+Printed as an IEEE three-column grid: three authors on the first row, one centred beneath.
+Reading order left-to-right then top-to-bottom, which is the order [GAIB] ref [34] also uses.
+--------------------------------------------------------------------------------
+
+  1.  Ali M. Elhenidy
+      Computer Engineering and Control Systems Department. Faculty of Engineering,
+      Mansoura University
+      Faculty of Engineering, Mansoura National University, Gamasa, Egypt
+      Mansoura, Egypt
+      alielhenidy@mans.edu.eg
+
+  2.  Muhammed E Abd Alkhalec Tharwat
+      Technical College of Engineering, Al-Bayan University,
+      Baghdad, Iraq
+      muhammed.e@albayan.edu.iq
+
+  3.  Saif M.BAlsabti
+      Technical College of Engineering, Al-Bayan University,
+      Baghdad, Iraq
+      dr.saifalsabti@gmail.com
+
+  4.  Raid gaib
+      Technical College of Engineering, Al-Bayan University,
+      Baghdad, Iraq
+      Raidsata@gmail.com
+
+  Count: 4.
+
+--------------------------------------------------------------------------------
+[GAIB] author block, PDF p. 1, transcribed verbatim from the 300 dpi render.
+Printed as an IEEE three-column grid: three authors on the first row, three on the second.
+Reading order left-to-right then top-to-bottom.
+--------------------------------------------------------------------------------
+
+  1.  Raid Gaibi
+      Technical College of Engineering, Al-Bayan University,
+      Baghdad, Iraq
+      Raidsata@gmail.com
+
+  2.  Saif M.BAlsabti
+      Technical College of Engineering, Al-Bayan University,
+      Baghdad, Iraq
+      dr.saifalsabti@gmail.com
+
+  3.  Shaimaa Khamees Ahmed
+      Department of Computer Engineering, College of Engineering, University of Diyala,
+      Diyala, Iraq
+      shaimaa_khamees@uodiyala.edu.iq
+
+  4.  Siba Monther Yousif
+      Department of Electronic and Communications Engineering, College of Engineering,
+      Al-Nahrain University, Jadriya, Baghdad, Iraq
+      siba.monther.1@nahrainuniv.edu.iq
+
+  5.  Qussay, Albustani
+      Technical College of Engineering, Al-Bayan University,
+      Baghdad, Iraq
+      qussayalbostany@yahoo.com
+
+  6.  Ali M. Elhenidy
+      Computer Engineering and Control Systems Department. Faculty of Engineering,
+      Mansoura University
+      alielhenidy@mans.edu.eg
+
+  Count: 6.
+
+  Two notes on what is printed. Entry 5 is printed with a comma inside the name, "Qussay,
+  Albustani", and its email spells the surname "albostany". Entry 6's affiliation is the
+  first two lines of the affiliation [ELHENIDY] gives the same author; the Mansoura National
+  University line and the "Mansoura, Egypt" line are not repeated here.
+
+--------------------------------------------------------------------------------
+Overlap, matched on email address rather than on surname spelling.
+--------------------------------------------------------------------------------
+
+| Author (as printed in ELHENIDY) | Email                     | Position in | Position in |
+|                                 |                           | ELHENIDY    | GAIB        |
+|---------------------------------|---------------------------|-------------|-------------|
+| Ali M. Elhenidy                 | alielhenidy@mans.edu.eg   | 1 of 4      | 6 of 6      |
+| Muhammed E Abd Alkhalec Tharwat | muhammed.e@albayan.edu.iq | 2 of 4      | NOT PRESENT |
+| Saif M.BAlsabti                 | dr.saifalsabti@gmail.com  | 3 of 4      | 2 of 6      |
+| Raid gaib                       | Raidsata@gmail.com        | 4 of 4      | 1 of 6      |
+|                                 |   (printed "Raid Gaibi"   |             |             |
+|                                 |    in GAIB)               |             |             |
+
+| Author unique to GAIB  | Email                             | Position in GAIB |
+|------------------------|-----------------------------------|------------------|
+| Shaimaa Khamees Ahmed  | shaimaa_khamees@uodiyala.edu.iq   | 3 of 6           |
+| Siba Monther Yousif    | siba.monther.1@nahrainuniv.edu.iq | 4 of 6           |
+| Qussay, Albustani      | qussayalbostany@yahoo.com         | 5 of 6           |
+
+  Shared authors: 3.
+  Authors on ELHENIDY only: 1.
+  Authors on GAIB only: 3.
+  Manuscript claim "three of the four on the earlier paper are among the six on the later":
+  CONFIRMED.
+
+--------------------------------------------------------------------------------
+Every printed surname spelling, for the bibliography check.
+--------------------------------------------------------------------------------
+
+| Surname as printed         | Where                                                     |
+|----------------------------|-----------------------------------------------------------|
+| Elhenidy                   | ELHENIDY author block (Ali M. Elhenidy); GAIB author      |
+|                            | block (Ali M. Elhenidy); ELHENIDY refs [18], [19], [25],  |
+|                            | [26]; GAIB refs [18], [19], [25], [27], [28], [29], [31], |
+|                            | [32], [33], [34]                                          |
+| Abd Alkhalec Tharwat       | ELHENIDY author block (Muhammed E Abd Alkhalec Tharwat);  |
+|                            | GAIB ref [34] as "M. E. Abd Alkhalec Tharwat"             |
+| BAlsabti                   | ELHENIDY and GAIB author blocks (Saif M.BAlsabti);        |
+|                            | GAIB refs [28], [33] as "S. M. BAlsabti"                  |
+| Balsabti                   | GAIB ref [31] as "Saif M. Balsabti"                       |
+| Al-Sabti                   | GAIB ref [30] as "Al-Sabti, S.M.B."                       |
+| gaib  (lowercase g)        | ELHENIDY author block (Raid gaib); GAIB ref [31]          |
+|                            | (Raid gaib)                                               |
+| Gaibi (capital G, trailing | GAIB author block (Raid Gaibi)                            |
+| i)                         |                                                           |
+| Gaib  (capital G)          | GAIB refs [28], [30], [33], [34] as "R. Gaib" /           |
+|                            | "Gaib, R."                                                |
+| Khamees Ahmed              | GAIB author block (Shaimaa Khamees Ahmed); GAIB ref [31]  |
+|                            | as "Shaimaa Khamees Ahmed"                                |
+| Monther Yousif             | GAIB author block (Siba Monther Yousif)                   |
+| Albustani                  | GAIB author block (Qussay, Albustani); the same entry's   |
+|                            | email spells it "albostany"                               |
+
+--------------------------------------------------------------------------------
+DOIs.
+--------------------------------------------------------------------------------
+
+| Paper     | DOI printed in its own PDF? | Value                                       |
+|-----------|-----------------------------|---------------------------------------------|
+| ELHENIDY  | NO                          | Recoverable from GAIB ref [34], PDF p. 7:   |
+|           |                             | 10.1109/ICEEM66692.2025.11225036            |
+| GAIB      | NO                          | NOT FOUND in either PDF                     |
+
+Identifier strings that ARE printed on page 1 of each:
+  [ELHENIDY]  "979-8-3315-8956-1/25/$31.00 (c)2025 IEEE"
+              "https://iceem2025.conferences.ekb.eg"
+              banner: "4th IEEE International Conference on Electronic Engineering,
+                       Menoufia University, Egypt / ICEEM2025, 4-5 October 2025"
+  [GAIB]      "979-8-3315-5668-6/26/$31.00 (c)2026 IEEE"
+              no conference banner
+
+Two sibling ICEEM 2025 papers by overlapping author sets are cited in [GAIB] and carry
+DOIs, recorded because they may be confused with [ELHENIDY] when checking the bibliography:
+  ref [28]  "HAYOLO: A novel object detection model for detecting defects in PCB",
+            A. M. Elhenidy, R. Gaib, S. M. BAlsabti and L. R. Al-Najjar, ICEEM 2025,
+            pp. 1-7, doi: 10.1109/ICEEM66692.2025.11225093
+  ref [33]  "DefYOLOv12: A novel object detection model for detecting defects in Solar
+            panels", A. M. Elhenidy, S. M. BAlsabti, R. Gaib and L. R. Al-Najjar,
+            ICEEM 2025, pp. 1-6, doi: 10.1109/ICEEM66692.2025.11225292
+  ref [34]  is [ELHENIDY] itself, doi: 10.1109/ICEEM66692.2025.11225036
+
+SEARCH TERMS USED
+
+Case-insensitive over the full text layer of both PDFs (6 + 7 = 13 pages):
+
+  doi | DOI | 10\.\d{4} | ISBN | IEEE | Elhenidy | Gaib | Gaibi | Alsabti | BAlsabti |
+  Balsabti | Al-Sabti | Tharwat | Khamees | Monther | Albustani | albostany | ICEEM |
+  @  (to enumerate every printed email address)
+
+Both author blocks were transcribed from 300 dpi renders rather than from the text layer,
+because pdftotext walks an IEEE multi-column author grid in column order and interleaves the
+affiliation lines of adjacent authors. The rendered images give the printed layout directly,
+which is what fixes the reading order recorded above. Both reference lists were read the
+same way. No text-layer/image disagreement was found in either author block or either
+reference list, but the text layer's ordering of the author grid is not usable on its own
+and the image is the source of record here.
+
+COULD NOT DETERMINE
+
+[GAIB]'s own DOI. It is not printed in the paper and it is not cited by [ELHENIDY], which
+predates it. The 2026 copyright year and the ISBN 979-8-3315-5668-6 are the only identifiers
+it carries.
+
+Whether "Raid gaib" and "Raid Gaibi" are intended as the same name with a typographic
+variation or as two renderings of a transliterated name. The shared email address
+Raidsata@gmail.com makes them the same person; nothing printed indicates which spelling the
+author prefers.
+
+The correct author-order reading of either IEEE grid beyond what the layout shows. The grids
+are unnumbered. For [ELHENIDY] the reading recorded above is corroborated by [GAIB] ref
+[34], which lists the same four in the same order. For [GAIB] there is no such external
+corroboration.
+
+IMPACT ON THE MANUSCRIPT
+
+No correction required. The claim that three of the four authors of the earlier paper are
+among the six of the later is confirmed.
+
+Three practical points for the bibliography:
+
+  - Cite [ELHENIDY] with doi 10.1109/ICEEM66692.2025.11225036, taken from [GAIB] ref [34]
+    rather than from the paper itself, which prints no DOI. If the bibliography records
+    where each DOI came from, record that.
+
+  - [GAIB] has no DOI available from either source. If the entry needs one, it will have to
+    come from outside these PDFs.
+
+  - The surname of the shared third author is printed four ways across the two papers --
+    "Raid gaib", "Raid Gaibi", "R. Gaib", "Raid gaib" again -- and Alsabti's four ways as
+    well. Match on the author blocks, which are what each paper claims for itself:
+    "Raid gaib" for the earlier and "Raid Gaibi" for the later, "Saif M.BAlsabti" for both.
+    Do not silently normalise one to the other; the two papers genuinely print different
+    strings, and a bibliography that unifies them is recording something neither paper says.
+
+  - Three further ICEEM 2025 papers by overlapping author sets are cited inside [GAIB] and
+    share the DOI prefix 10.1109/ICEEM66692.2025. If any is cited, check the numeric suffix:
+    11225093 is HAYOLO, 11225292 is DefYOLOv12, and 11225036 is the paper this study calls
+    [ELHENIDY].

@@ -1,0 +1,142 @@
+================================================================================
+CHECK    : C01 - Scope: does anyone else train on ElectroCom61?
+QUESTION : Do Chen et al. (Processes 2025) or Nguyen et al. (Data in Brief 60) report any
+           detection or classification result computed on the ElectroCom61 dataset?
+SOURCES  : [CHEN] processes-13-03802.pdf, PDF pages 1-19 (printed "1 of 19" .. "19 of 19");
+           full-text keyword sweep plus close reading of pp. 2, 4, 8-16 and the reference
+           list on p. 17.
+           [NGUYEN] main.pdf, PDF pages 1-9 (printed 1-9); full-text keyword sweep plus
+           close reading of pp. 2, 7 and the reference list on p. 8.
+VERDICT  : CONFIRMED
+ONE LINE : Neither paper computes any result on ElectroCom61; each cites it exactly twice --
+           once as a related-work dataset and once in its reference list -- and each reports
+           results only on its own newly introduced dataset.
+AFFECTS  : The manuscript's claim that exactly three studies report results on ElectroCom61,
+           and that Chen and Nguyen cite the dataset without training on it.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. ElectroCom61 appears in [CHEN] exactly twice: once in the introduction as a related
+   dataset (PDF p. 2, printed "2 of 19", Section 1), and once in the reference list as
+   reference [7] (PDF p. 17, printed "17 of 19"). Both are category (a), a citation in
+   related work. Neither is (b) a dataset used for training or evaluation, nor (c) a
+   comparison baseline.
+
+2. [CHEN] evaluates on a dataset it builds itself. Section 3 states that 1610 raw images at
+   3072 x 4096 resolution were gathered with a self-built image acquisition box (PDF p. 8,
+   printed "8 of 19"), forming Dataset I. Datasets II, III and IV are augmentations of those
+   same 1610 images (PDF pp. 10-11). Every results table in the paper is computed over
+   Dataset I / II / III / IV. ElectroCom61 supplies no images and no numbers.
+
+3. ElectroCom61 appears in [NGUYEN] exactly twice: once in Section 2 "Background" as one of
+   four named example datasets (PDF p. 2, printed 2), and once in the reference list as
+   reference [1] (PDF p. 8, printed 8). Both are category (a). Neither is (b) or (c).
+
+4. [NGUYEN] evaluates on IoTKITs, the dataset it introduces. Section 4.4 "Training setup"
+   states that each model was trained on the IoTKITs dataset (PDF p. 7, printed 7), and
+   Table 4 on the same page is captioned "Training results of 4 models". ElectroCom61 is
+   not among the data any row was computed on.
+
+5. Plainly stated: NEITHER [CHEN] NOR [NGUYEN] REPORTS ANY DETECTION OR CLASSIFICATION
+   RESULT COMPUTED ON ElectroCom61.
+
+6. Incidental, and worth knowing before the bibliography is finalised: [NGUYEN]'s reference
+   [1] miscites the ElectroCom61 paper. It gives the venue as "Sci. Data 11 (1) (2024) 811"
+   and the lead author as "M.A.S. Faiyaz". The paper is Data in Brief 59 (2025) 111331 and
+   the lead author is Md. Faiyaz Abdullah Sayeedi. [NGUYEN]'s reference [2] carries the same
+   "Sci. Data 11 (2024) 811" string, so the two entries appear to have collided.
+
+7. Also incidental: [CHEN]'s reference [7] is correct in every field checked -- authors,
+   title, "Data Brief 2025, 59, 111331".
+
+EVIDENCE
+
+| # | Paper  | PDF p | Printed p | Location             | What is printed                    |
+|---|--------|-------|-----------|----------------------|------------------------------------|
+| 1 | CHEN   | 2     | 2 of 19   | Section 1 (intro)    | "Sayeedi et al. [7] introduced the |
+|   |        |       |           |                      | ElectroCom61 dataset covering 61   |
+|   |        |       |           |                      | common component classes with 2121 |
+|   |        |       |           |                      | finely annotated images, yet it    |
+|   |        |       |           |                      | omits intra-class micro-           |
+|   |        |       |           |                      | differences"                       |
+| 2 | CHEN   | 17    | 17 of 19  | Reference [7]        | "Sayeedi, M.F.A.; ... ElectroCom61:|
+|   |        |       |           |                      | A multiclass dataset for detection |
+|   |        |       |           |                      | of electronic components. Data     |
+|   |        |       |           |                      | Brief 2025, 59, 111331."           |
+| 3 | CHEN   | 8     | 8 of 19   | Section 3 (results)  | "A total of 1610 images were       |
+|   |        |       |           |                      | collected to form Dataset I"       |
+| 4 | CHEN   | 11    | 11 of 19  | Table 3              | Dataset I 1610 / II 12,880 /       |
+|   |        |       |           |                      | III 3220 / IV 14,490               |
+| 5 | CHEN   | 14    | 14 of 19  | Table 5              | "Performance comparison of         |
+|   |        |       |           |                      | different models on various        |
+|   |        |       |           |                      | datasets (imbalanced               |
+|   |        |       |           |                      | classification)" -- the datasets   |
+|   |        |       |           |                      | are I-IV, not ElectroCom61         |
+| 6 | NGUYEN | 2     | 2         | Section 2 Background | "datasets such as ElectroCom 61    |
+|   |        |       |           |                      | [1], DeepPCB [2], FPIC [3], and    |
+|   |        |       |           |                      | VisA [4] support tasks like        |
+|   |        |       |           |                      | identifying ICs, resistors"        |
+| 7 | NGUYEN | 8     | 8         | Reference [1]        | "M.A.S. Faiyaz, A.M.I.M. Osmani,   |
+|   |        |       |           |                      | T. Rahman, J.F. Deepti,            |
+|   |        |       |           |                      | ElectroCom61: a multiclass dataset |
+|   |        |       |           |                      | for detection of electronic        |
+|   |        |       |           |                      | components, Sci. Data 11 (1)       |
+|   |        |       |           |                      | (2024) 811."                       |
+| 8 | NGUYEN | 7     | 7         | Section 4.4          | "Each model was trained on the     |
+|   |        |       |           |                      | IoTKITs dataset using a consistent |
+|   |        |       |           |                      | input resolution of 640 x 640"     |
+| 9 | NGUYEN | 7     | 7         | Table 4              | "Training results of 4 models" --  |
+|   |        |       |           |                      | Yolo v5 / Yolo v7 / Faster RCNN /  |
+|   |        |       |           |                      | SSD, on IoTKITs                    |
+
+Classification of every ElectroCom61 mention found:
+
+| Mention  | Paper  | PDF p | Category                                   |
+|----------|--------|-------|--------------------------------------------|
+| 1 of 2   | CHEN   | 2     | (a) citation in related work               |
+| 2 of 2   | CHEN   | 17    | (a) citation, reference list entry          |
+| 1 of 2   | NGUYEN | 2     | (a) citation in related work / background   |
+| 2 of 2   | NGUYEN | 8     | (a) citation, reference list entry          |
+
+No mention in either paper falls into category (b) dataset used for training or evaluation,
+or category (c) comparison baseline.
+
+Rendered page images used to read the tables and the citing passages off the page rather
+than off the text layer (all at 300 dpi, in reports/tables/, gitignored):
+  CHEN-p02-02.png, CHEN-p14-14.png, CHEN-p17-17.png,
+  NGUYEN-p02-2.png, NGUYEN-p07-7.png, NGUYEN-p08-8.png
+
+SEARCH TERMS USED
+
+Run case-insensitively over the per-page text layer of both PDFs (19 + 9 = 28 pages):
+  ElectroCom, Electro Com, electro\s*com, ElectroCom61, Sayeedi, 111331,
+  10.1016/j.dib.2025.111331, "multiclass dataset", "electronic components dataset",
+  "electronic component"
+
+Hit counts: "electro\s*com|sayeedi|111331|multiclass dataset" -> 5 lines across both papers
+(the four mentions above, plus the second line of CHEN's wrapped reference [7]).
+"electronic component" -> 46 lines, all of which are generic uses of the phrase or other
+references; none introduces an ElectroCom61 result.
+
+Follow-up sweep to establish what each paper DOES evaluate on:
+  "our dataset", "the dataset", "self-built", "self-constructed", "collected",
+  "Dataset I", "1610", "images were"
+
+COULD NOT DETERMINE
+
+Nothing. Both questions -- how many times ElectroCom61 is mentioned, and whether any result
+is computed on it -- resolved cleanly from the full text of both papers.
+
+IMPACT ON THE MANUSCRIPT
+
+No change required. This is the load-bearing check for the claim that exactly three studies
+report results on ElectroCom61, and it holds: Chen and Nguyen both cite the dataset and
+neither trains or evaluates on it.
+
+One optional correction is available. If the manuscript characterises Nguyen's citation of
+ElectroCom61, it may be worth noting that the citation is bibliographically wrong in the
+source (wrong journal, wrong year, wrong lead-author form). State that as a fact about the
+printed reference if it is used; do not let it change the scope conclusion, which does not
+depend on it.

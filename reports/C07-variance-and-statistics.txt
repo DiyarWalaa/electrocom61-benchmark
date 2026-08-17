@@ -1,0 +1,222 @@
+================================================================================
+CHECK    : C07 - Variance estimates and statistical testing in the two benchmark papers
+QUESTION : Where are Elhenidy's standard deviations, confidence intervals and paired t-tests
+           stated, what number of runs stands behind them, and does Gaib's reproduced table
+           carry variance columns?
+SOURCES  : [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 1-6 in full; TABLE I header on PDF p. 3, body rows on PDF p. 4;
+             300 dpi renders of all six pages.
+           [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7 in full; TABLE I on
+             PDF p. 4; 300 dpi renders of all seven pages.
+           Conference papers: neither carries a printed folio.
+VERDICT  : DIFFERS
+ONE LINE : Elhenidy's SDs, 95% CIs and paired t-test are located and transcribed, but the
+           paper states no number of runs, seeds, repetitions or folds anywhere -- while
+           Gaib, which drops all variance columns from the same table, is the paper that
+           states a resampling procedure, 3-fold cross-validation with k = 3.
+AFFECTS  : Section 2.4's account of what each study's uncertainty estimates rest on; the
+           note on row 12 of data/published_accuracy.csv, which records that Elhenidy states
+           neither the number of runs nor the procedure.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+PART 1 -- [ELHENIDY]
+
+1. THE STANDARD DEVIATIONS AND 95% CONFIDENCE INTERVALS ARE IN TABLE I, columns 4, 5 and 6.
+   The caption is on PDF p. 3 and reads "TABLE I. A COMPARISON OF YOLOV12 WITH THE
+   STATE-OF-THE-ART OBJECT DETECTION MODELS". The header row is also on PDF p. 3; all seven
+   body rows are on PDF p. 4. The three headers carrying variance are printed as:
+     "mAP@0.5 (mean +/- SD, 95% CI)"
+     "Precision (mean +/- SD, 95% CI)"
+     "Recall (mean +/- SD, 95% CI)"
+   Every one of the 21 cells in those three columns carries a value, a standard deviation
+   after a plus-minus sign, and a parenthesised interval. All 21 are transcribed below.
+
+2. THE PAIRED t-TEST IS IN SECTION IV BODY TEXT, PDF p. 4, left column, one sentence:
+   "Statistical tests (paired t-test, p < 0.05) confirm that YOLOv12s significantly
+   outperforms YOLOv8s and YOLOv9s across mAP, precision, and recall."
+   That is the only statistical test stated in the paper. No test statistic, no degrees of
+   freedom, no exact p-value, and no per-comparison result are given; the threshold
+   p < 0.05 is the only number attached to it. The comparison set is two models -- YOLOv8s
+   and YOLOv9s -- across three metrics.
+
+3. THE NUMBER OF RUNS BEHIND THE SDs AND CIs IS NOT STATED ANYWHERE IN THE PAPER. Searching
+   the full six pages for runs, repeated, repetitions, seed, trials, folds,
+   cross-validation, "n =", "average of", "three times", "five times", independent,
+   replicate, standard deviation and variance returns five lines, and every one of them is
+   an unrelated word-stem match ("real-world", "replicate various perspectives", "replicate
+   real-world situations", "practical relevance", "recall decreased"). None states a run
+   count, a seed, a repetition count, a fold count, or a resampling scheme.
+
+4. So the position in [ELHENIDY] is: 21 standard deviations, 21 confidence intervals and one
+   paired t-test are printed, and the sample size they are computed over is not stated. The
+   words "runs", "seed", "fold" and "cross-validation" do not occur in the paper at all.
+
+5. A SECONDARY OBSERVATION ON HOW THE VARIANCE IS WRITTEN IN THE BODY TEXT. Section IV's
+   prose does not repeat the numeric SDs and CIs from the table; it substitutes the literal
+   strings. For example, PDF p. 3: "YOLOv8s ... achieves a mean mAP@0.5 of 83.6% (+/-SD,
+   95% CI) but shows relatively low recall at 53.3% (+/-SD, 95% CI)". The parenthetical is
+   the placeholder text "(+/-SD, 95% CI)" rather than the values 0.4 and (83.2-84.0) that
+   TABLE I gives. This pattern runs through eight sentences on PDF pp. 3-4. The table is
+   the only place the numeric variance appears.
+
+PART 2 -- [GAIB]
+
+6. [GAIB]'s TABLE I CARRIES NO VARIANCE COLUMNS. CONFIRMED. Its six headers are Model,
+   Layers, Parameters (M), mAP@0.5, Precision, Recall. The mAP, precision and recall
+   headers carry no "(mean +/- SD, 95% CI)" decoration, and none of its 24 metric cells
+   carries a plus-minus sign or a parenthesised interval. The strings "SD", "95% CI",
+   "confidence interval", "standard deviation" and "t-test" return ZERO hits in the whole
+   paper.
+
+7. YET [GAIB] IS THE PAPER THAT STATES A RESAMPLING PROCEDURE. Section III "Methodology",
+   PDF p. 2 (continuing onto PDF p. 3), states: "To verify the reliability and
+   generalization ability of the proposed YOLOv13 model, the 3-fold cross validation
+   algorithm was used during the training phase. In this case, the entire data set was split
+   into three equal parts, such that each part was used once as a validation set, but the
+   other two parts were used for training. This was repeated three times, thus allowing to
+   test the model on different data splits and alleviate the risk of overfitting that comes
+   with one data split. Final performance indicators were calculated as the summative mean
+   of the obtained results of all the three validation runs". PDF p. 3 adds: "Using a value
+   of k = 3 is a reasonable trade off between the cost of computation and eliminating
+   variation in evaluation."
+
+8. [GAIB] also asserts a statistical test without any accompanying number. Section IV,
+   PDF p. 5: "Statistical tests confirm that YOLOv12s significantly outperforms YOLOv8s and
+   YOLOv9s across mAP, precision, and recall." This is [ELHENIDY]'s sentence with the
+   parenthetical "(paired t-test, p < 0.05)" removed. No test is named and no p-value is
+   given in [GAIB].
+
+9. THE COMBINED PICTURE IS THE INVERSE OF WHAT WOULD BE EXPECTED. The paper that prints
+   variance estimates states no procedure that could produce them; the paper that states a
+   3-fold cross-validation prints no variance estimates, and reproduces the earlier paper's
+   central values to the decimal in all 35 shared cells (see C03). Both facts are recorded
+   as printed.
+
+EVIDENCE
+
+[ELHENIDY] TABLE I -- all 21 variance-bearing cells, read from 300 dpi renders
+(reports/tables/ELHENIDY-p03-3.png for caption and header, ELHENIDY-p04-4.png for the body
+rows). Printed as "value +/- SD (low-high)"; the plus-minus is the typographic sign.
+
+| Model                  | mAP@0.5        | Precision      | Recall         |
+|                        | (mean +/- SD,  | (mean +/- SD,  | (mean +/- SD,  |
+|                        | 95% CI)        | 95% CI)        | 95% CI)        |
+|------------------------|----------------|----------------|----------------|
+| YOLO v8s [20]          | 83.6 +/- 0.4   | 81.4 +/- 0.5   | 53.3 +/- 0.6   |
+|                        | (83.2-84.0)    | (80.9-81.9)    | (52.7-53.9)    |
+| YOLO v9s [24]          | 84.9 +/- 0.3   | 88.6 +/- 0.4   | 59.8 +/- 0.5   |
+|                        | (84.6-85.2)    | (88.2-89.0)    | (59.3-60.3)    |
+| YOLOv10s [21]          | 86.7 +/- 0.5   | 87.5 +/- 0.3   | 63.5 +/- 0.4   |
+|                        | (86.2-87.2)    | (87.2-87.8)    | (63.1-63.9)    |
+| YOLOv11s [22]          | 87.6 +/- 0.4   | 83.2 +/- 0.6   | 65.8 +/- 0.5   |
+|                        | (87.2-88.0)    | (82.6-83.8)    | (65.3-66.3)    |
+| EcoDetect-YOLOv2 [11]  | 88.5 +/- 0.5   | 84.2 +/- 0.4   | 64.7 +/- 0.6   |
+|                        | (88.0-89.0)    | (83.8-84.6)    | (64.1-65.3)    |
+| YOLO_EC [13]           | 88.7 +/- 0.3   | 86.3 +/- 0.5   | 66.9 +/- 0.4   |
+|                        | (88.4-89.0)    | (85.8-86.8)    | (66.5-67.3)    |
+| YOLOv12S [12] (bold)   | 89.1 +/- 0.4   | 82.1 +/- 0.3   | 68.5 +/- 0.5   |
+|                        | (88.7-89.5)    | (81.8-82.4)    | (68.0-69.0)    |
+
+Location summary for [ELHENIDY]:
+
+| Item                          | PDF p | Location                                        |
+|-------------------------------|-------|-------------------------------------------------|
+| SD, all 21 cells              | 4     | TABLE I, cols 4-6 (header and caption on p. 3)  |
+| 95% CI, all 21 cells          | 4     | TABLE I, cols 4-6 (header and caption on p. 3)  |
+| Paired t-test, p < 0.05       | 4     | Section IV body text, left column               |
+| Number of runs / seeds / folds| --    | NOT FOUND anywhere in PDF pp. 1-6               |
+
+Location summary for [GAIB]:
+
+| Item                          | PDF p | Location                                        |
+|-------------------------------|-------|-------------------------------------------------|
+| Variance columns in TABLE I   | --    | NOT PRESENT; headers are bare mAP@0.5,           |
+|                               |       | Precision, Recall                               |
+| SD anywhere                   | --    | NOT FOUND (0 hits)                              |
+| 95% CI anywhere               | --    | NOT FOUND (0 hits)                              |
+| t-test named                  | --    | NOT FOUND (0 hits); an unnamed "Statistical      |
+|                               |       | tests confirm" sentence appears on PDF p. 5     |
+| p-value                       | --    | NOT FOUND (0 hits)                              |
+| 3-fold cross-validation       | 2-3   | Section III "Methodology"                       |
+| k = 3                         | 3     | Section III "Methodology"                       |
+| "repeated three times"        | 2     | Section III "Methodology"                       |
+| "three validation runs"       | 3     | Section III "Methodology"                       |
+
+Side-by-side on the point the check turns on:
+
+| Quantity                        | [ELHENIDY]              | [GAIB]                   |
+|---------------------------------|-------------------------|--------------------------|
+| Variance printed in the table   | yes, 21 SDs + 21 CIs    | no                       |
+| Statistical test named          | yes, paired t-test      | no, "statistical tests"  |
+| p-value threshold given         | yes, p < 0.05           | no                       |
+| Resampling procedure stated     | no                      | yes, 3-fold CV, k = 3    |
+| Number of runs stated           | no                      | yes, three               |
+
+SEARCH TERMS USED
+
+Over the full text layer of [ELHENIDY] (6 pages), case-insensitive:
+
+  \bruns?\b | repeat | \bseed | trial | \bfold | cross[- ]valid | n\s*= | average of |
+  three times | five times | independent | replicat | standard deviation | variance
+
+Result: 5 matching lines, all incidental stem matches, none stating a count. Specifically
+"real-world" (PDF pp. 2, 2), "replicate various perspectives" (PDF p. 2), "replicate
+real-world situations" (PDF p. 2), "recall decreased" (PDF p. 1). Zero hits for "runs",
+"seed", "fold", "cross-validation", "repeated", "trials", "n =", "average of",
+"three times", "five times", "standard deviation", "variance".
+
+Over the full text layer of both papers, case-insensitive:
+
+  Table\s*(2|II)\b | 95% CI | \bSD\b | t-test | t test | p-value | p < | confidence interval
+
+Result: 12 matching lines, ALL in [ELHENIDY], ZERO in [GAIB]. This is the direct evidence
+for finding 6.
+
+Over the full text layer of [GAIB] (7 pages):
+
+  cross[- ]valid | \bfold | k\s*=\s*3 | validation run | repeated
+
+Result: the Section III passage transcribed in finding 7.
+
+Both tables additionally read off 300 dpi page renders rather than the text layer, so the
+presence or absence of a variance decoration in a header is established visually and not
+from extraction. No text-layer/image disagreement was found in either table.
+
+COULD NOT DETERMINE
+
+How many runs [ELHENIDY]'s standard deviations and confidence intervals were computed over.
+This is a genuine NOT STATED: the paper prints the estimates and does not print the sample
+size, the seed, the repetition count, or any procedure that would fix one. The interval
+widths in TABLE I are all consistent with roughly +/- 2 SD / sqrt(n) for a small n, but the
+paper licenses no such inference and none is asserted here.
+
+Whether [GAIB]'s 3-fold cross-validation was applied to the seven rows it shares with
+[ELHENIDY] or only to its own YOLOv13s row. Section III states it for "the proposed YOLOv13
+model"; nothing states what produced the other seven rows, whose central values match
+[ELHENIDY]'s exactly.
+
+What test [GAIB]'s unnamed "Statistical tests confirm" sentence refers to.
+
+IMPACT ON THE MANUSCRIPT
+
+The note on row 12 of data/published_accuracy.csv is accurate and should stand: Elhenidy
+"states neither the number of runs nor the procedure, so plus_minus and the interval are
+transcribed as printed rather than interpreted here." This check confirms both halves of
+that sentence against the full text.
+
+One addition is worth making to Section 2.4, because the finding is the opposite of the
+natural assumption and the manuscript would otherwise be silent on it. The variance
+estimates and the resampling procedure are in DIFFERENT papers: Elhenidy prints 21 standard
+deviations and 21 confidence intervals with no stated number of runs, and Gaib -- which
+drops every variance column while reproducing Elhenidy's central values to the decimal --
+is the paper that states 3-fold cross-validation with k = 3 and three validation runs.
+Stated as a fact requiring resolution rather than as an accusation: the uncertainty
+estimates in the earlier study and the resampling procedure in the later one are not
+attached to the same set of numbers, and neither paper explains the relationship.
+
+If the manuscript quotes Elhenidy's t-test, quote its scope with it. It is stated for two
+comparisons only -- YOLOv12s against YOLOv8s and against YOLOv9s -- across three metrics,
+with p < 0.05 as the only number given. It is not a test across the full seven-row table.

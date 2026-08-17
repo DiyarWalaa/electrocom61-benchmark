@@ -1,0 +1,186 @@
+================================================================================
+CHECK    : C06 - Where mAP@50-95 appears in the two benchmark papers
+QUESTION : Does mAP@50-95 appear in Elhenidy or Gaib as a results-table cell, a figure axis,
+           body text, or nowhere?
+SOURCES  : [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 1-6, full text plus 300 dpi renders of all six pages.
+           [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7, full text plus 300 dpi
+             renders of all seven pages.
+           Conference papers: neither carries a printed folio.
+VERDICT  : DIFFERS
+ONE LINE : Neither paper reports mAP@50-95 as a number anywhere -- in both it appears only
+           as a training-curve panel title with no readable value, and in Gaib additionally
+           as an unquantified mention in body text -- so a reader cannot obtain a
+           mAP@50-95 figure for any model from either paper.
+AFFECTS  : Section 2.4; the manuscript's rule that mAP@50 is never reported alone, and any
+           statement about what the prior work does and does not report at the stricter
+           threshold.
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. NEITHER PAPER'S RESULTS TABLE CONTAINS mAP@50-95. [ELHENIDY] TABLE I has six columns:
+   Model, Layers, Parameters (M), mAP@0.5 (mean +/- SD, 95% CI), Precision (mean +/- SD,
+   95% CI), Recall (mean +/- SD, 95% CI). [GAIB] TABLE I has six columns: Model, Layers,
+   Parameters (M), mAP@0.5, Precision, Recall. There is no mAP@50-95 column in either, and
+   therefore no mAP@50-95 cell for any of the 7 and 8 models respectively.
+
+2. IN [ELHENIDY] mAP@50-95 APPEARS EXACTLY ONCE, AS A FIGURE PANEL TITLE. Fig. 3 "Training
+   performance results", PDF p. 5, is a ten-panel grid of Ultralytics training curves. The
+   tenth panel, bottom right, is titled "metrics/mAP50-95(B)". It appears nowhere else in
+   the paper: not in the abstract, not in Section IV, not in the conclusion, not in TABLE I.
+
+3. IN [GAIB] mAP@50-95 APPEARS TWICE. Once as a figure panel title -- Fig. 3 "Training
+   performance results", PDF p. 5, panel titled "metrics/mAP50-95(B)", second row leftmost.
+   And once in body text on the same page: "The evaluation measures, such as precision,
+   recall, mAP50, and mAP50-95, indicate the improvement to occur swiftly in the initial
+   epochs and then a gentle plateau". That sentence names the metric but attaches no value
+   to it.
+
+4. NO NUMERIC VALUE IS READABLE for mAP@50-95 in either paper. On both figures the metric
+   is a plotted curve against epochs, with a y-axis carrying tick labels but no printed
+   value for any specific model or epoch, and no data labels. What can be read is the axis
+   range and the approximate plateau level of the curve, recorded below because it is the
+   only quantitative information the figures carry.
+
+5. THE TWO FIGURES DISAGREE SHARPLY on the level the curve reaches, and the axis ranges
+   differ accordingly:
+
+| Paper     | PDF p | Figure | Panel title            | y-axis range | y-ticks              |
+|-----------|-------|--------|------------------------|--------------|----------------------|
+| ELHENIDY  | 5     | Fig. 3 | metrics/mAP50-95(B)    | 0.0 to 0.4   | 0.0, 0.1, 0.2, 0.3,  |
+|           |       |        |                        |              | 0.4                  |
+| GAIB      | 5     | Fig. 3 | metrics/mAP50-95(B)    | 0.0 to 0.6   | 0.0, 0.1, 0.2, 0.3,  |
+|           |       |        |                        |              | 0.4, 0.5, 0.6        |
+
+   [ELHENIDY]'s curve rises quickly and then plateaus at roughly 0.28-0.35, fluctuating
+   within that band for the rest of the run. [GAIB]'s curve rises quickly and then plateaus
+   at roughly 0.58-0.60. Both figures show a single model's training run, not one curve per
+   table row.
+
+6. A SEPARATE OBSERVATION FROM THE SAME FIGURES, ON THE x-AXIS. [GAIB]'s Fig. 3 panels run
+   from 0 to 100 on the x-axis with ticks at 0, 50 and 100, consistent with the 100 epochs
+   its Section IV states. [ELHENIDY]'s Fig. 3 panels carry ticks only at 0 and 100, and the
+   plotted data extends well past the 100 tick, to roughly 175-180. [ELHENIDY] Section IV
+   states "Training is conducted for 100 epochs". The figure and the stated epoch count do
+   not agree. Recorded as read off the render; no epoch count is printed on the figure
+   itself.
+
+7. mAP@75 appears in [GAIB] only, as a further panel title "metrics/mAP75(B)" (Fig. 3,
+   PDF p. 5, second row rightmost), plateauing at roughly 0.65. It has no table column and
+   no body-text value either. [ELHENIDY]'s Fig. 3 has no mAP75 panel.
+
+8. FOR CONTEXT, THE mAP@50 FIGURES ON THE SAME PLOTS do not match the tables. [ELHENIDY]'s
+   metrics/mAP50(B) panel plateaus at roughly 0.70 while its TABLE I reports 89.1 for
+   YOLOv12S. [GAIB]'s metrics/mAP50(B) panel plateaus at roughly 0.90 while its TABLE I
+   reports 91.8 for YOLOv13s. Neither paper states which model, split or run the figure
+   depicts, so the two quantities are not necessarily the same measurement and no
+   discrepancy is asserted here -- only that the figure cannot be used to read a table
+   value back.
+
+EVIDENCE
+
+Every occurrence of the metric, in both papers, with its exact printed form:
+
+| # | Paper    | PDF p | Where                    | Printed form           | Numeric value? |
+|---|----------|-------|--------------------------|------------------------|----------------|
+| 1 | ELHENIDY | 5     | Fig. 3, panel title,     | metrics/mAP50-95(B)    | none           |
+|   |          |       | bottom row rightmost     |                        |                |
+| 2 | GAIB     | 5     | Fig. 3, panel title,     | metrics/mAP50-95(B)    | none           |
+|   |          |       | second row leftmost      |                        |                |
+| 3 | GAIB     | 5     | Body text, Section IV,   | "mAP50-95"             | none           |
+|   |          |       | right column             |                        |                |
+
+Distinguished as the check requires:
+
+| Location type                    | [ELHENIDY]        | [GAIB]                        |
+|----------------------------------|-------------------|-------------------------------|
+| Results table cell               | NOT FOUND         | NOT FOUND                     |
+| Training-curve figure / axis     | FOUND, Fig. 3,    | FOUND, Fig. 3, PDF p. 5       |
+|                                  | PDF p. 5          |                               |
+| Body text                        | NOT FOUND         | FOUND, PDF p. 5, Section IV   |
+| Abstract / conclusion            | NOT FOUND         | NOT FOUND                     |
+| Nowhere                          | --                | --                            |
+
+Full panel inventory of both training-curve figures, read off the 300 dpi renders
+(reports/tables/ELHENIDY-p05-5.png, reports/tables/GAIB-p05-5.png):
+
+  [ELHENIDY] Fig. 3, PDF p. 5, ten panels in two rows of five:
+    row 1: train/box_loss | train/cls_loss | train/dfl_loss | metrics/precision(B)
+           | metrics/recall(B)
+    row 2: val/box_loss | val/cls_loss | val/dfl_loss | metrics/mAP50(B)
+           | metrics/mAP50-95(B)
+
+  [GAIB] Fig. 3, PDF p. 5, ten panels in two rows of five:
+    row 1: train/box_loss | train/cls_loss | train/dfl_loss | metrics/precision(B)
+           | metrics/recall(B)
+    row 2: metrics/mAP50-95(B) | val/box_loss | val/cls_loss | metrics/mAP50(B)
+           | metrics/mAP75(B)
+
+  Both figures carry a legend reading "results" (solid, with markers) and "smooth"
+  (dotted). Both are the standard Ultralytics results.png layout, [GAIB]'s with the panels
+  reordered and val/dfl_loss replaced by metrics/mAP75(B).
+
+Approximate values readable from the mAP50-95 curves. These are read off the plot and are
+NOT printed numbers; they are recorded only to show what the figure does and does not
+support:
+
+| Paper     | y-axis range | plateau band (read off plot) | x-axis extent           |
+|-----------|--------------|------------------------------|-------------------------|
+| ELHENIDY  | 0.0 - 0.4    | approx. 0.28 - 0.35          | 0 to approx. 175-180    |
+| GAIB      | 0.0 - 0.6    | approx. 0.58 - 0.60          | 0 to 100                |
+
+SEARCH TERMS USED
+
+Case-insensitive regex over the per-page text layer of both PDFs (6 + 7 = 13 pages):
+
+  50-95 | 50:95 | 0\.5:0\.95 | 50_95 | mAP50 | mAP@0\.5: | AP50
+
+Returned 2 lines, both in [GAIB] PDF p. 5, both part of the same body-text sentence. The
+figure panel titles are raster text inside the plotted images and carry no text layer, so
+they cannot be found by search at all; they were located by rendering every page of both
+papers at 300 dpi and reading the figures directly. That is why the visual pass, not the
+text search, is the operative evidence for this check.
+
+Also searched, to confirm the metric is absent from the tables rather than merely
+unmatched by the patterns above: the full column-header strings of both TABLE I
+transcriptions in C02, cell by cell.
+
+COULD NOT DETERMINE
+
+The exact mAP@50-95 value either training run reached. Neither paper prints one, and the
+figures carry no data labels. The plateau bands above are estimates read off a plot and
+must not be quoted as published values.
+
+Which model each Fig. 3 depicts. Neither paper states it. In [ELHENIDY] the surrounding
+text discusses YOLOv12s and in [GAIB] YOLOv13s, which makes those the natural readings, but
+neither figure nor caption says so.
+
+Why [ELHENIDY]'s Fig. 3 x-axis extends to roughly 175-180 when its Section IV states 100
+epochs. The figure carries no epoch label and the text carries no second epoch count.
+
+IMPACT ON THE MANUSCRIPT
+
+This is the check whose verdict is DIFFERS, and the difference is one of degree rather than
+direction: the metric is present in both papers, but no value is.
+
+If Section 2.4 says the prior work reports mAP@50 without mAP@50-95, that is right in
+substance and can be made exact and unarguable by naming where the metric does appear:
+neither paper's results table has a mAP@50-95 column, and the metric surfaces only as a
+training-curve panel title in both -- plus one unquantified sentence in Gaib -- so no
+mAP@50-95 figure can be obtained for any model from either source. Written that way the
+sentence survives a reader who opens Gaib at page 5, sees "mAP50-95" in the text, and would
+otherwise think the claim overstated.
+
+Two further items are available if wanted, both facts about what is printed:
+
+  - The two Fig. 3 mAP50-95 curves plateau in visibly different bands, roughly 0.28-0.35
+    and roughly 0.58-0.60, on y-axes of different range. Since the two papers' tables agree
+    to the decimal on all 35 shared cells (see C03), the figures are the one place where the
+    two studies visibly diverge.
+
+  - Elhenidy's training curves run past 100 epochs on the x-axis while its Section IV states
+    100 epochs. If Section 2.4 or the configuration table cites "100 epochs" from that
+    paper, this is a discrepancy in the source requiring resolution, and C08 records the
+    exact sentence the 100 comes from.

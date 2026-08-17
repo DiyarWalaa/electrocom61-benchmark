@@ -1,0 +1,184 @@
+================================================================================
+CHECK    : C04 - Parameter counts, model size, FLOPs and layer counts in the two benchmark
+           papers
+QUESTION : What complexity figures do Elhenidy and Gaib print for YOLO11s, YOLOv12s and
+           YOLOv9s, and do either state whether the counts are fused or unfused?
+SOURCES  : [ELHENIDY] Automated-Electronic-Components-Waste-Detection-Using-YOLOv12.pdf,
+             PDF pp. 1-6 in full; TABLE I header on PDF p. 3, body rows on PDF p. 4.
+           [GAIB] E-waste detection base on yolov13.pdf, PDF pp. 1-7 in full; TABLE I on
+             PDF p. 4.
+           Table values read from 300 dpi renders (reports/tables/ELHENIDY-p03-3.png,
+           ELHENIDY-p04-4.png, GAIB-p04-4.png).
+           Conference papers: neither carries a printed folio.
+VERDICT  : CONFIRMED
+ONE LINE : All three manuscript figures are confirmed in both tables -- 2.5 M for YOLOv11s,
+           19.7 M for YOLOv12S, 60.8 M for YOLOv9s -- but both papers' body text attributes
+           "~2.5M parameters" to YOLOv10s, which their own tables give as 2.6 M, and neither
+           paper mentions fusion, reparameterisation or FLOPs anywhere.
+AFFECTS  : Section 2.4 and Section 7.4's use of published parameter counts;
+           data/published_complexity.csv (all 15 rows).
+RUN      : 2026-08-17 15:13, commit 00d8aae
+================================================================================
+
+FINDINGS
+
+1. The manuscript's three figures are confirmed, in both papers, in the column headed
+   "Parameters (M)":
+
+| Model    | Manuscript claim | [ELHENIDY] printed | [GAIB] printed | Verdict   |
+|----------|------------------|--------------------|----------------|-----------|
+| YOLO11s  | 2.5 M            | 2.5                | 2.5            | CONFIRMED |
+| YOLOv12s | 19.7 M           | 19.7               | 19.7           | CONFIRMED |
+| YOLOv9s  | 60.8 M           | 60.8               | 60.8           | CONFIRMED |
+
+   The row labels as printed are "YOLOv11s [22]", "YOLOv12S [12]" (capital S) and
+   "YOLO v9s [24]" (with a space). The unit is carried by the column header "Parameters
+   (M)"; no cell prints a unit of its own.
+
+2. EVERY complexity figure printed in either paper is a value in one of two columns,
+   "Layers" and "Parameters (M)". There is no third complexity column. Both papers print
+   exactly 7 x 2 = 14 such values ([ELHENIDY]) and 8 x 2 = 16 ([GAIB]).
+
+3. NOT FOUND in either paper, anywhere: GFLOPs, FLOPs, MACs, model size in MB, weight-file
+   size, memory footprint, or any complexity figure other than layers and parameters.
+
+4. NOT FOUND in either paper, anywhere: any statement of whether the parameter counts are
+   fused or unfused; any mention of batch-norm fusion, model.fuse(), reparameterisation,
+   re-parameterisation, or a deploy mode. The word "fuse"/"fused"/"fusion" occurs in both
+   papers only in architectural descriptions (Adaptive Spatial Feature Fusion in
+   [ELHENIDY]; HyberACE feature fusion in [GAIB]) and inside "confusion matrix". So the
+   answer to the fused/unfused question is: NOT STATED, in both papers.
+
+5. AN INTERNAL INCONSISTENCY, present in both papers, between body text and table. Both
+   papers' Section IV states "Despite having only ~2.5M parameters, YOLOv10s achieves an
+   mAP@0.5 of 86.7%". Both papers' TABLE I gives YOLOv10s as 2.6 and YOLOv11s as 2.5. The
+   ~2.5M attribution in the prose belongs to the adjacent row. The tables are internally
+   consistent with each other and are the values transcribed above; the prose is not
+   consistent with the tables.
+
+6. [ELHENIDY] prints one further complexity statement, in Section V "Conclusion and future
+   work": YOLOv12s "achieves the highest mAP@0.5 (89.1%) and recall (68.5%) while
+   maintaining a moderate parameter count (19.7M)". This agrees with TABLE I.
+   [GAIB] prints the equivalent for its own model in Section IV: YOLOv13s "With 648 layers
+   and 2.5M parameters". This agrees with its TABLE I.
+
+7. [ELHENIDY] Section IV contains the phrase "while maintaining a compact model size". No
+   number accompanies it. It is a qualitative statement, not a model-size figure.
+
+EVIDENCE
+
+Every complexity figure printed in [ELHENIDY]. Source: TABLE I, caption and header row on
+PDF p. 3, body rows on PDF p. 4. Column headers as printed: "Layers" and "Parameters (M)".
+
+| Row label (as printed) | Layers | Parameters (M) | PDF p | Column header  |
+|------------------------|--------|----------------|-------|----------------|
+| YOLO v8s [20]          | 214    | 17.6           | 4     | Layers / Parameters (M) |
+| YOLO v9s [24]          | 930    | 60.8           | 4     | Layers / Parameters (M) |
+| YOLOv10s [21]          | 319    | 2.6            | 4     | Layers / Parameters (M) |
+| YOLOv11s [22]          | 272    | 2.5            | 4     | Layers / Parameters (M) |
+| EcoDetect-YOLOv2 [11]  | 196    | 23.4           | 4     | Layers / Parameters (M) |
+| YOLO_EC [13]           | 325    | 25.1           | 4     | Layers / Parameters (M) |
+| YOLOv12S [12] (bold)   | 292    | 19.7           | 4     | Layers / Parameters (M) |
+
+Every complexity figure printed in [GAIB]. Source: TABLE I, entirely on PDF p. 4. Column
+headers as printed: "Layers" and "Parameters (M)".
+
+| Row label (as printed) | Layers | Parameters (M) | PDF p | Column header  |
+|------------------------|--------|----------------|-------|----------------|
+| YOLO v8s [20]          | 214    | 17.6           | 4     | Layers / Parameters (M) |
+| YOLO v9s [24]          | 930    | 60.8           | 4     | Layers / Parameters (M) |
+| YOLOv10s [21]          | 319    | 2.6            | 4     | Layers / Parameters (M) |
+| YOLOv11s [22]          | 272    | 2.5            | 4     | Layers / Parameters (M) |
+| EcoDetect-YOLOv2 [11]  | 196    | 23.4           | 4     | Layers / Parameters (M) |
+| YOLO_EC [13]           | 325    | 25.1           | 4     | Layers / Parameters (M) |
+| YOLOv12S [12]          | 292    | 19.7           | 4     | Layers / Parameters (M) |
+| YOLOv13s [26] (bold)   | 648    | 2.5            | 4     | Layers / Parameters (M) |
+
+Complexity figures appearing in body text rather than in a table:
+
+| Paper     | PDF p | Section | Printed statement                                       |
+|-----------|-------|---------|---------------------------------------------------------|
+| ELHENIDY  | 3     | IV      | "YOLOv8s, with 214 layers and 17.6M parameters"         |
+| ELHENIDY  | 3     | IV      | "YOLOv9s increases architectural depth to 930 layers    |
+|           |       |         | with 60.8M parameters"                                  |
+| ELHENIDY  | 3     | IV      | "Despite having only ~2.5M parameters, YOLOv10s         |
+|           |       |         | achieves an mAP@0.5 of 86.7%"  <-- table says 2.6 for   |
+|           |       |         | YOLOv10s and 2.5 for YOLOv11s                           |
+| ELHENIDY  | 4     | IV      | "With 292 layers and 19.7M parameters"  (YOLOv12s)      |
+| ELHENIDY  | 6     | V       | "maintaining a moderate parameter count (19.7M)"        |
+| GAIB      | 3     | IV      | "YOLOv8s has 214 layers and 17.6M parameters"           |
+| GAIB      | 3     | IV      | "YOLOv9s increases architectural depth to 930 layers    |
+|           |       |         | with 60.8M parameters"                                  |
+| GAIB      | 3     | IV      | "Despite having only ~2.5M parameters, YOLOv10s         |
+|           |       |         | achieves an mAP@0.5 of 86.7%"  <-- same inconsistency   |
+| GAIB      | 5     | IV      | "YOLOv12s with 292 layers and 19.7M parameters"         |
+| GAIB      | 5     | IV      | "With 648 layers and 2.5M parameters"  (YOLOv13s)       |
+
+Fusion question, stated as a negative with its search evidence:
+
+| Term searched   | [ELHENIDY] hits                    | [GAIB] hits                       |
+|-----------------|------------------------------------|-----------------------------------|
+| fuse            | 0                                  | 0                                 |
+| fused           | 0                                  | 2, both architectural ("the       |
+|                 |                                    | outputs of these are fused        |
+|                 |                                    | together using 1*1 convolutions"; |
+|                 |                                    | "the fused feature tensor"),      |
+|                 |                                    | PDF p. 2                          |
+| fusion          | 2, both architectural ("Adaptive   | 2, both architectural ("multi-    |
+|                 | Spatial Feature Fusion (ASFF)",    | scale feature fusion in the neck",|
+|                 | PDF p. 2; "efficient feature       | PDF p. 5; "effective feature      |
+|                 | fusion", PDF p. 6)                 | fusion", PDF p. 6)                |
+| reparam         | 0                                  | 0                                 |
+| re-param        | 0                                  | 0                                 |
+| deploy mode     | 0                                  | 0                                 |
+| GFLOP           | 0                                  | 0                                 |
+| FLOP            | 0                                  | 0                                 |
+| model size      | 1, qualitative, no number ("while  | 1, qualitative, no number ("at    |
+|                 | maintaining a compact model size", | the same time having a small      |
+|                 | PDF p. 2)                          | model size", PDF p. 3)            |
+| MB              | 0                                  | 0                                 |
+| .pt             | 0                                  | 0                                 |
+| weights         | 0                                  | 0                                 |
+
+SEARCH TERMS USED
+
+  fuse, fused, fusion, reparam, re-param, deploy mode, GFLOP, FLOP, model size, weights,
+  \.pt\b, MB\b, params, parameters, layers, complexity, memory, footprint, MACs
+
+Run case-insensitively over the per-page text layer of both PDFs (6 + 7 = 13 pages), then
+every hit read back in context. Table cells additionally read off 300 dpi page renders
+rather than the text layer, because the IEEE two-column layout splits [ELHENIDY]'s table
+header from its body across a page break. No text-layer/image disagreement was found in
+either table.
+
+COULD NOT DETERMINE
+
+Whether the printed parameter counts are fused or unfused. Neither paper says, and neither
+gives any of the secondary evidence -- a GFLOPs figure, a weight-file size, a printed
+Ultralytics banner line -- from which it could be inferred. This is a genuine NOT STATED in
+both sources, not a failure to find it.
+
+Whether the 648-layer / 2.5 M figure [GAIB] prints for YOLOv13s is on the same counting
+basis as the seven rows it shares with [ELHENIDY]. Nothing printed establishes it.
+
+IMPACT ON THE MANUSCRIPT
+
+No change required to the three figures. 2.5 M for YOLO11s, 19.7 M for YOLOv12s and 60.8 M
+for YOLOv9s are all confirmed in both papers' tables, and data/published_complexity.csv
+records them correctly for both sources.
+
+Two things are worth carrying into the prose, because both bear on how much weight a
+published parameter count can take:
+
+  - Neither paper states whether its counts are fused or unfused. If Section 7.4 compares a
+    published count against a count this study measures, the comparison rests on an
+    assumption the sources do not license, and saying so is a fact about the sources rather
+    than a criticism of them. The absence is now on record here rather than needing
+    rediscovery.
+
+  - The "~2.5M parameters, YOLOv10s" sentence appears in both papers and disagrees with
+    both papers' own tables, which give YOLOv10s 2.6 and YOLOv11s 2.5. If the manuscript
+    ever quotes a parameter count from the body text of either paper rather than from
+    TABLE I, this is the sentence to avoid. Stated as a discrepancy requiring resolution:
+    the table and the prose of each paper give different parameter counts for YOLOv10s, and
+    this report takes the table as the value of record.

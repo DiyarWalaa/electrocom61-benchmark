@@ -6,7 +6,8 @@
 % defending, it belongs in the body instead.
 %
 % CONSTRAINTS, each checked mechanically after drafting:
-%   - Every numeral appears elsewhere in the paper: 15, 61, 2,121, 12,937.
+%   - Every numeral appears elsewhere in the paper: 61, 2,121, 12,937. The 15
+%     left with the unevaluable-classes paragraph on 2026-08-17; see below.
 %   - Every citation is already in references.bib and already used elsewhere.
 %   - No claim that Sections 3-9 do not support.
 %
@@ -40,12 +41,29 @@
 % hundredfold lower and does not train at all without it. In a paper whose
 % argument is that experimental conditions go under-reported, that was the worst
 % possible thing to compress. The wording follows 5.2's own ("an identical
-% configuration, with one exception") and the paragraph after the list names the
-% deviation and forwards to 5.3. The same edit was made to the abstract and to
-% Section 9's first paragraph. NOTE THE SCOPE: the deviation is a CONFIGURATION
+% configuration, with one exception"). The same edit was made to the abstract and
+% to Section 9's first paragraph. NOTE THE SCOPE: the deviation is a CONFIGURATION
 % difference, the learning rate. RT-DETR-l also early-stopped at epochs 59 and
 % 73 while every YOLO ran the full 100, but that is an OUTCOME of a patience
 % setting shared by all ten runs, not a second deviation; Section 8 reports it.
+%
+% TWO PARAGRAPHS LEFT ON 2026-08-17, and neither should come back.
+%   - THE DEVIATION PARAGRAPH, which followed the contributions list and read
+%     "The deviation is the transformer detector's learning rate." It explained a
+%     methods caveat before the reader knows what RT-DETR is or what the shared
+%     configuration was. Contribution 3 now names the deviation inline and
+%     forwards to 5.3, which carries the full account. The forward reference is
+%     \ref{sec:rtdetr-lr} -- note the LABEL is sec:rtdetr-lr while the SUBSECTION
+%     TITLE is "A configuration that is uniform but not neutral"; they do not
+%     match, so do not guess the label from the title.
+%   - THE UNEVALUABLE-CLASSES PARAGRAPH, which read "Underneath that disagreement
+%     is a defect in the published partition. Fifteen of the 61 classes..." It
+%     delivered the audit's headline finding one paragraph BEFORE the objective
+%     sentence asks the question it answers. What replaced it states which
+%     properties the published record is missing, in the same order as the
+%     objective's three limbs, without pre-empting the finding. The finding
+%     itself is in the abstract, 3.1 and 9. Nothing in Sections 2-9 refers back
+%     here for it; checked 2026-08-17.
 %
 % WORDING THAT MUST NOT DRIFT BACK. "None of the three prior studies tabulates"
 % is exact and was arrived at after a false claim reached the built PDF: both
@@ -77,13 +95,15 @@ reader would need in order to reconcile them --- which version of the dataset
 was used, which partition the figures were computed on, what seed was drawn, or
 which release of the model library produced the architectures.
 
-Underneath that disagreement is a defect in the published partition. Fifteen of
-the 61 classes have no instances in either the validation or the test set, so no
-score reported on that partition can include them. They are not the rare
-classes: eight of the ten most heavily annotated classes in the dataset are
-among the fifteen. What determines whether a class can be evaluated is which
-capture session it was photographed in, and whether that session happened to be
-assigned entirely to training.
+Underneath that disagreement sits a question about the figures themselves. A mean
+average precision is an average over classes, and what a published one on this
+dataset averages over is not stated by any of the three studies: none reports the
+number of classes its evaluation actually reached, which partition its figures
+come from, or which release of the model library produced its architectures. Nor
+does any of them report a timing measurement, so a reader has no way to tell
+whether the better model is fast enough for the conveyor. The properties needed
+to interpret a result on this dataset are absent from the record that reports
+them.
 
 This paper asks what a detection result reported on ElectroCom61 measures: which
 classes the figure covers, which metric it rests on, and whether it bears on the
@@ -103,16 +123,13 @@ This paper makes three contributions.
     evaluable while the split sizes and the measured test--train contamination
     are held at their published values.
   \item A controlled benchmark of five detectors on both partitions under one
-    configuration, with a single documented deviation, establishing that
-    correcting the split raises every model's score, and reporting mAP@50--95,
-    per-class average precision, the number of classes actually evaluated and
-    inference latency --- none of which the three prior studies tabulate.
+    configuration, with a single documented deviation --- a hundredfold lower
+    learning rate for the transformer detector (Section~\ref{sec:rtdetr-lr}) ---
+    establishing that correcting the split raises every model's score, and
+    reporting mAP@50--95, per-class average precision, the number of classes
+    actually evaluated and inference latency ---
+    none of which the three prior studies tabulate.
 \end{enumerate}
-
-The deviation is the transformer detector's learning rate. It does not train at
-the value that trains the four convolutional detectors, and the figures reported
-for it use one a hundredfold lower. Section~\ref{sec:rtdetr-lr} gives the
-evidence and what follows from it for comparisons across architecture families.
 
 Two of these results run against expectation. The defect had been understating
 reported performance rather than inflating it, which is the reverse of what a

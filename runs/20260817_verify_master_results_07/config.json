@@ -1,0 +1,21 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "failed": 0,
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "34bafe412297f67490458ed2b5c584ffc0cf7ff88469cf89663461dd0b532a6c",
+  "params": {
+    "comparison": "exact unless a tolerance is declared",
+    "n_expectations": 13,
+    "tables": [
+      "C:\\research\\electrocom61\\data\\master_results.csv",
+      "C:\\research\\electrocom61\\data\\latency_by_arch.csv"
+    ]
+  },
+  "passed": 17,
+  "platform": "Windows-11-10.0.26200-SP0",
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-17T16:04:26.079458Z",
+  "script": "verify_master_results.py",
+  "script_sha256": "b11549115faca3530ffa5fe373ccdcb51acf99cac2f61526918aed977f9fbe7e"
+}

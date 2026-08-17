@@ -1,0 +1,95 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "derived_best_epoch": 4,
+  "derived_best_fitness": 0.0018410000000000002,
+  "gpu": "Tesla P100-PCIE-16GB",
+  "inputs": {
+    "data\\kaggle\\artifacts\\rtdetr_l_pub\\rtdetr_l_pub_training_curves.csv": "4bc4a9cca74ffdf22819472fb4d1b5228314a0bac64daf350815aa14af135383",
+    "data\\kaggle\\results_rtdetr_l_pub.json": "685de5e35c7cf24300c37245cbe552bf85a2a6f45d0d73a4acab5fa6b5d3832b"
+  },
+  "lr0": 0.01,
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "34bafe412297f67490458ed2b5c584ffc0cf7ff88469cf89663461dd0b532a6c",
+  "nan_onset": {
+    "train/cls_loss": {
+      "finite_epochs_after": [],
+      "first_nan_epoch": 7
+    },
+    "train/giou_loss": {
+      "finite_epochs_after": [],
+      "first_nan_epoch": 7
+    },
+    "train/l1_loss": {
+      "finite_epochs_after": [],
+      "first_nan_epoch": 7
+    },
+    "val/cls_loss": {
+      "finite_epochs_after": [
+        4
+      ],
+      "first_nan_epoch": 2
+    },
+    "val/giou_loss": {
+      "finite_epochs_after": [
+        4
+      ],
+      "first_nan_epoch": 2
+    },
+    "val/l1_loss": {
+      "finite_epochs_after": [
+        4
+      ],
+      "first_nan_epoch": 2
+    }
+  },
+  "notes": [
+    "best epoch 4 + patience 15 = last epoch 19, so the stopping epoch corroborates the best epoch independently",
+    "the VALIDATION loss terms first go NaN at epoch [2], well before the training terms at 7, and recover at epochs (4,). Any claim covering 'its three loss terms' without saying which pass is at best ambiguous.",
+    "mAP@50 is ALSO exactly zero at epoch(s) [5], before divergence. Zero mAP is therefore not exclusive to the post-divergence regime, and cannot on its own be used to date the divergence."
+  ],
+  "params": {
+    "claimed": {
+      "best_epoch": 4,
+      "first_nan_epoch": 7,
+      "stopped_at": 19,
+      "test_classes": 46,
+      "test_mAP50": 0.0057,
+      "test_mAP50_95": 0.0026,
+      "train_minutes": 43.7,
+      "val_classes": 45,
+      "val_mAP50": 0.0039,
+      "val_mAP50_95": 0.0016
+    },
+    "curves": "C:\\research\\electrocom61\\data\\kaggle\\artifacts\\rtdetr_l_pub\\rtdetr_l_pub_training_curves.csv",
+    "fitness": "0.1*mAP50 + 0.9*mAP50-95 (Ultralytics)",
+    "json": "C:\\research\\electrocom61\\data\\kaggle\\results_rtdetr_l_pub.json",
+    "run": "rtdetr_l_pub"
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "problems": [],
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-17T16:04:27.009237Z",
+  "script": "verify_diverged_run.py",
+  "script_sha256": "677911d6ec749ff834edfcdcbf8d4c20af53b3240a77dd04bc5df5fe20db0b7e",
+  "seed": 0,
+  "status_field": "complete",
+  "torch": "2.5.1+cu121",
+  "ultralytics": "8.4.115",
+  "zero_map_epochs": [
+    5,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19
+  ]
+}

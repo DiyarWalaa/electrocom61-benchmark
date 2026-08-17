@@ -221,17 +221,16 @@ source --- a split that ignores the grouping places related items on both sides
 of the boundary and inflates measured performance; this has been shown directly
 for connectome-based models \citep{rosenblatt2024leakage}, and, for biological
 domains, checklists exist for detecting the condition before a model is trained
-\citep{bernett2024guiding}.
+\citep{bernett2024guiding}. The same structure appears in object detection:
+datasets built from video contain frames with high spatiotemporal correlation,
+and clustering them by image feature so that whole clusters are allocated
+together removes the leakage an image-level split creates
+\citep{figueiredo2024leakage}.
 
 The problem has also been given tooling. Leakage-reduced splitting has been
 formalised as a combinatorial optimisation over similarity between items and
 solved with clustering heuristics, so that group-aware partitions can be
-produced automatically rather than by hand \citep{joeres2025datasail}. The same
-construction has been applied in object detection. Frames extracted from video
-carry high spatiotemporal correlation, so an image-level random split distributes
-near-identical frames across partitions; clustering frames by image feature and
-allocating whole clusters removes that leakage, and the detection scores measured
-against the corrected split fall \citep{figueiredo2024leakage}.
+produced automatically rather than by hand \citep{joeres2025datasail}.
 
 An established benchmark has been corrected on these grounds, and the correction
 moved the numbers: on a binding-affinity benchmark, previously reported
@@ -247,9 +246,9 @@ categories reaching its validation and test partitions may be a strict subset of
 those in training, because it adopts an existing image-level partition and cannot
 guarantee otherwise \citep{gupta2019lvis}. We have not found the condition
 measured, its extent reported, or a cause attributed to it. That claim is of a
-different kind from the ones about ElectroCom61
-above: those range over three identified studies, whereas this one is bounded by
-a reading of a literature rather than by an enumerable set, and should be read as
+different kind from the ones about ElectroCom61 above: those range over three
+identified studies, whereas this one is bounded by a reading of a literature
+rather than by an enumerable set, and should be read as
 such. Its consequences are taken up in
 Section~\ref{sec:generalisation}.
 

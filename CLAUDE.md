@@ -59,6 +59,39 @@ The rules in brief — the plan gives the reason for each:
 
 Draft a whole section per pass, not a paragraph.
 
+## Reports
+
+Every report goes in `C:\research\electrocom61\reports\` and nowhere else. This
+is the single location; do not write reports to the scratchpad, to a sibling of
+the repository, or to a subfolder of `notes/`. If a report is found anywhere
+else, it is in the wrong place — move it here and leave only one copy.
+
+Keep the structure that a report pass defines, including `reports/tables/` for
+any rendered page images and any CSV a pass is asked to produce.
+
+**`reports/tables/` is gitignored and its images are never committed.** Decided
+2026-08-17. Page images rendered from prior-work PDFs are reproductions of
+copyrighted papers and this repository is public, which is the same reason the
+PDFs themselves stay out. Render them, read the tables off them, and leave them
+uncommitted. What IS committed is `reports/*.txt` and any `reports/*.csv`: those
+cite page and table numbers rather than reproducing the page, so the evidence
+trail survives without the images. A consequence to accept rather than fix: a
+fresh checkout has the reports but not the images they were read from, so
+re-checking a transcribed value means re-rendering the page.
+
+Reports are not byte-reproducible: they record a run date and a commit hash, so
+re-running a pass legitimately changes them. That is unlike everything under
+`runs/`, `tables/` and `figures/`, which must regenerate identically — see
+`notes/clean-clone-verification.md`.
+
+**Source material for a report stays out of the repository.** Prior-work PDFs
+are copyrighted and Section 8 of the manuscript states they are not part of it.
+Read them from outside the repo and cite page and table numbers; never copy them
+in. As of 2026-08-17 the home directory is unreadable (`.claude/settings.json`
+denies `Read(~/**)`), so PDFs to be read must sit outside `C:\Users\athar` —
+`C:\research\pdfs\` works and is a sibling of the repository rather than part
+of it.
+
 ## Current task
 
 Draft the paper, in the order given by `notes/writing-plan.md`. Section 5 is

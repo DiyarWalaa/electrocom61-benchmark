@@ -26,6 +26,13 @@
 *.csv   text eol=lf
 *.json  text eol=lf
 
+# Evidence-extraction reports. Pinned for the same reason as everything above,
+# and additionally because these files are written to be pasted into a chat
+# window: a CRLF report pasted from a fresh checkout would carry stray carriage
+# returns into whatever it is pasted into.
+reports/*.txt   text eol=lf
+reports/*.csv   text eol=lf
+
 # Not listed above and deliberately so: *.py and *.ps1 are not generated, and
 # *.pdf / *.png are binary and must never be touched by an eol filter.
 *.pdf   binary

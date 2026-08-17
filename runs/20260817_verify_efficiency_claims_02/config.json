@@ -1,0 +1,176 @@
+{
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "environment": {
+    "gpu": "Tesla P100-PCIE-16GB",
+    "torch": "2.5.1+cu121",
+    "ultralytics": "8.4.115"
+  },
+  "fusion": {
+    "rtdetr-l": {
+      "gflops_drop_pct": 4.138563349340509,
+      "gflops_fused": 105.6,
+      "gflops_unfused": 110.159,
+      "params_drop": 822336,
+      "params_drop_pct": 2.4971159012191118,
+      "params_fused": 32109095,
+      "params_unfused": 32931431
+    },
+    "yolo11s": {
+      "gflops_drop_pct": 1.1286992429456397,
+      "gflops_fused": 21.549,
+      "gflops_unfused": 21.795,
+      "params_drop": 14992,
+      "params_drop_pct": 0.15862201987240196,
+      "params_fused": 9436407,
+      "params_unfused": 9451399
+    },
+    "yolo12s": {
+      "gflops_drop_pct": 1.3171268846349313,
+      "gflops_fused": 23.301,
+      "gflops_unfused": 23.612,
+      "params_drop": 22256,
+      "params_drop_pct": 0.23991178800576884,
+      "params_fused": 9254487,
+      "params_unfused": 9276743
+    },
+    "yolo26s": {
+      "gflops_drop_pct": 9.157318027654586,
+      "gflops_fused": 20.892,
+      "gflops_unfused": 22.998,
+      "params_drop": 506291,
+      "params_drop_pct": 5.065403191450832,
+      "params_fused": 9488787,
+      "params_unfused": 9995078
+    },
+    "yolov9s": {
+      "gflops_drop_pct": 2.384500745156479,
+      "gflops_fused": 26.855,
+      "gflops_unfused": 27.511,
+      "params_drop": 120320,
+      "params_drop_pct": 1.645735920388619,
+      "params_fused": 7190695,
+      "params_unfused": 7311015
+    }
+  },
+  "inputs": {
+    "data\\kaggle\\results_latency_unified.json": "23dd0d96309f696f40bd72b7aa75da8540983bad789355a8d4ee075b520baf97",
+    "data\\latency_by_arch.csv": "07874f2235fd4f6fe508d042129ea9e46b93d07b3856b2124a2d2ec966401b4d",
+    "data\\master_results.csv": "0a4fb582d599b50977673778d741b7866c90448c2fab8c43fb30e6d85f065f0c"
+  },
+  "largest_pair_gap": {
+    "model": "yolo11s",
+    "ms": 0.24,
+    "pct": 1.7544
+  },
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "34bafe412297f67490458ed2b5c584ffc0cf7ff88469cf89663461dd0b532a6c",
+  "notes": [
+    "protocol records an additional precaution the prose does not mention -- burn_in: '30 images on one model before the loop, discarded'",
+    "latency_by_arch.csv expresses its gap percentages as gap / mean.",
+    "the claimed 23% is reproduced only by dividing the gap by the larger of the pair (23.32%). The same paragraph's 1.75% pair-gap figure comes from latency_by_arch.csv, which divides by the MEAN -- on that basis the cross-session figure is 26.40%, and on the smaller value it is 30.41%. The two percentages in this subsection are computed on different bases."
+  ],
+  "params": {
+    "by_arch_csv": "C:\\research\\electrocom61\\data\\latency_by_arch.csv",
+    "claimed_max_gap_ms": 0.24,
+    "claimed_max_gap_pct": 1.75,
+    "claimed_range_pct": [
+      0.2,
+      5.1
+    ],
+    "claimed_session_spread_pct": 23.0,
+    "latency_json": "C:\\research\\electrocom61\\data\\kaggle\\results_latency_unified.json",
+    "master_csv": "C:\\research\\electrocom61\\data\\master_results.csv",
+    "quoted": {
+      "rtdetr-l": {
+        "gflops_fused": "105.6",
+        "gflops_unfused": "110.159",
+        "params_fused": "32109095",
+        "params_unfused": "32931431"
+      },
+      "yolo26s": {
+        "gflops_fused": "20.892",
+        "gflops_unfused": "22.998",
+        "params_fused": "9488787",
+        "params_unfused": "9995078"
+      }
+    }
+  },
+  "per_session_spread": {
+    "rtdetr-l": {
+      "gap_ms": 0.7199999999999989,
+      "gap_pct": 1.633023361306416,
+      "gap_pct_of_max": 1.6067841999553645,
+      "gap_pct_of_mean": 1.6197975253093337,
+      "max": 44.81,
+      "min": 44.09,
+      "runs": {
+        "rtdetr_l_corr": 44.81,
+        "rtdetr_l_pub_lr1e4": 44.09
+      }
+    },
+    "yolo11s": {
+      "gap_ms": 1.25,
+      "gap_pct": 11.542012927054477,
+      "gap_pct_of_max": 10.347682119205299,
+      "gap_pct_of_mean": 10.912265386294195,
+      "max": 12.08,
+      "min": 10.83,
+      "runs": {
+        "yolo11s_corr": 10.83,
+        "yolo11s_pub": 12.08
+      }
+    },
+    "yolo12s": {
+      "gap_ms": 0.33000000000000007,
+      "gap_pct": 2.087286527514232,
+      "gap_pct_of_max": 2.04460966542751,
+      "gap_pct_of_mean": 2.0657276995305165,
+      "max": 16.14,
+      "min": 15.81,
+      "runs": {
+        "yolo12s_corr": 15.81,
+        "yolo12s_pub": 16.14
+      }
+    },
+    "yolo26s": {
+      "gap_ms": 0.2900000000000009,
+      "gap_pct": 2.301587301587309,
+      "gap_pct_of_max": 2.2498060512024898,
+      "gap_pct_of_mean": 2.2754021184778415,
+      "max": 12.89,
+      "min": 12.6,
+      "runs": {
+        "yolo26s_corr": 12.89,
+        "yolo26s_pub": 12.6
+      }
+    },
+    "yolov9s": {
+      "gap_ms": 5.650000000000002,
+      "gap_pct": 30.40904198062434,
+      "gap_pct_of_max": 23.31820057779613,
+      "gap_pct_of_mean": 26.395701938799355,
+      "max": 24.23,
+      "min": 18.58,
+      "runs": {
+        "yolov9s_corr": 18.58,
+        "yolov9s_pub": 24.23
+      }
+    }
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "problems": [],
+  "protocol": {
+    "batch": 1,
+    "burn_in": "30 images on one model before the loop, discarded",
+    "complexity": "params, GFLOPs and layers before and after model.fuse(), imgsz=640",
+    "file_cache": "all 205 images read once before any timing",
+    "imgsz": 640,
+    "timer": "perf_counter + cuda.synchronize, p50/p95 per-image end-to-end predict()",
+    "warmup": 20
+  },
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-17T14:19:12.327952Z",
+  "script": "verify_efficiency_claims.py",
+  "script_sha256": "71b68772d7e46eebd0d049b51b3e20af0ec7fa6d133855bd73c531ed71f7babe"
+}

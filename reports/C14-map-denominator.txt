@@ -1,122 +1,176 @@
 ================================================================================
 CHECK    : C14 - Can a background class enter the mAP average in Ultralytics?
-QUESTION : In the installed Ultralytics release, does the background row and column that
-           appears in the confusion matrix also enter the mAP average, or is mAP computed on
-           a separate path that never sees it?
-SOURCES  : INTENDED: ap_per_class and the mAP aggregation in the installed ultralytics
-           8.4.115, read from the installed package source.
-           ACTUALLY AVAILABLE: none. Ultralytics is not installed on this machine and no
-           copy of its source is present. See COULD NOT DETERMINE.
+QUESTION : In ultralytics 8.4.115, does the background row and column that appears in the
+           confusion matrix also enter the mAP average, or is mAP computed on a separate
+           path that never sees it? And what is the "classes evaluated" count the framework
+           prints actually counting?
+SOURCES  : INTENDED: ap_per_class and the mAP aggregation in the ultralytics 8.4.115 source
+           distribution, read from an extracted tree outside the repository.
+           ACTUALLY AVAILABLE: none. The package is not installed on this machine and the
+           source could not be fetched. See COULD NOT DETERMINE.
 VERDICT  : COULD NOT DETERMINE
-ONE LINE : The check could not be run: ultralytics is not importable and no copy of its
-           source exists on this machine, so the question was not settled and is recorded
-           here unanswered rather than answered from recollection.
+ONE LINE : The check could not be run: every route to fetching the 8.4.115 source is denied
+           by scripts/deny_guard.py, so the question was not settled and is recorded here
+           unanswered rather than answered from recollection.
 AFFECTS  : reports/C09-per-class-and-class-count.txt, whose closing inference that a
            published mAP and one computed here "are not known to share a denominator" rests
            partly on the background row and column being present in all three confusion
            matrices. No sentence in the manuscript depends on it.
-RUN      : 2026-08-17 16:43, commit 1caa507
+RUN      : 2026-08-17 17:05, commit d142436
+           Supersedes the first version of this file, which recorded a different blocker.
 ================================================================================
 
 FINDINGS
 
-1. THE CHECK WAS NOT RUN. Ultralytics is not installed in the Python environment used by
-   this repository, and no copy of its source tree exists anywhere the search reached. The
-   question therefore remains open.
+1. THE CHECK WAS NOT RUN, and the reason has changed since the first version of this file.
+   That version recorded the blocker as "the package is absent and CLAUDE.md forbids
+   installing it without asking". Permission to read the source was subsequently granted,
+   explicitly scoped to a source-read outside the repository with no install and no
+   dependencies. That is exactly the right scope for the question -- reading ap_per_class
+   does not require a working import -- and it was attempted. It was denied by the
+   repository's own guard.
 
-2. NO ANSWER IS OFFERED HERE. The working rule for this series of reports is that a value or
-   a behaviour is read from the source and cited by location, never stated from memory. That
-   rule binds hardest when the expected answer is one the reader would find plausible. The
-   task brief states the expected mechanism -- that the confusion matrix is built at nc+1 to
-   account for unmatched predictions and missed ground truths while mAP is computed on a
-   separate path -- and that statement is very likely correct, but this report cannot
-   confirm it without reading ap_per_class, and so does not.
+2. EVERY FETCH ROUTE IS BLOCKED BY scripts/deny_guard.py, BY DESIGN. The guard's module
+   docstring states its purpose as "block destructive and network-installing commands
+   outright". Its rule table denies, case-insensitively and anchored at the start of a
+   command segment:
+     - curl, wget, invoke-webrequest, invoke-restmethod, iwr, irm, start-bitstransfer,
+       classified as "network download"
+     - pip, pip3, conda, npm, npx, winget, choco, mpm, miktex, and python -m pip,
+       classified as "package installation"
+     - git clone from any remote spelling, classified as "network clone"
+   Between them these cover every way of obtaining a PyPI sdist or a GitHub tag. The block
+   is not incidental to this task; it is the guard working as specified.
 
-3. WHAT WOULD SETTLE IT, once the package is available: read, in order,
-     - ultralytics/utils/metrics.py, function ap_per_class -- specifically what array it
-       iterates over to produce per-class AP, and whether that array is derived from the
-       set of target classes present or from a range over nc+1;
-     - the DetMetrics / Metric aggregation in the same file, for how the per-class AP vector
-       is reduced to a scalar mAP;
-     - ultralytics/utils/metrics.py, class ConfusionMatrix, for where the nc+1 dimension is
-       introduced, in order to confirm that the two are computed independently.
-   Report the file path, the function name and the line range for each, and quote the single
-   expression that fixes the denominator.
+3. NOTHING WAS DOWNLOADED AND NOTHING WAS LEFT ANYWHERE. The attempt was made as a single
+   command that created a directory outside the repository and then fetched into it. The
+   guard blocked the command before any part of it ran, so C:\research\ultralytics-src was
+   never created; its absence was confirmed afterwards. No archive of any kind exists
+   anywhere in the repository. The working tree carried no untracked file as a result.
 
-4. THE MANUSCRIPT IS UNAFFECTED EITHER WAY, which is why this was scoped as a verification
-   rather than an edit. No sentence in the paper asserts anything about the denominator of a
-   published mAP. Section 3.1 and Section 7.1 both speak about the number of classes the
-   evaluation framework scored on the published split -- 45 on validation, 46 on test --
-   which is a figure this study read off its own runs and which is independent of how a
-   background class is or is not handled.
+4. THE GUARD ALSO DENIES DELETION, so had a tree been created it could not have been removed
+   from here. This is documented behaviour: .gitignore carries three separate notes
+   recording files that "cannot be deleted from here -- scripts/deny_guard.py denies
+   deletion -- so remove it by hand". Any future run of this check should assume the same,
+   and should place the extracted tree where a hand cleanup is expected rather than
+   promised.
 
-5. THE ONE PLACE THE OPEN QUESTION BITES is reports/C09, not the manuscript. C09's closing
-   paragraph says a published mAP@50 on ElectroCom61 and one computed here "are not known to
-   share a denominator", and gives two reasons: that none of the three papers states the
-   class count its mAP was averaged over, and that all three publish confusion matrices
-   carrying a background row and column. THE FIRST REASON STANDS ON ITS OWN and is
-   established by direct reading of the three papers. The second is the inference this check
-   was meant to test. If the mechanism in the brief is confirmed, the second reason should be
-   struck from C09 and the first left standing; the conclusion does not change, but one of
-   its two supports does.
+5. NO ANSWER IS OFFERED, TO EITHER QUESTION. The working rule for this series is that a
+   value or a behaviour is read from the source and cited by location, never stated from
+   memory, and that rule binds hardest when the expected answer is one a reader would find
+   plausible. The brief states the expected mechanism -- that the confusion matrix is built
+   at nc+1 to account for unmatched predictions and missed ground truths while mAP is
+   computed on a separate path -- and that is very likely correct. This report cannot
+   confirm it and therefore does not.
+
+6. THE VERSION'S AVAILABILITY WAS NOT EVEN CONFIRMED. The metadata lookup and the download
+   were issued as one command and the whole command was denied, so the PyPI response was
+   never seen. This report cannot state that 8.4.115 is or is not published as an sdist. The
+   instruction to stop rather than read a neighbouring release stands and was not reached:
+   nothing was read.
+
+7. THE SECOND QUESTION IS THE MORE LOAD-BEARING OF THE TWO and is entirely unaddressed. What
+   the framework's "classes evaluated" count is counting -- classes with instances in the
+   evaluation set, or classes with predictions, or a range over nc -- decides what the 45
+   and 46 figures mean, and Sections 3.1, 5.4 and 6.1 all rest on those two numbers. Note
+   that this does NOT put those sections in doubt: 45 and 46 are values this study read off
+   its own runs and they are reproduced by scripts/verify_eval_protocol.py, which passes.
+   What is unestablished is the semantics of the count, not its value.
 
 EVIDENCE
 
-Attempts made to locate the package, with outcomes:
+Attempts made, in order, with outcomes:
 
-| Method                                            | Result                              |
-|---------------------------------------------------|-------------------------------------|
-| python -c "import ultralytics"                     | ModuleNotFoundError: No module named |
-|                                                    | 'ultralytics'                       |
-| importlib.util.find_spec('ultralytics')            | None                                |
-| site.getsitepackages() + getusersitepackages(),    | no ultralytics directory in any of   |
-| all three enumerated and inspected                 | the three                           |
-| recursive directory search of C:\ for a directory  | no match                            |
-| named "ultralytics", depth 8                       |                                     |
-| recursive file search of C:\ for metrics.py under  | no match                            |
-| any path containing "ultralytics", depth 9         |                                     |
+| # | Attempt                                            | Outcome                        |
+|---|----------------------------------------------------|--------------------------------|
+| 1 | python -c "import ultralytics"                     | ModuleNotFoundError: No module |
+|   |                                                    | named 'ultralytics'            |
+| 2 | importlib.util.find_spec('ultralytics')            | None                           |
+| 3 | site.getsitepackages() + getusersitepackages(),    | no ultralytics directory in    |
+|   | all three enumerated and inspected                 | any of the three               |
+| 4 | recursive directory search of C:\ for a directory  | no match                       |
+|   | named "ultralytics", depth 8                       |                                |
+| 5 | recursive file search of C:\ for metrics.py under  | no match                       |
+|   | any path containing "ultralytics", depth 9         |                                |
+| 6 | Invoke-RestMethod to the PyPI JSON API for 8.4.115 | denied by deny_guard.py,       |
+|   | followed by Invoke-WebRequest of the sdist into    | "network download", reported   |
+|   | C:\research\ultralytics-src (outside the repo)     | against the Invoke-WebRequest  |
+|   |                                                    | segment; whole command blocked |
+| 7 | Test-Path C:\research\ultralytics-src              | does not exist -- confirming   |
+|   |                                                    | attempt 6 ran no part of itself|
 
-The three site directories enumerated were:
-  C:\Users\athar\AppData\Local\Programs\Python\Python312
-  C:\Users\athar\AppData\Local\Programs\Python\Python312\Lib\site-packages
-  C:\Users\athar\AppData\Roaming\Python\Python312\site-packages
+The guard rules that decide it, quoted from scripts/deny_guard.py:
 
-For context, 8.4.115 is the release this study used and records: it is the value of the
-`ultralytics` row of data/config_provenance.csv, whose provenance column reads "added" and
-whose citation column reads "stated by neither paper". That row is a record of what this
-study ran, not evidence that the package is present in this working copy.
+    (r"^(pip|pip3|conda|npm|npx|winget|choco|mpm|miktex)(?=\s|$)",
+     "package installation"),
+    (r"^python\s+-m\s+pip(?=\s|$)",
+     "package installation"),
+    (r"^(install-module|install-package)(?=\s|$)",
+     "package installation"),
+    (r"^(curl|wget|invoke-webrequest|invoke-restmethod|iwr|irm|start-bitstransfer)(?=\s|$)",
+     "network download"),
+
+and, handled separately by clone_verdict(), remote git clone, reported as "network clone".
+
+No attempt was made to work around any of these. Rewriting, relocating or shimming a guard
+file is prohibited, and reaching the network by some spelling the rule table happens not to
+list would defeat a control this repository maintains deliberately.
+
+What the check still needs, unchanged from the first version of this file, so that a future
+run has the plan ready:
+  - ultralytics/utils/metrics.py, function ap_per_class -- what array it iterates over to
+    produce per-class AP, and whether that array derives from the set of target classes
+    present or from a range over nc or nc+1;
+  - the DetMetrics / Metric aggregation in the same file -- how the per-class AP vector is
+    reduced to a scalar mAP, and over what denominator;
+  - ultralytics/utils/metrics.py, class ConfusionMatrix -- where the nc+1 dimension is
+    introduced, to confirm the two are computed independently;
+  - whatever emits the per-class summary table at validation time, to establish what the
+    printed class count enumerates.
+Report file path, function name and line range for each, and quote the single expression
+that fixes the denominator.
 
 SEARCH TERMS USED
 
-  ultralytics                 (as an import, as a find_spec target, as a directory name)
-  metrics.py                  (as a filename, filtered to paths containing "ultralytics")
-  ap_per_class                (not reachable -- no source tree to search)
+  ultralytics        (as an import, as a find_spec target, as a directory name)
+  metrics.py         (as a filename, filtered to paths containing "ultralytics")
+  ap_per_class       (not reachable -- no source tree to search)
+  network, download, Invoke-WebRequest, curl, wget, urllib, requests
+                     (against scripts/deny_guard.py, to establish what the guard forbids)
 
 COULD NOT DETERMINE
 
-Everything this check was asked to determine.
+Both questions the check was asked to settle:
+  - whether a background class can enter the mAP average in 8.4.115;
+  - what the framework's printed "classes evaluated" count enumerates.
 
-The blocker is that the package is absent and CLAUDE.md forbids installing packages without
-asking first. Installing ultralytics 8.4.115 would resolve it in a single step, and that is
-the decision this report is waiting on. Two things are worth weighing before saying yes:
+And one thing incidental to them: whether 8.4.115 is published on PyPI as a source
+distribution at all.
 
-  - The install is not small. Ultralytics pulls in torch and torchvision, which on a CUDA
-    build is several gigabytes. If the intent is only to read three functions, fetching the
-    source distribution or the GitHub tag for 8.4.115 without installing its dependencies is
-    enough, and is much cheaper.
-  - Whichever route is chosen, the version read MUST be 8.4.115. Reading a different release
-    would answer a question about a different codebase, and the layer composition and metric
-    plumbing of this package are exactly the things Section 7.1 argues are not stable across
-    releases.
+The blocker is scripts/deny_guard.py, which denies every command that could fetch the
+source. Permission from the repository owner is not sufficient on its own, because the guard
+is a committed control enforced by a hook rather than a matter of policy. Resolving it needs
+one of:
+  - the owner fetching and extracting the 8.4.115 sdist by hand into a directory outside the
+    repository, after which this check is a pure read and needs no network at all;
+  - or a deliberate, owner-made change to the guard's rule table, which is a larger decision
+    than this check warrants and is not recommended for it.
+The first is cheap, leaves the guard intact, and is the recommended route. A hand cleanup
+will be needed afterwards for the same reason: the guard denies deletion.
 
 IMPACT ON THE MANUSCRIPT
 
-None, and none is intended. The brief was explicit that nothing in the paper should change
-on the strength of this check, and nothing has. No sentence currently depends on the
-question, and this report does not create one.
+None, and none is intended. The brief was explicit that nothing in the paper changes on the
+strength of this check, and nothing has. No sentence depends on the question and this report
+does not create one.
 
-The one downstream action, deferred until the check can actually be run: if reading
-ap_per_class confirms that the background class cannot enter the mAP average, strike the
-confusion-matrix half of C09's closing inference and leave the half that rests on the three
-papers' silence about their class counts. That half is established and is the one the
+Sections 3.1, 5.4 and 6.1 are not left exposed by the check being unrun. The 45 and 46 they
+rest on are measured values from this study's own runs, reproduced independently by
+scripts/verify_eval_protocol.py, which passes. What this check would add is the semantics of
+that count, not its value.
+
+The one downstream action, deferred: if reading ap_per_class confirms that a background
+class cannot enter the mAP average, strike the confusion-matrix half of C09's closing
+inference and leave the half that rests on the three papers' silence about their class
+counts. That half is established by direct reading of the three papers and is the half the
 manuscript would ever have cause to rely on.

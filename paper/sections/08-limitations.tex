@@ -119,8 +119,8 @@ Section~\ref{sec:training-configuration} treats that version as part of the
 specification, but it is a mitigation and not a fix.
 
 Latency was measured on a single Tesla P100, chosen because prior work on this
-dataset reports the same device and holding it constant keeps the comparison
-against those studies intact. It is not the hardware the deployment argument in
+dataset reports training on the P100 provided by Kaggle, and holding the device
+constant keeps the comparison against those studies intact. It is not the hardware the deployment argument in
 Section~\ref{sec:deployment} concerns: a recycling facility would install an
 embedded accelerator or an industrial edge device, where memory bandwidth,
 kernel support and operator coverage all differ from a datacentre GPU. A

@@ -21,15 +21,29 @@
 %   - THE DATASET IS NOT REDISTRIBUTED. `data/` is git-ignored; the manifest
 %     names images in a tree the reader downloads from the Mendeley DOI. Saying
 %     otherwise would be a licensing claim we have not made (README, License).
-%   - THE CHECKPOINTS ARE NOT IN THE REPOSITORY. Section 5.6 says they are
-%     retained in the notebook outputs that produced them, and that is what this
-%     says. The repository carries the per-run records, not the weights.
+%   - THE CHECKPOINTS ARE NOT IN THE REPOSITORY. They are retained in the
+%     notebook outputs that produced them. THIS SECTION IS THE ONLY PLACE THAT
+%     SAYS SO, since 5.6 was reduced on 2026-08-18; it used to say it too and
+%     the sentence here used to cite it. Do not re-add that attribution without
+%     first checking that 5.6 has the claim back. The repository carries the
+%     per-run records, not the weights.
 %   - TWO LICENCES, NOT ONE. Code is MIT; anything derived from the dataset --
 %     which includes the manifest -- is CC BY 4.0, because the dataset's CC BY
 %     attribution travels with it.
 %   - THREE FILES IN data/ ARE READINGS OF THE LITERATURE, not measurements, and
 %     no script can regenerate them. Naming them here is the same discipline
-%     Section 5.6 applies to the provenance column of Table 3.
+%     Section 5.6 applies to the provenance column of TABLE 4, the
+%     training-configuration table. This comment said Table 3 until 2026-08-18;
+%     Table 3 is the split-properties table and was never the one meant.
+%
+% WHAT SECTION 5.6 NOW CONTAINS, since this section points at it and was written
+% when it contained more. As of 2026-08-18 it is a single paragraph: that every
+% figure and table is script-generated from a data file with no value
+% hand-transcribed, that each generating run writes a directory of inputs,
+% content hashes and derived values, that figures are matched to their run by
+% script hash rather than timestamp, and that the provenance column of Table 4 is
+% the one exception. Everything about what is RELEASED now lives here, and 5.6
+% closes by pointing at this section.
 
 \section{Data and Code Availability}
 \label{sec:availability}
@@ -61,8 +75,8 @@ measurement that produced it. Also released are each run's configuration
 snapshot, training curves and per-class average precision, including for the run
 that failed to converge, which is retained and marked as such. Two things are
 not in the repository and are named here rather than left to be discovered. The
-ten trained checkpoints are retained in the notebook outputs that produced them,
-as Section~\ref{sec:artifacts} states. And three files in the data directory are
+ten trained checkpoints are retained in the notebook outputs that produced them.
+And three files in the data directory are
 readings of the prior literature rather than measurements --- the provenance
 column of Table~\ref{tab:training-config}, and the published complexity and
 accuracy figures quoted in Sections~\ref{sec:introduction}

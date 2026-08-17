@@ -114,8 +114,10 @@ why the disagreement in the published record was never about the models.
 
 At least four properties differ between the three published studies reporting
 results on ElectroCom61 (Section~\ref{sec:related-electrocom61}), and none of
-them states which value it used for any of the four. Each is enough on its own to move a reported figure by more than the
-differences the comparisons are drawing conclusions from.
+them states which value it used for any of the four. Each is enough on its own to
+move a reported figure by more than the differences the comparisons are drawing
+conclusions from. Two further quantities can be set beside measured values
+directly, and are taken up after the four.
 
 The first is the version of the dataset. The archived notebook that produces the
 dataset paper's headline figure downloads Roboflow export version 5, while the
@@ -130,8 +132,8 @@ command is run without a test-split argument, so the reported figure is a
 validation-set score; the test directory is never passed to an evaluation
 command anywhere in it. Neither benchmark study names which partition its figures
 come from, and the later one states a 3-fold cross-validation over the whole
-dataset while reproducing the earlier study's central values unchanged, so what
-partition any of its rows rests on is not established \citep{yolov13paper}. A
+dataset, so what partition any of its rows rests on is not established
+\citep{yolov13paper}. A
 validation score and a test score are different quantities even when the split
 is sound, and the notebook selects its best checkpoint on
 the same partition it then reports.
@@ -171,7 +173,6 @@ The same pattern appears in how variance is handled, and there it costs more.
 The earlier benchmark study does report it: each cell of its three accuracy
 columns carries a mean and standard deviation with a 95\% confidence interval,
 and its text reports paired $t$-tests at $p < 0.05$ \citep{yolov12paper}. What it
-does
 does not state is how many runs those estimates were computed over, or by what
 procedure --- and without the number of runs, a standard deviation cannot be
 converted into anything a reader can check or reproduce. The later study

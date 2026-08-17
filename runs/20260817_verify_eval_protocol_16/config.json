@@ -1,0 +1,238 @@
+{
+  "class_difference_by_run": {
+    "rtdetr_l_pub_lr1e4": {
+      "csv_crosscheck": "agrees",
+      "n_test": 46,
+      "n_val": 45,
+      "test_not_val": [
+        "ESP32"
+      ],
+      "val_not_test": []
+    },
+    "yolo11s_pub": {
+      "csv_crosscheck": "agrees",
+      "n_test": 46,
+      "n_val": 45,
+      "test_not_val": [
+        "ESP32"
+      ],
+      "val_not_test": []
+    },
+    "yolo12s_pub": {
+      "csv_crosscheck": "agrees",
+      "n_test": 46,
+      "n_val": 45,
+      "test_not_val": [
+        "ESP32"
+      ],
+      "val_not_test": []
+    },
+    "yolo26s_pub": {
+      "csv_crosscheck": "agrees",
+      "n_test": 46,
+      "n_val": 45,
+      "test_not_val": [
+        "ESP32"
+      ],
+      "val_not_test": []
+    },
+    "yolov9s_pub": {
+      "csv_crosscheck": "absent",
+      "n_test": 46,
+      "n_val": 45,
+      "test_not_val": [
+        "ESP32"
+      ],
+      "val_not_test": []
+    }
+  },
+  "classes_evaluated": {
+    "corrected": {
+      "n_runs": 5,
+      "test": [
+        "61"
+      ],
+      "val": [
+        "61"
+      ]
+    },
+    "published": {
+      "n_runs": 5,
+      "test": [
+        "46"
+      ],
+      "val": [
+        "45"
+      ]
+    }
+  },
+  "dataset_dir": "C:\\research\\electrocom61\\data\\ElectroCom-61_v2",
+  "esp32": {
+    "class_id": "17",
+    "class_name": "ESP32",
+    "imgs_test": "2",
+    "imgs_train": "190",
+    "imgs_valid": "0",
+    "inst_test": "2",
+    "inst_total": "192",
+    "inst_train": "190",
+    "inst_valid": "0"
+  },
+  "inputs": {
+    "data\\kaggle\\artifacts\\rtdetr_l_corr\\rtdetr_l_corr_args.yaml": "f5251ea93a1b9f4bb9e03ce505c0a985d54e2618928e20bfca95b2f6234b2577",
+    "data\\kaggle\\artifacts\\rtdetr_l_pub_lr1e4\\rtdetr_l_pub_lr1e4_args.yaml": "c5fb1c711df0e911686151515a501a5d3c16aa2be806eaaf3be82cbb377eba62",
+    "data\\kaggle\\artifacts\\yolo11s_corr\\yolo11s_corr_args.yaml": "cc12bb7ad8a26204381d72c44c96138b400eb6295beb9963490d793f4382a3bd",
+    "data\\kaggle\\artifacts\\yolo11s_pub\\yolo11s_pub_args.yaml": "2311438bf4e9ffaa293add39b50d3dcd31aea9871547d2f908e8a9ea01ed07ce",
+    "data\\kaggle\\artifacts\\yolo12s_corr\\yolo12s_corr_args.yaml": "5b86165330ca969ab15e53f5e4b443f64040f5eb70d56238473597b7192dfdf1",
+    "data\\kaggle\\artifacts\\yolo12s_pub\\yolo12s_pub_args.yaml": "bff8ccc6baed994c3d13cebe02e12cf77071143e73ff05573ddc4d2435b389a5",
+    "data\\kaggle\\artifacts\\yolo26s_corr\\yolo26s_corr_args.yaml": "4caf8640527027c29c51dc0b118d874e21fcd169971cd22cf049db8605055f67",
+    "data\\kaggle\\artifacts\\yolo26s_pub\\yolo26s_pub_args.yaml": "c7484f288cb21601dd85183c44580262af0f67e219bab63c7ccc9a47df455287",
+    "data\\kaggle\\artifacts\\yolov9s_corr\\runs\\yolov9s_corr\\args.yaml": "306a017dd3479cd9eff421d085229f77bae1d4f8c36e5307220045f83ed17268",
+    "data\\kaggle\\artifacts\\yolov9s_pub\\runs\\yolov9s_pub\\args.yaml": "c2769aecaeb5fb406d4a8e5c5a403cc0732854203e9ec4d7f2847ccc8adaf3be",
+    "data\\kaggle\\results_rtdetr_l_pub_lr1e4.json": "529345cc884b3bae8abd06fe5773194f3cfb890d135636252efe8bce0a575458",
+    "data\\kaggle\\results_yolo11s_pub.json": "59a7b0b8085b42476fe209fd9f1a86bc2c5aa20814f6b584f56edcd729688c41",
+    "data\\kaggle\\results_yolo12s_pub.json": "569a1ad64d503348cf51a42b9bc0eac62a9039c53a864070019dfe2ee31a25d8",
+    "data\\kaggle\\results_yolo26s_pub.json": "110f152820b9f81d18247470db9c6e87bcf3acf1d57665f601ba2529225e4cb5",
+    "data\\kaggle\\results_yolov9s_pub.json": "16c2bc9b5949d4a93bf5f3df68ccf2b7e2b98cad78db93ecf9eb156e768d805b",
+    "data\\master_results.csv": "0a4fb582d599b50977673778d741b7866c90448c2fab8c43fb30e6d85f065f0c",
+    "runs\\20260802_class_date_provenance\\class_split_counts.csv": "71942daf481efdf007cc37a1567f1dc9fd7fb4a0bc2dd38c57b45bcce00432df"
+  },
+  "metadata_csv": "C:\\research\\electrocom61\\data\\Metadata_ElectroCom61.csv",
+  "module_sha256": "34bafe412297f67490458ed2b5c584ffc0cf7ff88469cf89663461dd0b532a6c",
+  "n_evaluations": 20,
+  "n_runs": 10,
+  "notes": [
+    "ESP32-CAM is a separate class: 73 train / 37 valid / 82 test instances, evaluated on both splits."
+  ],
+  "params": {
+    "artifacts_dir": "C:\\research\\electrocom61\\data\\kaggle\\artifacts",
+    "class_counts_csv": "C:\\research\\electrocom61\\runs\\20260802_class_date_provenance\\class_split_counts.csv",
+    "expected": {
+      "corrected_test": 61,
+      "corrected_val": 61,
+      "esp32_test_instances": 2,
+      "esp32_valid_instances": 0,
+      "n_evaluations": 20,
+      "n_runs": 10,
+      "published_test": 46,
+      "published_val": 45
+    },
+    "master_csv": "C:\\research\\electrocom61\\data\\master_results.csv",
+    "threshold_keys": [
+      "conf",
+      "iou",
+      "max_det"
+    ]
+  },
+  "platform": "Windows-11-10.0.26200-SP0",
+  "problems": [],
+  "python_version": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+  "repo_root": "C:\\research\\electrocom61",
+  "run_started_utc": "2026-08-17T20:52:18.867188Z",
+  "script": "verify_eval_protocol.py",
+  "script_sha256": "172928e3372500e9fecf3b6e89c5ec30dcb5a8f3189a5f295cf2dbe17b8e89af",
+  "threshold_agreement": {
+    "conf": {
+      "identical": true,
+      "values": [
+        "null"
+      ]
+    },
+    "iou": {
+      "identical": true,
+      "values": [
+        "0.7"
+      ]
+    },
+    "max_det": {
+      "identical": true,
+      "values": [
+        "300"
+      ]
+    },
+    "mode": {
+      "identical": true,
+      "values": [
+        "train"
+      ]
+    },
+    "split": {
+      "identical": true,
+      "values": [
+        "val"
+      ]
+    }
+  },
+  "thresholds": {
+    "rtdetr_l_corr": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "rtdetr_l_pub_lr1e4": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolo11s_corr": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolo11s_pub": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolo12s_corr": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolo12s_pub": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolo26s_corr": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolo26s_pub": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolov9s_corr": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    },
+    "yolov9s_pub": {
+      "conf": "null",
+      "iou": "0.7",
+      "max_det": "300",
+      "mode": "train",
+      "split": "val"
+    }
+  }
+}

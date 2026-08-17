@@ -1,0 +1,7 @@
+column,pass,first_nan_epoch,finite_epochs_after
+train/cls_loss,train,7,
+train/giou_loss,train,7,
+train/l1_loss,train,7,
+val/cls_loss,val,2,4
+val/giou_loss,val,2,4
+val/l1_loss,val,2,4

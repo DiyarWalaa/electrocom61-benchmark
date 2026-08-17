@@ -72,8 +72,12 @@ Figure~\ref{fig:class-instance-counts}, hold at most two test instances each, an
 eight of the ten hold none; the eleventh, IC-Base-14-Pin, holds 22.
 The transition between the tenth and eleventh ranks is therefore a step rather
 than a gradient. This is what distinguishes the pattern from class imbalance,
-which is the reading the ordering first invites: an imbalanced dataset produces a
-smooth decline in test representation as class frequency falls, and cannot
+which is the reading the ordering first invites. Where a long tail is the
+concern, rarity is defined by how many training images a category appears in, and
+it arises from the natural frequency of categories in images
+\citep{gupta2019lvis}; the fifteen classes here are among the most heavily
+annotated in the dataset. An imbalanced dataset produces a smooth decline in
+test representation as class frequency falls, and cannot
 produce a discontinuity between adjacent ranks in which the more frequent side is
 the empty one.
 

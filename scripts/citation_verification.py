@@ -116,6 +116,8 @@ TIER1 = [
     "rosenblatt2024leakage",  # group structure
     "bernett2024guiding",     # group structure
     "joeres2025datasail",
+    "figueiredo2024leakage",  # group-aware splitting applied to detection
+    "gupta2019lvis",          # long-tail rarity; the acknowledged complement
 ]
 
 # Tier 0: checked against the source already, so no re-reading is needed.
@@ -151,6 +153,29 @@ STATUS_TEXT = {
 }
 
 VERIFICATION = {
+    "figueiredo2024leakage": (
+        FULL_TEXT,
+        "Read in full, August 2026. Cited in 2.3 and 4.2 for a construction, "
+        "not a figure. It clusters video frames by image feature and allocates "
+        "whole clusters rather than individual frames, and reports that "
+        "detection scores fall against the corrected split -- which is the "
+        "same direction as the binding-affinity correction and the OPPOSITE of "
+        "this paper's. It also fixed a factual error: 4.2 had called "
+        "group-aware splitting something \"leakage-avoiding tools apply in "
+        "other domains\", when object detection is this paper's own domain. "
+        "Author count resolved from Crossref: TWO, not \"et al.\""),
+    "gupta2019lvis": (
+        FULL_TEXT,
+        "Read in full, August 2026. Cited in 2.3 and 3.1 for two statements "
+        "that paper makes about itself: that rarity in a long tail is defined "
+        "by how many training images a category appears in, and that the "
+        "categories reaching its validation and test partitions may be a "
+        "strict subset of those in training (its Section 2.3 footnote). THE "
+        "SECOND IS THE DELICATE ONE. It is an acknowledgement of the "
+        "possibility, not a measurement of it: that paper states the breakdown "
+        "is not reported. Neither sentence here gives a count, and neither "
+        "says that benchmark exhibits the defect. Do not add a figure to "
+        "either; there is no published one to add."),
     "apicella2025leakage": (FULL_TEXT, ""),
     "rosenblatt2024leakage": (
         FULL_TEXT,

@@ -226,7 +226,12 @@ domains, checklists exist for detecting the condition before a model is trained
 The problem has also been given tooling. Leakage-reduced splitting has been
 formalised as a combinatorial optimisation over similarity between items and
 solved with clustering heuristics, so that group-aware partitions can be
-produced automatically rather than by hand \citep{joeres2025datasail}.
+produced automatically rather than by hand \citep{joeres2025datasail}. The same
+construction has been applied in object detection. Frames extracted from video
+carry high spatiotemporal correlation, so an image-level random split distributes
+near-identical frames across partitions; clustering frames by image feature and
+allocating whole clusters removes that leakage, and the detection scores measured
+against the corrected split fall \citep{figueiredo2024leakage}.
 
 An established benchmark has been corrected on these grounds, and the correction
 moved the numbers: on a binding-affinity benchmark, previously reported
@@ -236,8 +241,13 @@ models \citep{graber2025resolving}.
 In every case cited above the defect is contamination --- material that should
 have been held out was not, and the measured score was too high. The complement,
 in which material that should have been evaluated was never evaluated at all and
-the measured score is too low, is what this paper describes. We have not found it
-characterised. That claim is of a different kind from the ones about ElectroCom61
+the measured score is too low, is what this paper describes. The possibility has
+been acknowledged: a long-vocabulary detection benchmark notes that the
+categories reaching its validation and test partitions may be a strict subset of
+those in training, because it adopts an existing image-level partition and cannot
+guarantee otherwise \citep{gupta2019lvis}. We have not found the condition
+measured, its extent reported, or a cause attributed to it. That claim is of a
+different kind from the ones about ElectroCom61
 above: those range over three identified studies, whereas this one is bounded by
 a reading of a literature rather than by an enumerable set, and should be read as
 such. Its consequences are taken up in

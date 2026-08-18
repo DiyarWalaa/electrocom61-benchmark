@@ -121,10 +121,18 @@ them is a regression, not an improvement.
    Section 8 is where it belongs.
 2. **Section 10 is load-bearing for two promises.** The abstract's closing
    sentence and Section 9's last paragraph both say this material "is released".
-   Before Section 10 existed the paper named no location at all. **Its DOI and
-   release tag are `\fbox` placeholders**, deliberately unmissable in a proof. If
-   the Zenodo DOI is never minted, both of those sentences must be softened
-   rather than left standing.
+   Before Section 10 existed the paper named no location at all. **Both promises
+   are now discharged by a minted DOI, and no `\fbox` placeholder remains
+   anywhere in the document** — filled 2026-08-18, so the softening contingency
+   recorded here is closed. The paper cites the **concept** DOI
+   `10.5281/zenodo.21994825`, not the v1.0 version DOI `10.5281/zenodo.21994826`,
+   because the v1.0 archive contains this paper's source with the placeholders
+   still unfilled; the release carrying the filled text is tagged `v1.0.1`. Do
+   not switch the citation to the version DOI. The sentence was reworded as well
+   as filled: it had promised that "the version this paper describes stays
+   retrievable" from an identifier that floats to the latest version by design,
+   and it now states what the concept DOI does and names the tag as what fixes
+   the version.
 
 ### The abstract — DRAFTED
 

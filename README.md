@@ -1,5 +1,11 @@
 # ElectroCom61 Benchmark Study
 
+[![DOI](https://zenodo.org/badge/1320285883.svg)](https://doi.org/10.5281/zenodo.21994825)
+
+The badge is the **concept** DOI, so it always resolves to the latest archived
+release. The version-specific DOI for v1.0 is `10.5281/zenodo.21994826`; each
+later release gets its own, all reachable from the concept record above.
+
 A controlled benchmark study of the **ElectroCom61** object detection dataset
 (61 electronic component classes, 2121 images, 12937 annotations).
 

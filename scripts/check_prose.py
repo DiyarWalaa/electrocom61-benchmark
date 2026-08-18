@@ -186,14 +186,22 @@ RULES = [
         why="RT-DETR-l leads mAP@50 only; YOLO26s leads mAP@50-95.",
         plan_anchor='Any\n   phrasing like "most accurate" is wrong.',
     ),
+    # INVERTED 2026-08-18, when the Zenodo DOI was minted. This rule used to
+    # assert that Section 10 contained exactly two \fbox placeholders, because
+    # the plan recorded them as deliberately unmissable in a proof. Filling them
+    # correctly failed the rule, which is the drift guard working: the rule had
+    # outlived the decision behind it. It now asserts the opposite -- that no
+    # placeholder survives anywhere -- which is the thing worth protecting once
+    # a DOI is published and cannot be withdrawn.
     dict(
-        rid="availability-placeholders-visible",
-        kind="present",
+        rid="no-placeholder-survives",
+        kind="absent",
         pattern=r"\\fbox\{",
-        where=["10"],
-        count=2,
-        why="The DOI and release tag are deliberately unmissable placeholders.",
-        plan_anchor="Its DOI and\n   release tag are `\\fbox` placeholders",
+        where=None,
+        why="The DOI and release tag are minted and filled; a returning "
+            "placeholder would ship an unfilled availability statement.",
+        plan_anchor="no `\\fbox` placeholder remains\n   anywhere in the "
+                    "document",
     ),
 ]
 

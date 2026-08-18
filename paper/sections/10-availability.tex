@@ -5,17 +5,36 @@
 % table of contents and can be \ref'd; venues that want it unnumbered take
 % \section*, and nothing else in this file depends on which is used.
 %
-% TWO PLACEHOLDERS, BOTH MARKED WITH \fbox SO THEY CANNOT BE MISSED IN A PROOF:
-%   - the Zenodo DOI, being minted from the GitHub repository as of 2026-08-15;
-%   - the archived version tag, which is whatever the minted release points at.
-% The repository URL is NOT a placeholder -- it is the `origin` remote of this
-% working tree, https://github.com/DiyarWalaa/electrocom61-benchmark.
+% THE TWO \fbox PLACEHOLDERS ARE FILLED, 2026-08-18. Nothing in this file is a
+% placeholder any more. The repository URL never was one -- it is the `origin`
+% remote of this working tree, https://github.com/DiyarWalaa/electrocom61-benchmark.
+%
+% THE CONCEPT DOI IS USED, NOT THE VERSION DOI, AND THE CHOICE IS DELIBERATE.
+%   concept (all versions)  10.5281/zenodo.21994825   <- this is the one cited
+%   v1.0 version            10.5281/zenodo.21994826
+% Verified by resolution: 825 redirects to zenodo.org/records/21994826.
+% The v1.0 archive contains this paper's source with the placeholders still
+% UNFILLED, so citing the version DOI would point a reader at an archive that
+% does not contain its own identifier. The concept DOI resolves to the latest
+% version, and v1.0.1 -- tagged immediately after this edit -- is the release
+% whose archive carries the filled text. Do not "correct" this to the version
+% DOI.
+%
+% THE SENTENCE WAS REWORDED, not just filled. It was drafted for a
+% version-specific identifier and promised that "the version this paper
+% describes stays retrievable"; a concept DOI floats to the latest version by
+% design, so the original wording would have promised fixity from an identifier
+% that does not provide it. It now says what the concept DOI does -- resolves to
+% the most recent version and lists every earlier one -- and names the tag as
+% what fixes the version. The promise survives; the mechanism is stated
+% accurately.
 %
 % WHAT THIS SECTION IS LOAD-BEARING FOR. The abstract's closing sentence and
 % Section 9's last paragraph both say this material "is released". Before this
 % section existed, neither had anywhere to point and the paper named no
-% location at all. If the DOI is not minted, those two sentences must be
-% softened rather than left standing -- see the note in notes/writing-plan.md.
+% location at all. Both are now satisfied by a minted DOI rather than by a
+% promise, and the softening contingency recorded in notes/writing-plan.md is
+% discharged.
 %
 % ACCURACY POINTS THAT COST US SOMETHING TO GET RIGHT, so do not smooth them:
 %   - THE DATASET IS NOT REDISTRIBUTED. `data/` is git-ignored; the manifest
@@ -50,9 +69,11 @@
 
 Everything needed to reproduce the results reported here is released in one
 public repository, \url{https://github.com/DiyarWalaa/electrocom61-benchmark},
-archived at a permanent identifier so that the version this paper describes
-stays retrievable independently of the repository's later history:
-\fbox{DOI to be inserted} (Zenodo), release \fbox{tag to be inserted}. The
+archived on Zenodo so that the version this paper describes stays retrievable
+independently of the repository's later history:
+\url{https://doi.org/10.5281/zenodo.21994825}, which resolves to the most recent
+archived version and lists every earlier one, with the release this paper
+describes tagged v1.0.1. The
 analysis code is under the MIT licence; everything derived from the dataset,
 including the split manifest, is under CC BY 4.0, the licence of the dataset it
 comes from, so attribution travels to the dataset's authors as well as to this

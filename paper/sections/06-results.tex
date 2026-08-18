@@ -201,9 +201,10 @@ YOLO26s spends 0.38~ms in postprocessing and RT-DETR-l 0.57~ms, against 1.06 to
 1.08~ms for the three architectures that run NMS --- a ratio of 2.8 between the
 extremes, and an absolute saving of about 0.68~ms for YOLO26s against YOLO11s.
 Table~\ref{tab:latency-breakdown} gives the stage breakdown. At batch size one
-that saving is modest: it is 2.6\% of YOLO26s's end-to-end time against 7.7\% of
-YOLO11s's. NMS cost grows with the number of predictions processed, so the
-advantage would be expected to widen with batch size, but every measurement
+that saving is modest: postprocessing accounts for 2.6\% of YOLO26s's end-to-end
+time against 7.7\% of YOLO11s's. NMS cost grows with the number of predictions
+processed, so the advantage would be expected to widen with batch size, but
+every measurement
 reported here is at batch size one and none of them establishes by how much.
 That is a limit of the protocol chosen in
 Section~\ref{sec:efficiency-measurement}, not a finding about the architectures.

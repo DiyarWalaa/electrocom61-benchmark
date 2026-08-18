@@ -74,11 +74,11 @@ than a gradient. This is what distinguishes the pattern from class imbalance,
 which is the reading the ordering first invites. Where a long tail is the
 concern, rarity is defined by how many training images a category appears in, and
 it arises from the natural frequency of categories in images
-\citep{gupta2019lvis}; the fifteen classes here are among the most heavily
-annotated in the dataset. An imbalanced dataset produces a smooth decline in
-test representation as class frequency falls, and cannot
-produce a discontinuity between adjacent ranks in which the more frequent side is
-the empty one.
+\citep{gupta2019lvis}. Nothing of the kind is at work here: the classes that
+cannot be evaluated are among the most heavily annotated in the dataset. An
+imbalanced dataset produces a smooth decline in test representation as class
+frequency falls, and cannot produce a discontinuity between adjacent ranks in
+which the more frequent side is the empty one.
 
 Fifteen of the 61 classes hold zero instances in both the validation and the test
 partition, and 22 hold fewer than five test instances. A class with no test

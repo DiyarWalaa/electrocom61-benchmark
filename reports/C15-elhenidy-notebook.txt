@@ -1,0 +1,297 @@
+================================================================================
+CHECK    : C15 - Elhenidy's released training notebook, read end to end
+QUESTION : What does the training code released with [ELHENIDY] actually run, and what does
+           its log say about the arguments passed, the checkpoint loaded, the partition
+           evaluated, and the class denominator behind its mAP?
+SOURCES  : C:\research\pdfs\yolov12-waste-train.ipynb, the Kaggle notebook linked in
+           [ELHENIDY]'s abstract (kaggle.com/code/alielhenidy/yolov12-waste-train).
+           nbformat 4.5, 6 code cells, 0 markdown cells. Cell 4 carries 234 outputs.
+           Read as JSON; not copied into the repository.
+           Compared against reports/C02-results-tables.txt (TABLE I as transcribed from a
+           300 dpi render) and against tables/t1_unevaluable_classes.tex.
+VERDICT  : DIFFERS
+ONE LINE : Every claimed value re-derives from the file, and the notebook loads
+           yolov12n.pt at 2.5 M parameters while the published table row is YOLOv12S at
+           19.7 M -- so the released code does not run the architecture the table names.
+AFFECTS  : Section 5.2's claim that the training configuration cannot explain a difference;
+           Section 6.3's phrase "for the same architecture"; Section 7.1's four unstated
+           properties; reports/C14-map-denominator.txt, whose first question this answers.
+RUN      : 2026-08-18 13:19, commit 2757f62
+================================================================================
+
+FINDINGS
+
+N1 -- WHAT THE TRAINING CALL PASSES. CONFIRMED.
+
+The notebook is six code cells. Verbatim:
+
+  cell 0   from distutils.dir_util import copy_tree
+           from_dir = '/kaggle/input/electrocom61'
+           to_dir = '/kaggle/working'
+           copy_tree(from_dir,to_dir)
+
+  cell 1   from distutils.dir_util import copy_tree
+           from_dir = '/kaggle/input/yolov12'
+           to_dir = '/kaggle/working/ElectroCom61 A Multiclass Dataset for Detection of
+                     Electronic Components/ElectroCom-61_v2'
+           copy_tree(from_dir,to_dir)
+
+  cell 2   %pip install ultralytics
+           import ultralytics
+           ultralytics.checks()
+
+  cell 3   from ultralytics import YOLO
+           model = YOLO("/kaggle/working/ElectroCom61 A Multiclass Dataset for Detection of
+                         Electronic Components/ElectroCom-61_v2/yolov12n.pt")
+
+  cell 4   model.train(data='/kaggle/working/ElectroCom61 A Multiclass Dataset for Detection
+                        of Electronic Components/ElectroCom-61_v2/data.yaml', epochs=100)
+
+  cell 5   (empty)
+
+model.train() is passed exactly TWO arguments: data= and epochs=100. Nothing else. The
+`engine/trainer:` line in cell 4 output 0 prints the resolved configuration, and every one
+of the settings the manuscript attributes to this study's prior work appears there as an
+Ultralytics default rather than as a user choice: batch=16, imgsz=640,
+weight_decay=0.0005, seed=0, deterministic=True. So do lr0=0.01, momentum=0.937,
+patience=100, split=val, optimizer=auto and pretrained=True.
+
+N2 -- VERSIONS AND HARDWARE. CONFIRMED, all four exactly as claimed.
+
+N3 -- THE OPTIMIZER LINES. CONFIRMED. Quoted exactly, from cell 4:
+
+  "optimizer: 'optimizer=auto' found, ignoring 'lr0=0.01' and 'momentum=0.937' and
+   determining best 'optimizer', 'lr0' and 'momentum' automatically..."
+
+  "optimizer: AdamW(lr=0.000154, momentum=0.9) with parameter groups 113 weight(decay=0.0),
+   120 weight(decay=0.0005), 119 bias(decay=0.0)"
+
+The lr0=0.01 printed on the trainer line was NOT the learning rate used. Ultralytics
+overrode it and trained at 0.000154, a factor of 65 lower. This closes an item previously
+recorded as unrecoverable.
+
+N4 -- THE MODEL LOADED. THE CLAIM IS CONFIRMED AND IS THE MOST CONSEQUENTIAL FINDING.
+
+The checkpoint is yolov12n.pt -- the NANO variant. Two summaries print:
+
+  at load    "YOLOv12n summary: 272 layers, 2,549,991 parameters, 2,549,975 gradients,
+              6.1 GFLOPs"
+  fused      "YOLOv12n summary (fused): 159 layers, 2,538,671 parameters, 0 gradients,
+              5.9 GFLOPs"
+
+The fused figures match the claim exactly. The published TABLE I row is labelled "YOLOv12S"
+and gives 292 layers and 19.7 M parameters. The notebook's model is neither: 2.5 M
+parameters against 19.7 M is a factor of 7.8, and no fusion convention accounts for it --
+C04 established that fusion moves a parameter count by at most 5.1% in this study's own
+measurements.
+
+N5 -- WHICH PARTITION. CONFIRMED. No test evaluation exists anywhere.
+
+  split=test        0 occurrences   model.val   0 occurrences
+  .val(             0 occurrences   .predict(   0 occurrences
+  split=val         1 occurrence, on the trainer line
+
+No source cell references a test split. Only two directories were scanned: train (1478
+images) and valid (438 images). The bare word "test" occurs 120 times in the whole file and
+every one is a destination path in cell 0's copy_tree listing -- the test split's files were
+copied to the working directory and never passed to an evaluation. The final validation
+line reports 438 images, which is the validation partition.
+
+NO REPORTED FIGURE IN THIS NOTEBOOK IS A TEST-SET SCORE.
+
+N6 -- CLASS COVERAGE. CONFIRMED, AND IT MATCHES THIS STUDY'S OWN AUDIT EXACTLY.
+
+nt_per_class has 61 entries. 16 are zero, 45 are non-zero. ap_class_index has 45 entries and
+is exactly the complement of the 16 zeros, which is an independent check on the count.
+
+The 16 zero-instance classes, by name, from the notebook's own `names` mapping:
+
+  idx  3  9-Volt-Battery                  idx 36  LDR-Sensor
+  idx  8  Bluetooth-Module                idx 37  LED-Light
+  idx 12  Buzzer                          idx 39  MLC-Capacitor
+  idx 17  ESP32                           idx 42  Motor-Driver
+  idx 24  Gas-Sensor                      idx 44  OLED-Display
+  idx 26  High-Voltage-Ceramic-Capacitor  idx 46  Push-Switch
+  idx 33  Inductor                        idx 47  RFID-Scanner
+  idx 35  LCD-Display                     idx 54  Sonar-Sensor
+
+Compared by name against tables/t1_unevaluable_classes.tex, which lists 15 classes:
+  in the notebook but not in Table 1 : ESP32
+  in Table 1 but not in the notebook : none
+The notebook's 16 is exactly the manuscript's 15 plus ESP32. Section 5.4 states "The two
+figures differ by a single class, ESP32", giving 45 evaluable on validation and 46 on test
+under the published split. The notebook validates on the validation partition and reaches
+45 -- the same figure, from a different group's released log, on the same published split.
+
+N7 -- THE DENOMINATOR. CONFIRMED, with the caveat the brief requires.
+
+  maps array length                 : 61
+  reported mAP50-95 (results_dict)  : 0.582854
+  mean of the 45 non-zero entries   : 0.582854
+  mean of all 61 entries            : 0.582853
+
+THE ARRAY IS 61 LONG, NOT 62. There is no background term in the average. That is what this
+check establishes and it is established directly, from a released log rather than by
+reading framework source.
+
+THE TWO MEANS AGREE BY CONSTRUCTION AND THAT AGREEMENT IS NOT INDEPENDENT EVIDENCE. All 16
+zero-instance entries carry the identical value 0.58285, which is the overall mean used as
+a placeholder. A mean over 45 real values and a mean over those 45 plus 16 copies of their
+own mean must agree; the sixth-decimal difference is rounding in the placeholder. What the
+comparison shows is that the placeholder convention is what it appears to be. What rules
+out a background class is the LENGTH.
+
+N8 -- FINAL METRICS AGAINST THE PUBLISHED TABLE.
+
+Final validation line, cell 4 output 232:
+  "all        438       2600      0.842       0.85      0.891      0.583"
+and to full precision from results_dict:
+  precision 0.8418057132621647   recall 0.849683959265091
+  mAP50     0.8905996187171579   mAP50-95 0.5828538073816025
+
+Set beside [ELHENIDY] TABLE I's YOLOv12S row as transcribed in C02:
+
+| Quantity        | TABLE I, YOLOv12S row | This notebook        | Match?           |
+|-----------------|-----------------------|----------------------|------------------|
+| Layers          | 292                   | 272 unfused /        | NO, either way   |
+|                 |                       | 159 fused            |                  |
+| Parameters (M)  | 19.7                  | 2.55 unfused /       | NO, factor ~7.8  |
+|                 |                       | 2.54 fused           |                  |
+| mAP@0.5         | 89.1 +/- 0.4          | 89.1                 | YES on the       |
+|                 | (88.7-89.5)           |                      | central value    |
+| Precision       | 82.1 +/- 0.3          | 84.2                 | NO               |
+|                 | (81.8-82.4)           |                      |                  |
+| Recall          | 68.5 +/- 0.5          | 85.0                 | NO               |
+|                 | (68.0-69.0)           |                      |                  |
+
+One of five quantities matches. Per the brief, this report does not conclude that this
+notebook produced the published table, and does not speculate about what did. The
+comparison is reported and stopped.
+
+N9 -- RUN PROVENANCE.
+
+  papermill start_time   2025-06-30T08:02:58.628181
+  papermill end_time     2025-06-30T09:06:11.46215
+  papermill duration     3792.833969 s (1 h 03 m 13 s), whole notebook
+  cell 4 duration        3678.458663 s (1 h 01 m 18 s), the training call alone
+  printed wall-clock     "100 epochs completed in 1.013 hours."
+  patience               100, from the trainer line
+  papermill exception    None; every cell status "completed"
+
+EARLY STOPPING COULD NOT HAVE TRIGGERED. patience=100 equals the epoch budget, so firing it
+would require 100 epochs without improvement after the best epoch, which cannot occur inside
+100 epochs. The log carries no EarlyStopping message and states that all 100 epochs
+completed. The full budget ran.
+
+EVIDENCE
+
+| Item                          | Cell | Where          | Value as printed                 |
+|-------------------------------|------|----------------|----------------------------------|
+| training call arguments       | 4    | source         | data=..., epochs=100             |
+| checkpoint loaded             | 3    | source         | .../yolov12n.pt                  |
+| Ultralytics / Python / torch  | 2    | output 0       | 8.3.160 / 3.11.11 / 2.6.0+cu124  |
+| GPU                           | 2    | output 0       | Tesla P100-PCIE-16GB, 16269MiB   |
+| same, repeated at train start | 4    | output 0       | identical string                 |
+| resolved config               | 4    | output 0       | engine/trainer: ... batch=16,    |
+|                               |      |                | imgsz=640, seed=0,               |
+|                               |      |                | deterministic=True,              |
+|                               |      |                | weight_decay=0.0005,             |
+|                               |      |                | patience=100, split=val,         |
+|                               |      |                | optimizer=auto, lr0=0.01         |
+| nc override                   | 4    | output 2       | Overriding model.yaml nc=80      |
+|                               |      |                | with nc=61                       |
+| unfused summary               | 4    | output 2       | YOLOv12n summary: 272 layers,    |
+|                               |      |                | 2,549,991 parameters, 6.1 GFLOPs |
+| optimizer=auto notice         | 4    | output ~11     | see N3, quoted verbatim          |
+| optimizer chosen              | 4    | output ~11     | AdamW(lr=0.000154, momentum=0.9) |
+| train scan                    | 4    | output 5       | train/labels... 1478 images      |
+| val scan                      | 4    | output 9       | valid/labels... 438 images       |
+| last epoch line               | 4    | output 230     | all 438 2600 0.849 0.854 0.898   |
+|                               |      |                | 0.579                            |
+| epochs completed              | 4    | output 230     | 100 epochs completed in 1.013    |
+|                               |      |                | hours.                           |
+| fused summary                 | 4    | output 230     | YOLOv12n summary (fused): 159    |
+|                               |      |                | layers, 2,538,671 parameters,    |
+|                               |      |                | 5.9 GFLOPs                       |
+| final validation line         | 4    | output 232     | all 438 2600 0.842 0.85 0.891    |
+|                               |      |                | 0.583                            |
+| nt_per_class, maps, names,    | 4    | output 233,    | DetMetrics repr; see N6, N7      |
+| ap_class_index, results_dict  |      | execute_result |                                  |
+
+ELISION CHECK ON THE ARRAYS N6 AND N7 REST ON. The DetMetrics repr contains 28 occurrences
+of "...", which is numpy eliding long arrays; an elided array would make every count and
+mean above wrong. Checked directly: neither the maps text nor the nt_per_class text contains
+"...", and both parse to exactly 61 values. The elisions are in curves_results.
+
+SEARCH TERMS USED
+
+Over the whole file as JSON (source, outputs, per-cell metadata, notebook metadata):
+  split=test, split='test', split="test", model.val, \.val\(, \.predict\(, split=val,
+  \btest\b, \bval\b, EarlyStopping, early stopping, best epoch, epochs completed,
+  Results saved, patience=, optimizer, fused, summary, AdamW, Scanning
+
+Zero-hit terms, recorded so the negatives are traceable: split=test, model.val, .val(,
+.predict(, EarlyStopping, "early stopping", "best epoch".
+
+Arrays extracted by bracket-balanced parse of the DetMetrics repr rather than by line
+regex, because numpy wraps them across lines.
+
+COULD NOT DETERMINE
+
+What produced the published TABLE I. The notebook matches the published mAP@0.5 on its
+central value and differs on precision, recall, layers and parameters. Nothing in the file
+states a relationship to the table, and this report does not infer one.
+
+Whether any other run exists. The notebook is a single papermill execution with one
+training call; the paper links this one notebook. Nothing here speaks to runs not released.
+
+The variance estimates in TABLE I. This notebook is one run and reports no standard
+deviation or interval, which is consistent with C07's finding that the paper states no
+number of runs, but does not explain where the printed intervals came from.
+
+IMPACT ON THE MANUSCRIPT
+
+Nothing in the manuscript was changed on the strength of this check; the brief said report
+first. Two questions were asked specifically.
+
+SECTION 5.2's CLAIM DOES NOT SURVIVE UNQUALIFIED, AND SHOULD BE NARROWED. It reads: "If the
+results reported here differ from published ones, the training configuration cannot be
+offered as the explanation." That rests on this study having copied seven settings from the
+prior papers, one of which is lr0=0.01. The released code passes no learning rate at all,
+leaves optimizer=auto, and Ultralytics then explicitly ignores lr0=0.01 and trains AdamW at
+0.000154. This study sets lr0=0.01 and means it. So for at least this one prior study, the
+learning rate actually used differs from this study's by a factor of 65, and the training
+configurations are not the same in the respect the sentence needs them to be. The claim is
+still true of the values the PAPERS STATE -- both state lr0 0.01 and AdamW, and this study
+reproduces both -- but the released code shows the stated value was not the operative one.
+The honest repair is to scope the sentence to the stated configuration and note what the
+released code shows, which is a stronger point than the one the sentence currently makes:
+it is a concrete instance of the reporting gap Section 7.1 argues for.
+
+SECTION 6.3's "FOR THE SAME ARCHITECTURE" IS NOT SAFE AS IT STANDS. The sentence sets this
+study's YOLOv12s measurement beside the published 89.1% "for the same architecture". The
+published row is labelled YOLOv12S at 19.7 M parameters; the released code loads
+yolov12n.pt and prints 2.5 M. Those are different architectures, and the difference is a
+factor of 7.8 in parameters, not a fusion or counting convention. Three readings are
+available and the file does not choose between them: the table's label is right and the
+notebook is a different run; the notebook is the run behind the table and the label is
+wrong; or neither. What can be said without choosing is narrower and still useful -- that
+the released training code loads the nano checkpoint while the table reports the small
+variant, which is exactly the kind of unstated condition Section 7.1 lists. Section 6.3
+should either drop "for the same architecture" or carry the qualification.
+
+ON SECTION 7.1, this check strengthens two of the four properties rather than changing them.
+The evaluation partition is now settled for this study rather than merely unstated: the
+released code evaluates on validation and never on test. The framework release is settled
+too: 8.3.160. Both were listed as unstated in the PAPER, which remains true; the notebook is
+a separate object and 7.1 should keep saying what the paper does and does not state.
+
+ON C14. N7 answers that report's first question -- whether a background class can enter the
+mAP average -- from a released log of the framework in operation: the maps array is 61 long
+for a 61-class dataset, so no background term is present. C14 is updated accordingly and no
+longer needs the 8.4.115 sdist for the denominator question. Its second question, what the
+printed "classes evaluated" count enumerates, is also answered here in substance: 45 is the
+count of classes with a non-zero nt_per_class, i.e. classes with instances in the evaluation
+set. Note the version difference -- this log is 8.3.160 and this study ran 8.4.115 -- so the
+source read remains the way to establish the behaviour for the exact release this study
+used, if that is ever needed.

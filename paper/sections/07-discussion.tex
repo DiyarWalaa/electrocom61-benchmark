@@ -217,8 +217,11 @@ framework actually scored.
 The third is the cheapest and the most telling, because a framework that computes
 mAP already has the number. Ultralytics reports that count on every evaluation it
 runs, and on the published split it reads 45 on validation and 46 on test against
-a dataset described throughout as having 61 classes. None of the three studies
-reports the count, and none states which framework release produced its figures.
+a dataset described throughout as having 61 classes. Where a training log has
+been released it is visible there: the notebook linked from one of the benchmark
+studies records 45 classes carrying validation instances and 16 carrying none
+\citep{yolov12notebook}. None of the three studies reports the count, and none
+states which framework release produced its figures.
 Reporting it beside the score --- as Section~\ref{sec:eval-protocol} does here
 --- would have made
 the defect self-evident without anyone looking for it.

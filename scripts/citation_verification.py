@@ -118,6 +118,7 @@ TIER1 = [
     "joeres2025datasail",
     "figueiredo2024leakage",  # group-aware splitting applied to detection
     "gupta2019lvis",          # long-tail rarity; the acknowledged complement
+    "yolov12notebook",        # what the released training code actually runs
 ]
 
 # Tier 0: checked against the source already, so no re-reading is needed.
@@ -153,6 +154,18 @@ STATUS_TEXT = {
 }
 
 VERIFICATION = {
+    "yolov12notebook": (
+        FULL_TEXT,
+        "Read in full, August 2026 -- all six source cells and all 234 outputs "
+        "of the training cell, as JSON rather than as a render. Full derivation "
+        "in reports/C15-elhenidy-notebook.txt. Cited in 5.2 for the optimizer "
+        "override (AdamW at lr 0.000154 while the supplied 0.01 is reported "
+        "ignored) and in 7.2 for the class count the framework prints (45 "
+        "classes with validation instances, 16 with none). NOT CITED, AND MUST "
+        "NOT BE, FOR WHAT PRODUCED THE PUBLISHED TABLE: of the five quantities "
+        "comparable with that paper's TABLE I row for YOLOv12S, only mAP@0.5 "
+        "matches. It has no author field of its own; the entry records the "
+        "publishing account, taken from the URL."),
     "figueiredo2024leakage": (
         FULL_TEXT,
         "Read in full, August 2026. Cited in 2.3 and 4.2 for a construction, "

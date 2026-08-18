@@ -111,7 +111,8 @@ the P100 GPU provided by Kaggle, together with the three replicated
 architectures. Both prior studies of this dataset state these values
 \citep{yolov12paper,yolov13paper}.
 The choice to copy them is deliberate. If the results reported here differ from
-published ones, the training configuration cannot be offered as the explanation.
+published ones, the configuration those studies state cannot be offered as the
+explanation.
 One stated condition is not replicated here: the later study reports a 3-fold
 cross-validation, and every run in this study trains once on a single partition.
 
@@ -146,6 +147,11 @@ The optimiser was specified explicitly rather than left at the Ultralytics
 default, \texttt{optimizer=\allowbreak"auto"}, which selects an optimiser and
 silently overrides the initial learning rate supplied by the user. A
 configuration that appears to specify a learning rate may therefore not use it.
+That is not hypothetical. The training notebook released with one of the
+benchmark studies passes only the dataset path and an epoch count, leaving every
+other setting at its default, and its log records the default optimiser selecting
+AdamW at an initial learning rate of 0.000154 while reporting that the supplied
+value of 0.01 was ignored \citep{yolov12notebook}.
 
 \subsection{A configuration that is uniform but not neutral}
 \label{sec:rtdetr-lr}

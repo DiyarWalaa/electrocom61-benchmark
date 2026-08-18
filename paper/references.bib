@@ -28,6 +28,42 @@
   doi       = {10.1109/ICEEM66692.2025.11225036},
 }
 
+% THE ARTIFACT, NOT THE STUDY. Keyed yolov12notebook rather than by author-year,
+% following this file's convention for the objects this paper examines directly
+% -- yolov12paper, yolov13paper, yolov13repo, electrocom61, ultralytics -- and
+% parallel to yolov13repo, which is likewise an artifact of a study rather than
+% the study. It is cited in 5.2 and 7.2 and nowhere else.
+%
+% WHAT IT IS CITED FOR: what the released code RUNS. Its log records that
+% model.train() is passed only a dataset path and an epoch count; that the
+% default optimizer=auto selected AdamW at lr 0.000154 while reporting the
+% supplied 0.01 ignored; and that 45 classes carried validation instances while
+% 16 carried none. Full derivation in reports/C15-elhenidy-notebook.txt.
+%
+% WHAT IT IS NOT CITED FOR, AND MUST NOT BE: what produced the published table.
+% Of the five quantities comparable with that paper's TABLE I row for YOLOv12S,
+% only the mAP at IoU 0.5 matches; precision, recall, layer count and parameter
+% count do not. Nothing establishes a relationship between this run and that
+% table, and no sentence in the manuscript asserts one.
+% (No "at" sign appears in this comment block, deliberately -- see the note above
+% the ultralytics entry: BibTeX starts a new entry at every one, leading % or
+% not, and doing it here cost one build already.)
+%
+% NO AUTHOR FIELD EXISTS. The notebook's metadata carries kaggle, kernelspec,
+% language_info and papermill blocks and no author, owner or creator key. The
+% name below is the publishing ACCOUNT, taken from the URL, and is recorded as
+% such rather than as a personal attribution.
+@misc{yolov12notebook,
+  author       = {{Elhenidy}},
+  title        = {{YOLOv12\_Waste\_train}},
+  year         = {2025},
+  howpublished = {Kaggle notebook,
+                  \url{https://www.kaggle.com/code/alielhenidy/yolov12-waste-train}},
+  note         = {Linked in the abstract of \citet{yolov12paper}; run recorded
+                  2025-06-30},
+  urldate      = {2026-08-18},
+}
+
 % INDEXED AND CONFIRMED, 2026-08-15. Supersedes the earlier in-press entry.
 % Source: IEEE Xplore document 11602786. Conference held 19-21 April 2026.
 % Full given names are the Xplore record's.

@@ -1,0 +1,7 @@
+published_model,our_model,source,table_location,published_layers,measured_layers,published_params_m,measured_fused_m,measured_unfused_m,ratio_pub_over_fused,diff_m,explained_by_fusion
+YOLOv9s,yolov9s,yolov12paper,Table I,930,486,60.8,7.19,7.31,8.46,+53.61,no
+YOLOv11s,yolo11s,yolov12paper,Table I,272,239,2.5,9.44,9.45,0.26,-6.94,no
+YOLOv12S,yolo12s,yolov12paper,Table I,292,352,19.7,9.25,9.28,2.13,+10.45,no
+YOLOv9s,yolov9s,yolov13paper,Table I,930,486,60.8,7.19,7.31,8.46,+53.61,no
+YOLOv11s,yolo11s,yolov13paper,Table I,272,239,2.5,9.44,9.45,0.26,-6.94,no
+YOLOv12S,yolo12s,yolov13paper,Table I,292,352,19.7,9.25,9.28,2.13,+10.45,no

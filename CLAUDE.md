@@ -28,6 +28,18 @@ Prior work reports contradictory results; we produce a controlled benchmark.
 
 &#x20; p50 and p95, state batch size.
 
+\- ALWAYS REBUILD `paper/main.pdf` AFTER ANY EDIT, including one-word ones.
+
+&#x20; Four passes from cold: `powershell -File scripts\build_paper.ps1 -Clean`.
+
+&#x20; Confirm zero undefined references, zero undefined citations and zero
+
+&#x20; overfull boxes before reporting the edit as done. An edit that has not
+
+&#x20; been built is not finished: a broken cross-reference, a dropped brace
+
+&#x20; or an overfull box is invisible in the .tex and obvious in the build.
+
 
 
 \## How to work with me

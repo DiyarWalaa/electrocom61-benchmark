@@ -19,6 +19,8 @@ AFFECTS  : Section 2.4; any comparison of this study's per-class results against
            and the basis on which a published mAP over ElectroCom61 can be compared with one
            computed here.
 RUN      : 2026-08-17 15:13, commit 00d8aae
+           Corrected 2026-08-18 14:03 at commit bfbf12c; see CORRECTIONS at the foot of this
+           file. The verdict is unchanged.
 ================================================================================
 
 FINDINGS
@@ -191,11 +193,46 @@ legible at 300 dpi but no paper prints a count, and counting tick labels off a r
 62-label axis is not a basis for a number this study would cite.
 
 Whether the mAP figures in any of the three were averaged over 61 classes or over 61 classes
-plus a background class. No paper states it. This is the substantive gap the check was
-looking for, and it is a genuine NOT STATED in all three sources.
+plus a background class. No paper states it, and that remains a genuine NOT STATED in all
+three sources. What has since been settled is the framework's behaviour rather than the
+papers' reporting: no background term enters the mAP average at all, so the question is now
+only how many of the 61 each paper's evaluation reached. See CORRECTIONS below and
+reports/C15-elhenidy-notebook.txt.
 
 Which partition each headline number was computed on. [SAYEEDI] names two partitions;
 [ELHENIDY] and [GAIB] name none.
+
+CORRECTIONS
+
+This file was corrected on 2026-08-18. The verdict is unchanged, every finding above about
+what the three papers do and do not print is unchanged, and no manuscript sentence rested on
+what was removed. One inference was struck:
+
+  1. THE BACKGROUND ROW DID NOT LICENSE THE DENOMINATOR CLAIM. The IMPACT section argued
+     that because all three papers publish confusion matrices carrying a background row and
+     column, a published mAP@50 on ElectroCom61 and one computed here are "not known to
+     share a denominator". That does not follow. The confusion matrix is built at nc+1 so
+     that unmatched predictions and missed ground truths have somewhere to go; the mAP is
+     computed on a separate path and never sees the extra row. The two are independent, and
+     a background row in a published figure says nothing about the average beside it.
+
+     THE OBSERVATION IS KEPT AND ONLY THE CONCLUSION REMOVED. That the matrices carry a
+     background row and column is what is printed, and it stays on the record.
+
+     WHAT SETTLED IT: reports/C15-elhenidy-notebook.txt, which reads the training log
+     released with [ELHENIDY]. The DetMetrics object the framework returned carries a maps
+     array 61 long for a 61-class dataset -- not 62 -- and its ap_class_index of 45 entries
+     is exactly the complement of the 16 classes with no instances. That is the framework's
+     own output on this dataset, which is stronger evidence for this question than reading
+     the code that produces it. Note the version: that log is Ultralytics 8.3.160 and this
+     study ran 8.4.115, an assumption C15 names rather than buries.
+
+     WHAT THE STRUCK INFERENCE WAS SUPPORTING SURVIVES INTACT, which is why the verdict does
+     not move. The reason a published mAP and one computed here may not be comparable is
+     that none of the three papers states the class count its own evaluation reached. That
+     rests on direct reading of the three papers, is established, and is the half the
+     manuscript would ever rely on. The background-row half was the weaker of the two and is
+     now known to be wrong.
 
 IMPACT ON THE MANUSCRIPT
 
@@ -209,10 +246,17 @@ constrain what a comparison against prior work can mean:
     reports is therefore the first, and has nothing to be compared against rather than
     something it agrees or disagrees with. Say the former.
 
-  - None of the three states the number of classes its mAP was averaged over, and all three
-    use confusion matrices that carry a background row and column. A published mAP@50 on
-    ElectroCom61 and one computed here are therefore not known to share a denominator. That
-    is a fact about what the sources omit, and it belongs beside any table that places a
+  - None of the three states the number of classes its mAP was averaged over. That is a
+    fact about what the sources omit, and it belongs beside any table that places a
     published figure next to one of ours. It compounds the partition problem: Sayeedi
     evaluates on "the validation and testing sets" without separating them, and neither
     benchmark paper names a partition at all.
+
+    All three also publish confusion matrices that carry a background row and column. That
+    is recorded above because it is what is printed, and NOTHING ABOUT THE mAP DENOMINATOR
+    FOLLOWS FROM IT. The matrix is built at nc+1 to account for unmatched predictions and
+    missed ground truths; the mAP is computed on a separate path and never sees the extra
+    row. reports/C15-elhenidy-notebook.txt settles this from a released log: the maps array
+    returned by the framework is 61 long for a 61-class dataset, and the 45 classes carrying
+    an AP are exactly the complement of the 16 carrying no instances. An earlier version of
+    this file drew the opposite inference; see CORRECTIONS below.

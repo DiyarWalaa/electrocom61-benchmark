@@ -1,0 +1,16 @@
+result,check,detail
+PASS,doubled-word,no doubled word in 12 file(s)
+PASS,single-homes,0.24 ms latency noise floor: 0.24 present in 5.5
+PASS,single-homes,"0.0515 margin, 95 excluded low-informati: 0.0515, 95, 23 present in 3.7"
+PASS,single-homes,"95.9% / 84.9% published disagreement: 95.9, 84.9 present in 1"
+PASS,single-homes,"95.9% / 84.9% published disagreement: 95.9, 84.9 present in 2.1"
+PASS,deviation-phrasing,"found 3 in abstract x1, 1 x1, 9 x1"
+PASS,deviation-bare-form,absent as required
+PASS,section9-otherwise-holds,found 1 in 9 x1
+PASS,section9-contradicted-form,absent as required
+PASS,tabulate-wording,found 1 in 1 x1
+PASS,tabulate-loose-form,absent as required
+PASS,quarter-never-bare,absent as required
+PASS,abstract-names-no-model,absent as required
+PASS,most-accurate-forbidden,absent as required
+PASS,availability-placeholders-visible,found 2 in 10 x2

@@ -18,6 +18,18 @@
 % concedes, and hedging each concession costs the credibility the concession
 % was meant to buy.
 %
+% THE FIVE-TO-TEN FIGURE IS HOMED HERE, NOT IN 4.7. The cross-referencing
+% paragraph sends the reader to 4.7 for four limitations of the split, and the
+% obvious tidy is to move this figure there with them. Do not, without checking
+% 4.7 first: as of 2026-08-18 that subsection states the lower bound and its
+% meaning ("Five instances is the threshold at which a class becomes
+% measurable") and otherwise says only "very few images each". The RANGE --
+% between five and ten test instances -- appears nowhere else in the paper, so
+% folding the sentence into the cross-reference would delete a figure rather
+% than relocate it. The sentence used to say so in the prose; that was the
+% paper explaining its own bookkeeping to the reader, and the note belongs here
+% instead.
+%
 % THE GUNDERSEN CLAUSE, ADDED 2026-08-17, IS THE ONE THING HERE THAT COULD BE
 % READ AS HEDGING, AND IS NOT. The rule above was weighed against it.
 %
@@ -90,9 +102,8 @@ is described: the contamination figures are floors rather than estimates, the
 rescued classes are measurable rather than well measured, the figure at the
 loosest threshold is not independent of the grouping that produced it, and the
 threshold is established for one seed
-(Section~\ref{sec:correction-limits}). One figure belongs here because it appears
-nowhere else in the paper: the fifteen rescued classes hold between five and ten
-test instances each.
+(Section~\ref{sec:correction-limits}). The fifteen rescued classes hold between
+five and ten test instances each.
 
 The confidence threshold used at evaluation is fixed by the Ultralytics release
 rather than stated explicitly in the configuration

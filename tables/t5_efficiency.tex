@@ -1,6 +1,6 @@
 \begin{table}[t]
   \centering
-  \caption{Efficiency, one row per architecture. Accuracy in Table~\ref{tab:main-results} is reported per split because it depends on which split a model was trained and evaluated on; latency does not, so each architecture is timed once and its two runs are averaged here. The pair gap is the difference between those two runs and is this rig's repeatability: the largest is 0.24\,ms for yolo11s, so any latency difference smaller than that is not a difference. Complexity is measured after \texttt{model.fuse()}.}
+  \caption{Efficiency, one row per architecture. Accuracy in Table~\ref{tab:main-results} is reported per split because it depends on which split a model was trained and evaluated on; latency does not, so each architecture is timed in both of its runs and the two are averaged here. The pair gap is the difference between those two runs and is this rig's repeatability: the largest is 0.24\,ms for yolo11s, so any latency difference smaller than that is not a difference. Complexity is measured after \texttt{model.fuse()}.}
   \label{tab:efficiency}
   \begin{tabular}{lrrrrrr}
     \toprule

@@ -427,3 +427,22 @@ the data:
   archived unmodified for the reasons given in *Reference material*. Its
   copyright rests with its author under whatever licence the original Kaggle
   notebook carries; that licence has not been recorded here yet.
+
+### The Zenodo record says MIT, and that is not the whole picture
+
+`.zenodo.json` in the repository root carries `"license": "MIT"`. Zenodo's
+metadata schema has a **single** licence field, so it cannot express the split
+above, and MIT is the right value to put in it because the archived record is
+primarily software.
+
+Anyone relying on the Zenodo record alone would therefore see one licence where
+this repository grants two: **MIT** for the analysis code in `scripts/`, and
+**CC BY 4.0** for everything derived from the dataset — which includes the split
+manifests and everything under `runs/`. Section 10 of the paper states the same
+split, and it governs. The CC BY attribution to the ElectroCom61 authors travels
+with the derived material regardless of what the Zenodo field says.
+
+`.zenodo.json` exists because Zenodo reads it when a GitHub release is archived.
+Without it the record would be titled from the repository name and authored from
+the GitHub username. A published DOI cannot be withdrawn, so the file has to be
+correct **before** the first release rather than fixed after one.

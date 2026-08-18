@@ -1,0 +1,31 @@
+{
+  "upload_type": "software",
+  "access_right": "open",
+  "license": "MIT",
+  "title": "ElectroCom61 benchmark: a dataset audit, a corrected partition, and a controlled detector benchmark",
+  "creators": [
+    {
+      "name": "Naji, Diyar Walaa",
+      "orcid": "0009-0003-0895-9494",
+      "affiliation": "University of Technology - Iraq, Baghdad, Iraq"
+    }
+  ],
+  "description": "Code, data and run records for an audit of the ElectroCom61 object detection dataset, a corrected train/validation/test partition released as a manifest, and a controlled benchmark of five detectors on both partitions. Includes the split manifest, the verification scripts, per-run records, and the scripts that generate every figure and table in the accompanying paper.",
+  "keywords": [
+    "object detection",
+    "dataset audit",
+    "data splitting",
+    "reproducibility",
+    "electronic waste",
+    "ElectroCom61",
+    "YOLO"
+  ],
+  "related_identifiers": [
+    {
+      "identifier": "10.1016/j.dib.2025.111331",
+      "relation": "isDerivedFrom",
+      "resource_type": "dataset",
+      "scheme": "doi"
+    }
+  ]
+}
